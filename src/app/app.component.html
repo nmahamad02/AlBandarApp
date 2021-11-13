@@ -1,0 +1,457 @@
+<header>
+  <mat-toolbar color="warn" style="background-color: rgb(2, 46, 82);" class="example-toolbar">
+    <button mat-icon-button class="btn btn-primary" style="background-color: rgb(2, 46, 82); border: rgb(2, 46, 82);" (click)="isExpanded = !isExpanded">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span>&nbsp;&nbsp;<img src="../favicon.ico" height="35px"  width="35px">&nbsp;&nbsp;&nbsp;</span>
+    <span><h1 class="example-app-name">IFA-Resort</h1></span>
+    <span class="example-spacer"></span>
+    <!-- 
+    <ng-container>
+      <mat-icon>language</mat-icon>
+      <button class="btn btn-primary btn-lg" style="background-color: rgb(2, 46, 82); border: rgb(2, 46, 82);" mat-button [matMenuTriggerFor]="menu">
+        {{siteLanguage}}
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu" style="background-color: rgb(2, 46, 82);">
+        <a mat-menu-item href="/en">English</a>
+        <a mat-menu-item href="/fr">Français</a>
+        <a mat-menu-item href="/ar">العربية</a> 
+      </mat-menu>
+    </ng-container> 
+    -->
+    <ng-container *ngIf="contentBool">
+      <mat-icon>account_circle</mat-icon>
+      <button class="btn btn-primary btn-lg" style="background-color: rgb(2, 46, 82); border: rgb(2, 46, 82);" mat-button [matMenuTriggerFor]="menu">
+        {{ fName }} {{ lName }}
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu" style="background-color: rgb(2, 46, 82);">
+        <button class="btn btn-link btn-block" [routerLinkActive]="['active']" [routerLink]="['/settings/services']">Profile</button>
+        <hr>
+        <button class="btn btn-link btn-block" (click)="onSignOut()">Sign Out</button> 
+      </mat-menu>
+    </ng-container> 
+  </mat-toolbar>
+</header>
+<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+<section>
+  <div *ngIf="loginBool">
+    <div *ngIf="signinBool">
+      <div class="row no-gutters">
+        <div class="col-md-8 col-lg-8 col-sm-12"> 
+          <img src="../assets/Pics/69413394_z.jpg" style="height: 100%; width: 100%;">
+        </div>
+        <div class="col-md-4 col-lg-4 col-sm-12">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-1"></div>
+              <div class="col-10">
+                <br>
+                <br>            
+                <p style="font-size:24px;">Al Bandar Resort Management Portal</p>
+                <hr>
+                <form [formGroup]="signinForm" (ngSubmit)="onSignin()">
+                  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+                  <div class="form-group" style="padding-bottom: 10px;">
+                    <label for="username" style="padding-bottom: 10px;">Username</label>
+                    <input type="text" class="form-control" id="username" formControlName="username" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" >
+                    <div *ngIf="submitted && f.username.errors" class="invalid-feedback">
+                      <div *ngIf="f.username.errors.required">Username is required</div>
+                    </div>
+                  </div>
+                  <div class="form-group" style="padding-bottom: 10px;">
+                    <label for="password" style="padding-bottom: 10px;">Password</label>
+                    <input type="password" class="form-control" id="password" formControlName="password" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" >
+                    <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
+                      <div *ngIf="f.password.errors.required">Password is required</div>
+                    </div>
+                  </div>
+                  <br>
+                  <div class="form-call-to-actions">
+                    <button class="btn btn-link" (click)="showForgotPass()">Forgot password?</button>
+                    <button class="btn btn-primary" type="submit" style="float: right;">Sign In</button>
+                  </div>
+                  <div style="text-align: center;">
+                    <span class="text" style="font-size:16px;">Don't have an account? <button class="btn btn-link" (click)="showSignUp()">Sign up</button></span>
+                  </div>
+                </form>
+                <br>
+              </div>
+              <div class="col-1"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="signupBool">
+      <div class="row no-gutters">
+        <div class="col-md-8 col-lg-8 col-sm-12">
+          <img src="../assets/Pics/169538_16062719030044150446.jpg" style="height: 100%; width: 100%;">
+        </div>
+        <div class="col-md-4 col-lg-4 col-sm-12">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-1"></div>
+              <div class="col-10">
+                <br>                 
+                <br>            
+                <p style="font-size:24px;">Welcome to Al Bandar Resort</p>
+                <hr>
+                <form class="signup-form" [formGroup]="signupForm">
+                  <div class="form-row">
+                    <div class="form-group" style="padding-bottom: 10px;">
+                      <label for="username" style="padding-bottom: 10px;">Username</label>
+                      <input type="text" class="form-control" id="username" formControlName="username" >
+                      <div *ngIf="submitted && g.username.errors" class="invalid-feedback">
+                        <div *ngIf="g.username.errors.required">Username is required</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group" style="padding-bottom: 10px;">
+                      <label for="firstname" style="padding-bottom: 10px;">First Name</label>
+                      <input type="text" class="form-control" id="firstname" formControlName="firstname" >
+                      <div *ngIf="submitted && g.firstname.errors" class="invalid-feedback">
+                        <div *ngIf="g.firstname.errors.required">First name is required</div>
+                      </div>
+                    </div>
+                    <div class="form-group" style="padding-bottom: 10px;">
+                      <label for="lastname" style="padding-bottom: 10px;">Last Name</label>
+                      <input type="text" class="form-control" id="lastname" formControlName="lastname" >
+                      <div *ngIf="submitted && g.lastname.errors" class="invalid-feedback">
+                        <div *ngIf="g.lastname.errors.required">Last name is required</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group" style="padding-bottom: 10px;">
+                      <label for="contactno" style="padding-bottom: 10px;">Contact Number</label>
+                      <input type="text" class="form-control" id="contactno" formControlName="contactno" >
+                      <div *ngIf="submitted && g.contactno.errors" class="invalid-feedback">
+                        <div *ngIf="g.contactno.errors.required">Contact number is required</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group" style="padding-bottom: 10px;">
+                      <label for="password" style="padding-bottom: 10px;">Password</label>
+                      <input type="password" class="form-control" id="password" formControlName="password" >
+                    <div *ngIf="submitted && g.password.errors" class="invalid-feedback">
+                      <div *ngIf="g.password.errors.required">Password is required</div>
+                      <div *ngIf="notmatched">Passwords do not match</div>
+                    </div>
+                    </div>
+                    <div class="form-group" style="padding-bottom: 10px;">
+                      <label for="confirmPassword" style="padding-bottom: 10px;">Confirm Password</label>
+                      <input type="password" class="form-control" id="confirmPassword" formControlName="confirmPassword" >
+                    <div *ngIf="submitted && g.confirmPassword.errors" class="invalid-feedback">
+                      <div *ngIf="g.confirmPassword.errors.required">Password is required</div>
+                      <div *ngIf="notmatched">Passwords do not match</div>
+                    </div>
+                  </div>
+                  </div>
+                  <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="terms" formControlName="terms">&nbsp;&nbsp;
+                    <label class="custom-control-label" for="terms">
+                      <span class="custom-label">I agree to the Terms and Privacy Policy.</span>
+                    </label>
+                  </div>
+                  <div class="form-call-to-actions">
+                    <button class="btn btn-primary" type="button" style="float: right;" (click)="onSignup()">Create account</button>
+                  </div>
+                  <br>
+                  <div style="text-align: center;">
+                    <span style="font-size:16px;">
+                      Already have an account? <button class="btn btn-link" (click)="showSignIn()">Log in.</button>
+                    </span>
+                  </div>
+                </form>
+                <br>
+              </div>                
+              <div class="col-1"></div>
+            </div>
+          </div>
+        </div>
+      </div>      
+    </div>
+    <div *ngIf="forgotPasswordBool">
+      <div class="row no-gutters">
+        <div class="col-md-8 col-lg-8 col-sm-12">
+          <img src="../assets/Pics/Al-Bander-Resort-7.jpg" style="height: 100%; width: 100%;">
+        </div>
+        <div class="col-md-4 col-lg-4 col-sm-12">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-1"></div>
+              <div class="col-10">
+                <br>                 
+                <br>     
+                <h1>Dont worry!</h1>
+                <span>
+                  We are here to help you recovering your password. Please enter your username along with your new password.
+                </span>
+                <hr>
+                <form class="recover-password-form" [formGroup]="recoverPasswordForm" (ngSubmit)="onRecoverPassword()">
+                  <div class="form-row">
+                    <div class="form-group" style="padding-bottom: 10px;">
+                      <label for="username" style="padding-bottom: 10px;">Username</label>
+                      <input type="text" class="form-control" id="username" formControlName="username" >
+                      <div *ngIf="submitted && h.username.errors" class="invalid-feedback">
+                        <div *ngIf="h.username.errors.required">Username is required</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group" style="padding-bottom: 10px;">
+                      <label for="password" style="padding-bottom: 10px;">Password</label>
+                      <input type="password" class="form-control" id="password" formControlName="password" >
+                      <div *ngIf="submitted && g.password.errors" class="invalid-feedback">
+                        <div *ngIf="g.password.errors.required">Password is required</div>
+                        <div *ngIf="notmatched">Passwords do not match</div>
+                      </div>
+                    </div>
+                    <div class="form-group" style="padding-bottom: 10px;">
+                      <label for="confirmPassword" style="padding-bottom: 10px;">Confirm Password</label>
+                      <input type="password" class="form-control" id="confirmPassword" formControlName="confirmPassword" >
+                      <div *ngIf="submitted && g.confirmPassword.errors" class="invalid-feedback">
+                        <div *ngIf="g.confirmPassword.errors.required">Password is required</div>
+                        <div *ngIf="notmatched">Passwords do not match</div>
+                      </div>
+                    </div>
+                  </div>
+                  <br>
+                  <div class="form-call-to-actions">
+                    <button class="btn btn-link" (click)="showSignIn()">Go back to Login page</button>
+                    <button class="btn btn-primary" style="float: right;" type="submit">Recover Password</button>
+                  </div>
+                </form>
+                <br>
+              </div>
+              <div class="col-1"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> 
+  <div *ngIf="contentBool">
+    <mat-sidenav-container class="example-container" autosize >
+      <mat-sidenav #sidenav class="example-sidenav" mode="side" opened="true" style="background-color: rgb(2, 46, 82)">
+        <ul class="side-menu-navigation nav flex-column" *ngIf="isExpanded || isShowing">
+          <li class="menu-item expandable-item nav-item" [routerLinkActive]="['active']" *ngIf="showCRM">
+            <mat-expansion-panel [expanded]="false" style="background-color: #badff3" >
+              <mat-expansion-panel-header class="menu-link">
+                <div class="item-header-content">
+                  <mat-panel-title>
+                    <i class="material-icons">headset_mic</i>&nbsp;&nbsp;
+                    <span i18n="@@CRMTitle" class="menu-item-title">Members and crm</span>
+                  </mat-panel-title>
+                </div>
+              </mat-expansion-panel-header>
+              <ul class="menu-sub-navigation nav flex-column">
+                <li class="menu-item nav-item"[routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/crm/dashboard']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@CRMDashboard" class="menu-item-title">Dashboard</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/crm/customers']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@CRMCustProfile" class="menu-item-title">Customer Profiles</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/crm/contacts']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@CRMContacts" class="menu-item-title">Contacts & Party</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/crm/members']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@CRMContacts" class="menu-item-title">Members</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/crm/sales-order']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@CRMSalesOrder" class="menu-item-title">Sales Orders & Agreements</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/crm/reference']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@CRMSalesOrder" class="menu-item-title">Amenities / Reference</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/crm/costcenter']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@CRMSalesOrder" class="menu-item-title">Cost Center</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/crm/deparment']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@CRMSalesOrder" class="menu-item-title">Department</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/crm/invoice']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@CRMSalesOrder" class="menu-item-title">Billing & Sales Inovice</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/crm/receipt']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@CRMBillNPay" class="menu-item-title">Receipts & Payments</span>
+                  </a>
+                </li>
+                
+              </ul>
+            </mat-expansion-panel>
+          </li>
+          <li class="menu-item expandable-item nav-item" [routerLinkActive]="['active']" *ngIf="showSC">
+            <mat-expansion-panel [expanded]="false" style="background-color: #badff3">
+              <mat-expansion-panel-header class="menu-link">
+                <div class="item-header-content">
+                  <mat-panel-title>
+                    <i class="material-icons">local_shipping</i>&nbsp;&nbsp;
+                    <span i18n="@@SCTitle" class="menu-item-title">Club Services</span>
+                  </mat-panel-title>
+                </div>
+              </mat-expansion-panel-header>
+              <ul class="menu-sub-navigation nav flex-column">
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/supply-chain/dashboard']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@SCDashboard" class="menu-item-title">Dashboard</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/club/services']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@MISFinancials" class="menu-item-title">Services</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/club/boat']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@MISFinancials" class="menu-item-title">Boat Master</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/club/tax-category']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@MISFinancials" class="menu-item-title">Tax Category</span>
+                  </a>
+                </li>
+              </ul>
+            </mat-expansion-panel>
+          </li>
+          <li class="menu-item expandable-item nav-item" [routerLinkActive]="['active']" *ngIf="showMMP">
+            <mat-expansion-panel [expanded]="false" style="background-color: #badff3">
+              <mat-expansion-panel-header class="menu-link">
+                <div class="item-header-content">
+                  <mat-panel-title>
+                    <i class="material-icons">toys</i>&nbsp;&nbsp;
+                    <span i18n="@@MMPTitle" class="menu-item-title">Admin Control</span>
+                  </mat-panel-title>
+                </div>
+              </mat-expansion-panel-header>
+              <ul class="menu-sub-navigation nav flex-column">
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/mmp/dashboard']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@MMPDashboard" class="menu-item-title">Dashboard</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/mmp/premises-master']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@MMPPremises" class="menu-item-title">Premises Master</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/mmp/resource-management']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@MMPresource" class="menu-item-title">User Management</span>
+                  </a>
+                </li>
+              </ul> 
+            </mat-expansion-panel>
+          </li>
+          <li class="menu-item expandable-item nav-item" [routerLinkActive]="['active']" *ngIf="showMIS">
+            <mat-expansion-panel [expanded]="false" style="background-color: #badff3">
+              <mat-expansion-panel-header class="menu-link">
+                <div class="item-header-content">
+                  <mat-panel-title>
+                    <i class="material-icons">museum</i>&nbsp;&nbsp;
+                    <span i18n="@@MISTitle" class="menu-item-title">Management Reports</span>
+                  </mat-panel-title>
+                </div>
+              </mat-expansion-panel-header>
+              <ul class="menu-sub-navigation nav flex-column">
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/mis/sales']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@MISSales" class="menu-item-title">Sales Revenues</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/mis/receivables']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@MISReceivables" class="menu-item-title">Receivables</span>
+                  </a>
+                </li>
+                <li class="menu-item nav-item" [routerLinkActive]="['active']">
+                  <a class="menu-link nav-link" [routerLinkActive]="['active']" [routerLink]="['/mis/members']">
+                    <i class="menu-item-icon"></i>
+                    <span i18n="@@MISMembers" class="menu-item-title">Members</span>
+                  </a>
+                </li>
+              </ul>
+            </mat-expansion-panel>
+          </li>
+        </ul>
+      </mat-sidenav>
+      <div class="bg">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-container>
+  </div>
+</section>
+<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+<footer style="background-color: rgb(2, 46, 82); color: white;">
+  <div class="container-fluid">
+    <br><br>
+    <div class="row">
+      <div class="col-1"></div>
+      <div class="col">
+        <div class="row">
+          <div class="col-6 container-fluid">
+            <h3>Support</h3>  
+            <hr style="border: 1px solid white;">
+          </div>
+          <div class="col-6 container-fluid">
+            <h3>About Us</h3>
+            <hr style="border: 1px solid white;">
+          </div>
+        </div>
+        <br>
+        <br>
+       <!--<hr style="border: 1px solid white;">--> 
+        <div class="col-12">
+        </div>
+        <hr style="border: 1px solid white;">
+        <br>
+      </div>
+      <div class="col-1"></div>
+    </div>
+  </div>
+</footer>
+
+

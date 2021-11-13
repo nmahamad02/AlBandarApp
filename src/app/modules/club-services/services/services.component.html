@@ -1,0 +1,237 @@
+<div class="container-fluid">
+    <br>
+    <div class="col-12">
+        <mat-card style="color: darkblue; background-color:rgb(251, 252, 249);">
+            <mat-card-header>
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-4">
+                            <mat-card-title>Service Management</mat-card-title>
+                        </div>
+                        <div class="col-7">
+                            <mat-card-actions>
+                                <div class="row">
+                                    <div class="col">
+                                        <button mat-raised-button class="bg-primary text-white btn btn-block" style="border-radius: 50%;" (click)="newForm()">
+                                            <mat-icon>add</mat-icon> New
+                                        </button>
+                                    </div>
+                                
+                                    <div class="col">
+                                        <button type="submit" mat-raised-button class="bg-secondary text-white btn btn-block" style="border-radius: 50%;">
+                                            <mat-icon>print</mat-icon> Print
+                                        </button>
+                                    </div>
+                                    <div class="col">
+                                        <button mat-raised-button class="bg-success  text-white btn btn-block" style="border-radius: 50%;" (click)="submitForm()">
+                                            <mat-icon>note_add</mat-icon> Submit 
+                                        </button>
+                                    </div>
+                                    <div class="col">
+                                        <button mat-raised-button class="bg-info text-white btn btn-block" style="border-radius: 50%;" [routerLink]="['/crm/dashboard']">
+                                            <mat-icon>Delete</mat-icon> Delete
+                                        </button>   
+                                    </div>
+                                    <div class="col">
+                                        <button mat-raised-button class="bg-danger text-white btn btn-block" style="border-radius: 50%;" [routerLink]="['/crm/dashboard']">
+                                            <mat-icon>cancel</mat-icon> Exit
+                                        </button>
+                                    </div>  
+                                </div>
+                            </mat-card-actions>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-header>
+            <hr>
+            <mat-card-content>
+                <form class="form-container" [formGroup]="servicesForm">
+                    <div class="row">
+                        <div class="col-2">
+                            <mat-form-field class="full-width">
+                                <mat-label>Service ID</mat-label>
+                                <input matInput 
+                                #srvNo formControlName="serviceId"  
+                                (keydown.f2)="lookUpSrv(srvNo.value)"
+                                (keydown.enter)="searchSiv(srvNo.value)"
+                                value="{{varServiceid}}">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-4">
+                            <mat-form-field class="full-width">
+                                <mat-label>Service Name</mat-label>
+                                <input matInput required formControlName="serviceName" value="{{varServiceName}}" >
+                                <mat-error>Service Name is <strong>required</strong></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-6">
+                            <mat-form-field class="full-width">
+                                <mat-label>Service Description</mat-label>
+                                <input matInput formControlName="serviceDescription" value="{{varServiceDescription}}">
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <mat-form-field class="full-width">
+                                <mat-label>Fee Category</mat-label>
+                                <input matInput required formControlName="feeCategory" value="{{varFeeCategory}}">
+                                <mat-error>Fee Category is <strong>required</strong></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-4">
+                            <mat-form-field class="full-width">
+                                <mat-label>Service Category</mat-label>
+                                <input matInput required formControlName="serviceCategory" value="{{VarSericeCategory}}">
+                                <mat-error>Service Category is <strong>required</strong></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-4"> 
+                            <mat-form-field class="full-width">
+                                <mat-label>Tax Category</mat-label>
+                                <mat-select formControlName="TaxCategory" [(ngModel)]="varTaxCategory">
+                                    <mat-option *ngFor="let type of TaxCatergoryList" [value]="type.TAX_CATEGORY_ID">{{ type.TAX_CATEGORY_CD }}</mat-option>
+                                </mat-select>
+                           </mat-form-field> 
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <mat-form-field class="full-width">
+                                <mat-label>Actual Price</mat-label>
+                                <input matInput required formControlName="actualPrice" value="{{varActualPrice}}">
+                                <mat-error>Actual Price is <strong>required</strong></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-4">
+                            <mat-form-field class="full-width">
+                                <mat-label>Discount Price</mat-label>
+                                <input matInput formControlName="discountPrice"  value="{{VarDiscountPrice}}">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-4">
+                            <mat-form-field class="full-width">
+                                <mat-label>Member Price</mat-label>
+                                <input matInput formControlName="memberPrice" value="{{varMemberPrice}}">
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <mat-form-field class="full-width">
+                                <mat-label>Department</mat-label>
+                                <mat-select formControlName="department" [(ngModel)]="varDepartment" (focusout)="OnSelected()">
+                                    <mat-option *ngFor="let dept of DepartmentList" [value]="dept.DEPT_ID">{{ dept.DEPT_NAME }}</mat-option>
+                                </mat-select>
+                                <mat-error>Department is <strong>required</strong></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-4">
+                            <mat-form-field class="full-width">
+                                <mat-label>Cost Center</mat-label>
+                                <mat-select formControlName="costcenter" [(ngModel)]="varCostcenter">
+                                    <mat-option *ngFor="let cost of CostandGlcodeList" [value]="cost.EXP_ID">{{ cost.EXP_DESC }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-4">
+                            <mat-form-field class="full-width">
+                                <mat-label>Customer Name</mat-label>
+                                <mat-select formControlName="glcode" [(ngModel)]="varGlcode">
+                                    <mat-option *ngFor="let gl of CostandGlcodeList" [value]="gl.PCODE">{{ gl.CUST_NAME }}</mat-option>
+                                </mat-select>
+                           </mat-form-field> 
+                        </div>
+                    </div>
+                    <hr>
+                </form>
+                <div class="col-11">
+                    <b>Search</b>
+                    <mat-form-field class="full-width">
+                        <mat-icon matPrefix>search</mat-icon>
+                        <input matInput type="text" style="color: black;" placeholder="Please Enter Your Seach Keyword to filter" (keyup)="quickSeriveSearch()" [(ngModel)]="searchValue">
+                    </mat-form-field>
+                </div>
+                <!-- GET PARTY DETAILS FOR THIS CUSTOMER-->
+                <ag-grid-angular style="width: 100%; height: 360px ;" 
+                class="ag-theme-balham" [animateRows]="true"
+                [pagination]="true" [paginationPageSize]="25" 
+                [gridOptions]="gridOptions" 
+                [rowStyle]="rowStyle"
+                [suppressRowClickSelection]="true"
+                (cellClicked)='onViewCellClicked($event)'
+                [columnDefs]="columnServicedefs"
+                (gridReady)="onGridServiceReady($event)"></ag-grid-angular>
+                <div class="col-12">
+                    <ng-template #sivLookupDialog 
+                    style="width: 60%;">
+                        <h3 matDialogTitle>
+                            <b>Look up Service Number: {{ srvArr.length }}</b>
+                        </h3>
+                        <hr>
+                        <!-- <mat-form-field >
+                        <input matInput #input
+                        (keyup)="applyFilter($event)" >
+                        </mat-form-field> --->
+                        <div mat-dialog-content>
+                            <table mat-table 
+                            [dataSource]="serviceDataSouuce" 
+                            class="mat-elevation-z8" 
+                            style="width: 65vw; height: 50vh;">
+                                <ng-container matColumnDef="ServiceID">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Service Nbr </th>
+                                    <td mat-cell 
+                                    *matCellDef="let srv"> {{ srv.ServiceID }} </td>
+                                </ng-container>
+                              
+                                <ng-container matColumnDef="servicedesc">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Service Description</th>
+                                    <td mat-cell 
+                                    *matCellDef="let srv"> {{ srv.ServiceDescription }} </td>
+                                </ng-container>
+        
+                                <ng-container matColumnDef="actualprice">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Actual Price </th>
+                                    <td mat-cell 
+                                    *matCellDef="let srv"> {{ srv.ActualPrice }} </td>
+                                </ng-container>
+                              
+                                <ng-container matColumnDef="memberprice">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> LName </th>
+                                    <td mat-cell 
+                                    *matCellDef="let srv"> {{ srv.MemberPrice }} </td>
+                                </ng-container>
+                          
+                                <tr mat-header-row 
+                                *matHeaderRowDef="serviceDisplayedColumns"></tr>
+                                <tr mat-row 
+                                *matRowDef="let row; columns: serviceDisplayedColumns;  let i= index"
+                                [ngClass]="{'highlight': selectedRowIndex == i}"
+                                (click)="highlight('srvs',i)"
+                                tabindex="999"
+                                (keydown.arrowdown)="arrowDownEvent('srvs',selectedRowIndex)"
+                                (keydown.arrowup)="arrowUpEvent('srvs',selectedRowIndex)" 
+                                (keydown.enter)="selectSiv(srvArr[selectedRowIndex])"></tr>
+                  
+                                <!-- Row shown when there is no matching data. 
+                                <tr class="mat-row" 
+                                *matNoDataRow>
+                                  <td class="mat-cell" 
+                                  colspan="4">No data matching the filter "{{input.value}}"</td>
+                                </tr> -->
+                            </table>
+                        </div>
+                        <mat-dialog-actions align="end">
+                            <button mat-button
+                            matDialogClose="close">Close</button>
+                        </mat-dialog-actions>
+                    </ng-template>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

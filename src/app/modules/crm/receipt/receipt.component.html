@@ -1,0 +1,510 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <br>
+            <br>
+            <mat-card style="color: darkblue; background-color:rgb(251, 252, 249);">
+                <mat-card-header>                        
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-4">
+                                <mat-card-title> Receipt Voucher </mat-card-title>  
+                            </div>
+                            <div class="col-7">
+                                <mat-card-actions>
+                                    <div class="row">
+                                        <div class="col">
+                                            <button mat-raised-button 
+                                            class="bg-primary text-white btn btn-block" 
+                                            style="border-radius: 50%;"
+                                            (click)="newForm()">
+                                                <mat-icon>add</mat-icon> New
+                                            </button>
+                                        </div>
+                                        <!-- <div class="col">
+                                            <button mat-raised-button 
+                                            class="bg-info text-white btn btn-block" 
+                                            style="border-radius: 50%;">
+                                                <mat-icon>note_add</mat-icon> Edit 
+                                            </button>
+                                        </div> -->
+                                        <div class="col">
+                                            <button mat-raised-button 
+                                            class="bg-secondary text-white btn btn-block" 
+                                            style="border-radius: 50%;">
+                                                <mat-icon>print</mat-icon> Print
+                                            </button>
+                                        </div>
+                                        <div class="col">
+                                            <button mat-raised-button 
+                                            class="bg-success text-white btn btn-block" 
+                                            style="border-radius: 50%;" 
+                                            (click)="onFormSubmit()">
+                                                <mat-icon>note_add</mat-icon> Submit 
+                                            </button>
+                                        </div>
+                                        <div class="col">
+                                            <button mat-raised-button 
+                                            class="bg-warning text-white btn btn-block" 
+                                            style="border-radius: 50%;">
+                                                <mat-icon>delete</mat-icon> Delete
+                                            </button>   
+                                        </div>
+                                        <div class="col">
+                                            <button mat-raised-button 
+                                            class="bg-danger text-white btn btn-block" 
+                                            style="border-radius: 50%;"
+                                            (click)="refreshForm()">
+                                                <mat-icon>cancel</mat-icon> Cancel
+                                            </button>
+                                        </div>  
+                                    </div>
+                                </mat-card-actions>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-header> 
+                <mat-card-content>
+                    <div class="col-12">
+                        <form class="form-container"
+                        [formGroup]="ReceiptVoucherForm">
+                            <div class="row">
+                                <div class="col-4">
+                                    <mat-form-field class="full-width">
+                                        <mat-label i18n="@@CMMContactsNameFormControl">Voucher Number</mat-label>
+                                        <input matInput 
+                                        #sivNo formControlName="rptVoucher"  
+                                        (keydown.f2)="lookUpVoucher(sivNo.value)"
+                                        (keydown.enter)="searchVocher(sivNo.value)">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-4"></div>
+                                <div class="col-4">
+                                    <mat-form-field class="full-width"> 
+                                        <mat-label i18n="@@CMMContactsMobileFormControl">
+                                            Voucher date
+                                        </mat-label>
+                                        <input matInput formControlName="rptVoucherDate" [matDatepicker]="vochpicker">
+                                        <mat-datepicker-toggle matSuffix [for]="vochpicker"> </mat-datepicker-toggle>
+                                        <mat-datepicker #vochpicker> </mat-datepicker>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3">
+                                    <mat-form-field class="full-width">
+                                        <mat-label i18n="@@CMMContactsNameFormControl">
+                                            Currency
+                                        </mat-label>
+                                        <mat-select formControlName="rptCurrency" required>
+                                            <mat-option> ----- </mat-option>
+                                            <mat-option value="BHD">BHD</mat-option>
+                                            <mat-option value="USD">USD</mat-option>
+                                            <mat-option value="AED">AED</mat-option>
+                                            <mat-option value="EURO">EURO</mat-option>
+                                            <mat-option value="INR">INR</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                    <mat-form-field class="full-width"> 
+                                        <mat-label i18n="@@CMMContactsMobileFormControl">Exchange Rate:</mat-label>
+                                        <input matInput 
+                                        type="text" 
+                                        formControlName="rptExchRate" >
+                                        <mat-error i18n="@@CMMContactsMobileFormControlError">Exchange Rate is <strong>required</strong></mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                    <mat-form-field class="full-width"> 
+                                        <mat-label i18n="@@CMMContactsMobileFormControl">Debit Account</mat-label>
+                                        <input matInput 
+                                        type="text" 
+                                        #debNo formControlName="rptDebitAccount"  
+                                            (keydown.f2)="lookUpDebitAcc(debNo.value)"
+                                            (keydown.enter)="searchDebitAccount(debNo.value)">
+                                        <mat-error i18n="@@CMMContactsMobileFormControlError">Debit Account is <strong>required</strong></mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                    <mat-form-field class="full-width"> 
+                                        <mat-label i18n="@@CMMContactsMobileFormControl">Account Description</mat-label>
+                                        <input matInput 
+                                        type="text" 
+                                        formControlName="rptAccountDescription" >
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row">        
+                                <div class="col-3">
+                                    <mat-form-field class="full-width">
+                                        <mat-label i18n="@@CMMContactsNameFormControl">
+                                            Payment Type
+                                        </mat-label>
+                                        <mat-select formControlName="rptPaymentType" required>
+                                            <mat-option> ----- </mat-option>
+                                            <mat-option *ngFor="let payType of paymenttypeArr" [value]="payType.PMTNAME">
+                                                {{ payType.PMTNAME }}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error i18n="@@CMMContactsNameFormControlError">
+                                            Payment Type is <strong>required</strong>
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-3">
+                                    <mat-form-field class="full-width">
+                                        <mat-label i18n="@@CMMContactsNameFormControl">Reference Number</mat-label>
+                                        <input matInput 
+                                        formControlName="rptRefNo">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-3" style="padding: 5px;">
+                                    <mat-form-field class="full-width"> 
+                                        <mat-label i18n="@@CMMContactsMobileFormControl">
+                                                Reference date
+                                        </mat-label>
+                                        <input matInput formControlName="rptRefDate" [matDatepicker]="picker">
+                                        <mat-datepicker-toggle matSuffix [for]="picker"> </mat-datepicker-toggle>
+                                        <mat-datepicker #picker> </mat-datepicker>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-3" style="padding: 5px;">
+                                    <mat-form-field class="full-width">
+                                        <mat-label i18n="@@CMMContactsNameFormControl">
+                                            Bank
+                                        </mat-label>
+                                        <mat-select formControlName="rptBank" required>
+                                            <mat-option> ----- </mat-option>
+                                            <mat-option *ngFor="let bankDeatils of bankdetailArr" [value]="bankDeatils.BANK_ID">
+                                                {{ bankDeatils.BANK_NAME }}
+                                            </mat-option>
+                                          </mat-select>
+                                        <mat-error i18n="@@CMMContactsNameFormControlError">
+                                            Bank Details is <strong>required</strong>
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4" 
+                                    style="padding: 5px;">
+                                    <mat-form-field class="full-width">
+                                        <mat-label i18n="@@CMMContactsNameFormControl">Name</mat-label>
+                                        <input matInput 
+                                        formControlName="rptName">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-4" style="padding: 5px;">
+                                    </div>
+                                    <div class="col-4" style="padding: 5px;">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12" 
+                                        style="padding: 5px;">
+                                        <mat-form-field class="full-width">
+                                            <mat-label i18n="@@CMMContactsNameFormControl">Narration</mat-label>
+                                            <input matInput 
+                                            formControlName="rptNarration">
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="form-row">
+                                    <div class="col-12" 
+                                    style="height: 45vh; overflow-y: auto;" >
+                                        <table class="table table-borderless table-hover table-responsive-xxl"
+                                        formArrayName="rptItemArray">
+                                            <thead>
+                                                <tr class="table-reflow" 
+                                                style="background-color: rgb(25, 129, 129); color: white;">
+                                                    <th style="width: 20%;">Account Code</th>
+                                                    <th style="width: 20%;">Account Name</th>
+                                                    <th style="width: 30%;">Description</th>
+                                                    <th style="width: 10%;">Credit Amount</th>
+                                                    <th style="width: 10%">Allocated</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody (keydown.alt.n)="addrptItem()">
+                                                <tr 
+                                                #rptItem 
+                                                *ngFor="let rp of rptItems.controls; let i = index;" 
+                                                [formGroupName]="i" 
+                                                (keydown.alt.x)="deleteSIItem(i)">
+                                                    <td>
+                                                        <input #itemCode 
+                                                        class="form-control form-control-sm" 
+                                                        type="text" 
+                                                        (keydown.f2)="lookupOpbal(itemCode.value,'opbal',i)"
+                                                        formControlName="rptAccontcode"
+                                                        (change)="checkopbal(itemCode.value,i)">
+                                                        
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control form-control-sm" 
+                                                        type="text" 
+                                                        formControlName="rptAccountName" >
+                                                        <!-- (keydown.f2)="lookUpLocs(itemCode.value)"> -->
+                                                    </td>              
+                                                    <td>
+                                                        <input class="form-control form-control-sm" 
+                                                        type="text" 
+                                                        formControlName="rptDescription">
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control form-control-sm" 
+                                                        type="text" 
+                                                        formControlName="rptcreditAmount">
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control form-control-sm" 
+                                                        type="text" 
+                                                        formControlName="rptAllocation">
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-danger" 
+                                                        type="button" 
+                                                        (click)="deleteSIItem(i)">&#10005;</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <button class="btn btn-success" 
+                                        type="button" 
+                                        (click)="addrptItem()">&#43;</button>
+                                    </div>
+                                </div>
+                                <hr>
+                            </form>
+                    </div>
+                        <div class="col-12">
+                            <ng-template #opbalLookupDialog 
+                            style="width: 60%;">
+                                <h3 matDialogTitle>
+                                    <b>Look up OpBal: {{ opbalArr.length }}</b>
+                                </h3>
+                                <hr>
+                                <!-- <mat-form-field >
+                                    <input matInput #input
+                                    (keyup)="applyFilter($event)" >
+                                </mat-form-field> --->
+                                <div mat-dialog-content>
+                                    <table mat-table 
+                                    [dataSource]="opbalDataSource" 
+                                    class="mat-elevation-z8" 
+                                    style="width: 65vw; height: 50vh;">
+                                        <ng-container matColumnDef="pcode">
+                                            <th mat-header-cell 
+                                            *matHeaderCellDef> Product Code </th>
+                                            <td mat-cell 
+                                            *matCellDef="let opbal"> {{ opbal.PCODE }} </td>
+                                        </ng-container>
+                                      
+                                        <ng-container matColumnDef="name">
+                                            <th mat-header-cell 
+                                            *matHeaderCellDef> Customer Name </th>
+                                            <td mat-cell 
+                                            *matCellDef="let opbal"> {{ opbal.CUST_NAME }} </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="glcode">
+                                            <th mat-header-cell 
+                                            *matHeaderCellDef> GLCODE </th>
+                                            <td mat-cell 
+                                            *matCellDef="let opbal"> {{ opbal.GLCODE }} </td>
+                                        </ng-container>
+                                      
+                                        <ng-container matColumnDef="opbal">
+                                            <th mat-header-cell 
+                                            *matHeaderCellDef> OPBAL </th>
+                                            <td mat-cell 
+                                            *matCellDef="let opbal"> {{ opbal.OPBAL }} </td>
+                                        </ng-container>
+                                      
+                                        <tr mat-header-row 
+                                        *matHeaderRowDef="opbalDisplayedColumns"></tr>
+                                        <tr mat-row 
+                                        *matRowDef="let row; columns: opbalDisplayedColumns;  let i= index"
+                                        [ngClass]="{'highlight': selectedRowIndex == i}"
+                                        (click)="highlight('opbal',i)"
+                                        tabindex="999"
+                                        (keydown.arrowdown)="arrowDownEvent('opbal',selectedRowIndex)"
+                                        (keydown.arrowup)="arrowUpEvent('opbal',selectedRowIndex)" 
+                                        (keydown.enter)="selectOpbal(opbalArr[selectedRowIndex])">
+                                        </tr>
+                                      
+                                        <!-- Row shown when there is no matching data. 
+                                        <tr class="mat-row" 
+                                        *matNoDataRow>
+                                            <td class="mat-cell" 
+                                            colspan="4">No data matching the filter "{{input.value}}"</td>
+                                        </tr> -->
+                                    </table>
+                                </div>
+                                <mat-dialog-actions align="end">
+                                    <button mat-button 
+                                    matDialogClose="close">Close</button>
+                                </mat-dialog-actions>
+                            </ng-template>
+                        </div>
+                        <div class="col-12">
+                            <ng-template #DebitAccountLookupDialog 
+                            style="width: 60%;">
+                                <h3 matDialogTitle>
+                                    <b>Look up OpBal By Debit Account : {{ debitAccArr.length }}</b>
+                                </h3>
+                                <hr>
+                                <!-- <mat-form-field >
+                                    <input matInput #input
+                                    (keyup)="applyFilter($event)" >
+                                </mat-form-field> --->
+                                <div mat-dialog-content>
+                                    <table mat-table 
+                                    [dataSource]="DebitAccountDataSource" 
+                                    class="mat-elevation-z8" 
+                                    style="width: 65vw; height: 50vh;">
+                                        <ng-container matColumnDef="pcode">
+                                            <th mat-header-cell 
+                                            *matHeaderCellDef> Product Code </th>
+                                            <td mat-cell 
+                                            *matCellDef="let DebitAcc"> {{ DebitAcc.PCODE }} </td>
+                                        </ng-container>
+                                      
+                                        <ng-container matColumnDef="name">
+                                            <th mat-header-cell 
+                                            *matHeaderCellDef> Customer Name </th>
+                                            <td mat-cell 
+                                            *matCellDef="let DebitAcc"> {{ DebitAcc.CUST_NAME }} </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="glcode">
+                                            <th mat-header-cell 
+                                            *matHeaderCellDef> GLCODE </th>
+                                            <td mat-cell 
+                                            *matCellDef="let DebitAcc"> {{ DebitAcc.GLCODE }} </td>
+                                        </ng-container>
+                                      
+                                        <ng-container matColumnDef="opbal">
+                                            <th mat-header-cell 
+                                            *matHeaderCellDef> OPBAL </th>
+                                            <td mat-cell 
+                                            *matCellDef="let DebitAcc"> {{ DebitAcc.OPBAL }} </td>
+                                        </ng-container>
+                                      
+                                        <tr mat-header-row 
+                                        *matHeaderRowDef="debitAccountDisplayedColumns"></tr>
+                                        <tr mat-row 
+                                        *matRowDef="let row; columns: debitAccountDisplayedColumns;  let i= index"
+                                        [ngClass]="{'highlight': selectedRowIndex == i}"
+                                        (click)="highlight('debitAcc',i)"
+                                        tabindex="999"
+                                        (keydown.arrowdown)="arrowDownEvent('debitAcc',selectedRowIndex)"
+                                        (keydown.arrowup)="arrowUpEvent('debitAcc',selectedRowIndex)" 
+                                        (keydown.enter)="selectDebitAcc(debitAccArr[selectedRowIndex])">
+                                        </tr>
+                                      
+                                        <!-- Row shown when there is no matching data. 
+                                        <tr class="mat-row" 
+                                        *matNoDataRow>
+                                            <td class="mat-cell" 
+                                            colspan="4">No data matching the filter "{{input.value}}"</td>
+                                        </tr> -->
+                                    </table>
+                                </div>
+                                <mat-dialog-actions align="end">
+                                    <button mat-button 
+                                    matDialogClose="close">Close</button>
+                                </mat-dialog-actions>
+                            </ng-template>
+                        </div>
+                        <div class="col-12">
+                            <ng-template #VoucerLookUpDailouge 
+                            style="width: 60%;">
+                                <h3 matDialogTitle>
+                                    <b>Look up Stock Issue Vouchers: {{ vochArr.length }}</b>
+                                </h3>
+                                <hr>
+                                <!-- <mat-form-field >
+                                    <input matInput #input
+                                    (keyup)="applyFilter($event)" >
+                                </mat-form-field> --->
+                                <div mat-dialog-content>
+                                    <table mat-table 
+                                    [dataSource]="vochDataSource" 
+                                    class="mat-elevation-z8" 
+                                    style="width: 65vw; height: 50vh;">
+                                        <ng-container matColumnDef="trnno">
+                                            <th mat-header-cell 
+                                            *matHeaderCellDef> Transaction Nbr </th>
+                                            <td mat-cell 
+                                            *matCellDef="let voch"> {{ voch.TRN_NO }} </td>
+                                        </ng-container>
+                                      
+                                        <ng-container matColumnDef="invno">
+                                            <th mat-header-cell 
+                                            *matHeaderCellDef> Invoice Nbr </th>
+                                            <td mat-cell 
+                                            *matCellDef="let voch"> {{ voch.INV_NO }} </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="amount">
+                                            <th mat-header-cell 
+                                            *matHeaderCellDef> Amount </th>
+                                            <td mat-cell 
+                                            *matCellDef="let voch"> {{ voch.NET_AMOUNT }} </td>
+                                        </ng-container>
+                                      
+                                        <ng-container matColumnDef="lname">
+                                            <th mat-header-cell 
+                                            *matHeaderCellDef> LName </th>
+                                            <td mat-cell 
+                                            *matCellDef="let voch"> {{ voch.LNAME }} </td>
+                                        </ng-container>
+                                          
+                                        <ng-container matColumnDef="refno">
+                                            <th mat-header-cell 
+                                            *matHeaderCellDef> Ref Nbr </th>
+                                            <td mat-cell 
+                                            *matCellDef="let voch"> {{ voch.REF_NO }} </td>
+                                        </ng-container>
+                                        
+                                        <ng-container matColumnDef="narration">
+                                            <th mat-header-cell 
+                                            *matHeaderCellDef> Narration </th>
+                                            <td mat-cell 
+                                            *matCellDef="let voch"> {{ voch.NARRATION }} </td>
+                                        </ng-container>
+                                      
+                                        <tr mat-header-row 
+                                        *matHeaderRowDef="vochDisplayedColumns"></tr>
+                                    <tr mat-row 
+                                    *matRowDef="let row; columns: vochDisplayedColumns;  let i= index"
+                                    [ngClass]="{'highlight': selectedRowIndex == i}"
+                                    (click)="highlight('voch',i)"
+                                    tabindex="999"
+                                    (keydown.arrowdown)="arrowDownEvent('voch',selectedRowIndex)"
+                                    (keydown.arrowup)="arrowUpEvent('voch',selectedRowIndex)" 
+                                    (keydown.enter)="selectSiv(vochArr[selectedRowIndex])"></tr>
+                                      
+                                        <!-- // Row shown when there is no matching data.  -->
+                                        <!-- <tr class="mat-row" 
+                                        *matNoDataRow>
+                                          <td class="mat-cell" 
+                                          colspan="4">No data matching the filter "{{input.value}}"</td>
+                                                                                </tr> -->
+                                </table>
+                            </div>
+                            <mat-dialog-actions align="end">
+                                <button mat-button 
+                                matDialogClose="close">Close</button>
+                            </mat-dialog-actions>
+                        </ng-template>
+                    </div>
+                    
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,367 @@
+<div class="container-fluid">
+    <div class="col-12">
+        <mat-card style="color: darkblue; background-color:rgb(251, 252, 249);">
+            <mat-card-header>
+                <mat-card-title>Boat Master</mat-card-title>
+            </mat-card-header>
+            <hr>
+            <div class="col-7">
+                <mat-card-actions>
+                    <div class="row">
+                        <div class="col">
+                            <button mat-raised-button class="bg-primary text-white btn btn-block" style="border-radius: 50%;" (click)="newForm()">
+                                <mat-icon>add</mat-icon> New
+                            </button>
+                        </div>
+                    
+                        <div class="col">
+                            <button type="submit" mat-raised-button class="bg-secondary text-white btn btn-block" style="border-radius: 50%;">
+                                <mat-icon>print</mat-icon> Print
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button mat-raised-button class="bg-success  text-white btn btn-block" style="border-radius: 50%;" (click)="submitForm()">
+                                <mat-icon>note_add</mat-icon> Submit 
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button mat-raised-button class="bg-info text-white btn btn-block" style="border-radius: 50%;">
+                                <mat-icon>Delete</mat-icon> Delete
+                            </button>   
+                        </div>
+                        <div class="col">
+                            <button mat-raised-button 
+                            class="bg-secondary text-white btn btn-block" 
+                            style="border-radius: 50%;" 
+                            (click)="exportAsXLSX()">
+                                <mat-icon>note</mat-icon> All Boat 
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button mat-raised-button class="bg-danger text-white btn btn-block" style="border-radius: 50%;" (click)="refreshForm()">
+                                <mat-icon>cancel</mat-icon> Exit
+                            </button>
+                        </div>  
+                    </div>
+                </mat-card-actions>
+            </div>
+            <mat-card-content>
+                <form class="form-container" [formGroup]="boatForm">
+                    <div class="row">
+                        <div class="col-3">
+                            <mat-form-field>
+                                <mat-label>Boat Number</mat-label>
+                                <input matInput 
+                                        #boatNo formControlName="boatNo"  
+                                        (keydown.f2)="lookUpBoatNo(boatNo.value)"
+                                        (keydown.enter)="searchBoat(boatNo.value)" 
+                                        value="{{varboatMasterId}}">
+                                <mat-error>Boat Number is <strong>required</strong></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                            <mat-form-field>
+                                <mat-label>Member Code</mat-label>
+                                <input #memCode type="text" formControlName="memberCode" matInput required
+                                            (keydown.f2)="lookUpMembers(memCode.value,'I')"
+                                            (keydown.enter)="getMemberData(memCode.value,'I')">
+                                <mat-error>Member Code is <strong>required</strong></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                            <mat-form-field>
+                                <mat-label>Boat Type</mat-label>
+                                <mat-label i18n="@@CMMContactsNameFormControl">
+                                    Boat Type
+                                </mat-label>
+                                <mat-select formControlName="boatType" value="{{varboatType}}" required >
+                                    <mat-option> ----- </mat-option>
+                                    <mat-option *ngFor="let type of mBoatType" [value]="type.REC_ID">
+                                        {{ type.NAME }}
+                                    </mat-option>
+                                  </mat-select>
+                                <mat-error i18n="@@CMMContactsNameFormControlError">
+                                    Title is <strong>required</strong>
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                            <mat-form-field>
+                                <mat-label>Registration No</mat-label>
+                                <input matInput required formControlName="registrationNo" value="{{varRegistrationNo}}">
+                                <mat-error>Registration Number is <strong>required</strong></mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <mat-form-field>
+                                <mat-label>Boat Color</mat-label>
+                                <input matInput formControlName="boatColor" value="{{varboatColor}}">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-2">
+                            <mat-form-field>
+                                <mat-label>Boat Engine Type</mat-label>
+                                <input matInput required formControlName="boatEngineType" value="{{varboatEngineType}}">
+                                <mat-error>Boat Engine Type is <strong>required</strong></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-2">
+                            <mat-form-field>
+                                <mat-label>Model No</mat-label>
+                                <input matInput required formControlName="modelNo" value="{{varmodelNo}}">
+                                <mat-error>Model Number is <strong>required</strong></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                            <mat-form-field>
+                                <mat-label>Boat Engine No</mat-label>
+                                <input matInput required formControlName="boatEngineNo" value="{{vvarboatEngineNo}}">
+                                <mat-error>Boat Engine Number is <strong>required</strong></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-2">
+                            <mat-form-field>
+                                <mat-label>Host Power</mat-label>
+                                <input matInput formControlName="hostPower" value="{{varhostPower}}">
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <!-- <mat-form-field appearance="fill">
+                                <mat-label>Sailing License Expiry Date</mat-label>
+                                <input matInput  required formControlName="expiryDate" [matDatepicker]="picker">
+                                <mat-error>Sailing License Expiry Date is <strong>required</strong></mat-error>
+                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                            </mat-form-field> -->
+
+
+                            <mat-form-field>
+                                <mat-label>Sailing License Expiry Date</mat-label>
+                                <input matInput formControlName="expiryDate" [matDatepicker]="sailpicker" value="{{varexpiryDate}}">
+                                <mat-datepicker-toggle matSuffix [for]="sailpicker"> </mat-datepicker-toggle>
+                                <mat-datepicker #sailpicker> </mat-datepicker>
+                                <mat-error>Sailing License Expiry Date is <strong>required</strong></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                            <mat-form-field>
+                                <mat-label>Reg Expiry</mat-label>
+                                <input matInput formControlName="regExpiry" [matDatepicker]="regpicker" value="{{varregExpiry}}">
+                                <mat-datepicker-toggle matSuffix [for]="regpicker"> </mat-datepicker-toggle>
+                                <mat-datepicker #regpicker> </mat-datepicker>
+                                <mat-error>Registration Expiry is <strong>required</strong></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                            <mat-form-field>
+                                <mat-label>Boat Name</mat-label>
+                                <input matInput required formControlName="boatName" value="{{varboatName}}">
+                                <mat-error>Boat Name is <strong>required</strong></mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                            <mat-form-field>
+                                <mat-label>Insurance No</mat-label>
+                                <input matInput formControlName="insuranceNo" value="{{varinsuranceNo}}">
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <mat-form-field>
+                                <mat-label>Insurance Expiry Date</mat-label>
+                                <input matInput formControlName="insuranceExpiry" [matDatepicker]="insexppicker" value="{{varinsuranceExpiry}}">
+                                <mat-datepicker-toggle matSuffix [for]="insexppicker"> </mat-datepicker-toggle>
+                                <mat-datepicker #insexppicker> </mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                            <mat-form-field>
+                                <mat-label>JetSki Reg No</mat-label>
+                                <input matInput formControlName="jetskiReg" value="{{varjetskiReg}}">
+                            </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                            <mat-form-field>
+                                <mat-label>JetSki Expiry Date</mat-label>
+                                <input matInput formControlName="jetskiExpiry" [matDatepicker]="jetskipicker" value="{{varjetskiExpiry}}">
+                                <mat-datepicker-toggle matSuffix [for]="jetskipicker"> </mat-datepicker-toggle>
+                                <mat-datepicker #jetskipicker> </mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-3">
+                            <mat-form-field>
+                                <mat-label>License Expiry Date</mat-label>
+                                <input matInput formControlName="licenseExpiry" [matDatepicker]="lincepicker" value="{{varlicenseExpiry}}">
+                                <mat-datepicker-toggle matSuffix [for]="lincepicker"> </mat-datepicker-toggle>
+                                <mat-datepicker #lincepicker> </mat-datepicker>
+                                <mat-error>License Expiry Date is <strong>required</strong></mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </form>
+                <div class="col-12">
+                    <ng-template #BoatLookupDialog 
+                    style="width: 60%;">
+                        <h3 matDialogTitle>
+                            <b>Look up Boat Master: {{ boatArr.length }}</b>
+                        </h3>
+                        <hr>
+                        <!-- <mat-form-field >
+                            <input matInput #input
+                            (keyup)="applyFilter($event)" >
+                        </mat-form-field> --->
+                        <div mat-dialog-content>
+                            <table mat-table 
+                            [dataSource]="BoatDataSource" 
+                            class="mat-elevation-z8" 
+                            style="width: 65vw; height: 50vh;">
+                                <ng-container matColumnDef="boatid">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Boat Master Code </th>
+                                    <td mat-cell 
+                                    *matCellDef="let boat"> {{ boat.BoatMasterID }} </td>
+                                </ng-container>
+                              
+                                <ng-container matColumnDef="boatname">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Boat Name </th>
+                                    <td mat-cell 
+                                    *matCellDef="let boat"> {{ boat.BoatName }} </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="membercode">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Member Code </th>
+                                    <td mat-cell 
+                                    *matCellDef="let boat"> {{ boat.MemberCode }} </td>
+                                </ng-container>
+                              
+                                <ng-container matColumnDef="registerno">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Registration Number </th>
+                                    <td mat-cell 
+                                    *matCellDef="let boat"> {{ boat.RegistrationNo }} </td>
+                                </ng-container>
+                              
+                                <tr mat-header-row 
+                                *matHeaderRowDef="BoatDisplayedColumns"></tr>
+                                <tr mat-row 
+                                *matRowDef="let row; columns: BoatDisplayedColumns;  let i= index"
+                                [ngClass]="{'highlight': selectedRowIndex == i}"
+                                (click)="highlight('boat',i)"
+                                tabindex="999"
+                                (keydown.arrowdown)="arrowDownEvent('boat',selectedRowIndex)"
+                                (keydown.arrowup)="arrowUpEvent('boat',selectedRowIndex)"
+                                (keydown.enter)="selectBoat(boatArr[selectedRowIndex])">
+                                </tr>
+                              
+                                <!-- Row shown when there is no matching data. 
+                                <tr class="mat-row" 
+                                *matNoDataRow>
+                                    <td class="mat-cell" 
+                                    colspan="4">No data matching the filter "{{input.value}}"</td>
+                                </tr> -->
+                            </table>
+                        </div>
+                        <mat-dialog-actions align="end">
+                            <button mat-button 
+                            matDialogClose="close">Close</button>
+                        </mat-dialog-actions>
+                    </ng-template>
+                </div>
+                <div class="col-12">
+                        <ng-template #membLookupDialog 
+                        style="width: 60%;">
+                            <h3 matDialogTitle>
+                                <b>Look up Members: {{ membArr.length }}</b>
+                            </h3>
+                            <hr>
+                            <div mat-dialog-content>
+                                <table mat-table 
+                                [dataSource]="membDataSource" 
+                                class="mat-elevation-z8" 
+                                style="width: 65vw; height: 50vh;">
+                                    <ng-container matColumnDef="memberNo">
+                                        <th mat-header-cell 
+                                        *matHeaderCellDef> Member Nbr </th>
+                                        <td mat-cell 
+                                        *matCellDef="let memb"> {{ memb.MemberNo }} </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="memberRefNo">
+                                        <th mat-header-cell 
+                                        *matHeaderCellDef> Reference Nbr </th>
+                                        <td mat-cell 
+                                        *matCellDef="let memb"> {{ memb.REFMEMBNO }} </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="title">
+                                        <th mat-header-cell 
+                                        *matHeaderCellDef> Title </th>
+                                        <td mat-cell 
+                                        *matCellDef="let memb"> {{ memb.TITLE }} </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="firstname">
+                                        <th mat-header-cell 
+                                        *matHeaderCellDef> Firstname </th>
+                                        <td mat-cell 
+                                        *matCellDef="let memb"> {{ memb.NAME }} </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="surname">
+                                        <th mat-header-cell 
+                                        *matHeaderCellDef> LName </th>
+                                        <td mat-cell 
+                                        *matCellDef="let memb"> {{ memb.SURNAME }} </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="cprno">
+                                        <th mat-header-cell 
+                                        *matHeaderCellDef> CPR Nbr </th>
+                                        <td mat-cell 
+                                        *matCellDef="let memb"> {{ memb.CPRNo }} </td>
+                                    </ng-container>
+                                    <tr mat-header-row 
+                                    *matHeaderRowDef="membDisplayedColumns"></tr>
+                                    <tr mat-row 
+                                    *matRowDef="let row; columns: membDisplayedColumns;  let i= index"
+                                    [ngClass]="{'highlight': selectedRowIndex == i}"
+                                    (click)="highlight('membs',i)"
+                                    tabindex="999"
+                                    (keydown.arrowdown)="arrowDownEvent('membs',selectedRowIndex)"
+                                    (keydown.arrowup)="arrowUpEvent('membs',selectedRowIndex)" 
+                                    (keydown.enter)="selectMemb(membArr[selectedRowIndex])" ></tr>
+                                </table>
+                            </div>
+                            <mat-dialog-actions align="end">
+                                <button mat-button 
+                                matDialogClose="close">Close</button>
+                            </mat-dialog-actions>
+                        </ng-template>
+                </div>
+            </mat-card-content>
+            <mat-tab-group mat-align-tabs="center" >
+                <mat-tab label="Home" style="color:wheat;">
+                    <div class="col-11">
+                        <b>Search</b>
+                        <mat-form-field class="full-width">
+                            <mat-icon matPrefix>search</mat-icon>
+                            <input matInput type="text" style="color: black;" placeholder="Please Enter Your Seach Keyword to filter" (keyup)="quickBoatSearch()" [(ngModel)]="searchValue">
+                        </mat-form-field>
+                    </div>
+                    <!-- GET PARTY DETAILS FOR THIS CUSTOMER-->
+                    <ag-grid-angular style="width: 100%; height: 360px ;" 
+                    class="ag-theme-balham" [animateRows]="true"
+                    [pagination]="true" [paginationPageSize]="25" 
+                    [gridOptions]="gridOptions" 
+                    [rowStyle]="rowStyle"
+                    [suppressRowClickSelection]="true"
+                    (cellClicked)='onViewCellClicked($event)'
+                    [columnDefs]="columnBoatDefs"
+                    (gridReady)="onGridBoatReady($event)"></ag-grid-angular>     
+                </mat-tab>
+            </mat-tab-group>
+        </mat-card>
+    </div>
+</div>

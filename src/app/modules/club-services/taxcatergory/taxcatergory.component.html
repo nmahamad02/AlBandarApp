@@ -1,0 +1,106 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-10">
+            <div class="col-12">
+                <mat-card style="color: darkblue; background-color:rgb(251, 252, 249);">
+                    <mat-card-header>
+                        <mat-card-title>Tax Category Management</mat-card-title>
+                    </mat-card-header>
+                    <hr>
+                    <mat-card-content>
+                        <form class="form-container" [formGroup]="taxFrom">
+                            <div class="row">
+                                <div class="col-6">
+                                    <mat-form-field appearance="fill">
+                                        <mat-label>Tax Catergory Id</mat-label>
+                                        <input matInput required formControlName="taxid" value="{{vartaxid}}">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                    <mat-form-field appearance="fill">
+                                        <mat-label>Tax Category Name</mat-label>
+                                        <input matInput required formControlName="taxName" value="{{vartaxname}}">
+                                        <mat-error>Category Name is <strong>required</strong></mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <mat-form-field appearance="fill">
+                                        <mat-label>Tax Group</mat-label>
+                                        <input matInput required formControlName="TaxGroup" value="{{vartaxGroup}}">
+                                        <mat-error>Tax Group is <strong>required</strong></mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                    <mat-form-field appearance="fill">
+                                        <mat-label>Sequence</mat-label>
+                                        <input matInput required formControlName="Sequence" value="{{varsequence}}">
+                                        <mat-error>Sequence is <strong>required</strong></mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <mat-form-field appearance="fill">
+                                        <mat-label>Tax %</mat-label>
+                                        <input matInput formControlName="TaxPer" value="{{vartaxper}}">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                    <mat-form-field appearance="fill">
+                                        <mat-label>Posting Account</mat-label>
+                                        <input matInput required formControlName="PostAcc" value="{{varpostacc}}">
+                                        <mat-error>Posting Account is <strong>required</strong></mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <mat-form-field appearance="fill">
+                                        <mat-label>Remarks </mat-label>
+                                        <input matInput formControlName="remarks"  value="{{varremarks}}">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-6">
+                                    <mat-form-field appearance="fill">
+                                        <mat-label>Active</mat-label>
+                                        <input matInput formControlName="active" value="{{varactive}}">
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-3">
+                                    <button  mat-button style="background-color: green; color: white; width: 100%">Submit</button> 
+                                </div>
+                                <div class="col-2">
+                                    <button mat-button style="background-color: red; color: white; width: 100%;">Cancel</button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="col-11">
+                            <b>Search</b>
+                            <mat-form-field class="full-width">
+                                <mat-icon matPrefix>search</mat-icon>
+                                <input matInput type="text" style="color: black;" placeholder="Please Enter Your Seach Keyword to filter" (keyup)="quickSeriveSearch()" [(ngModel)]="searchValue">
+                            </mat-form-field>
+                        </div>
+                        <!-- GET PARTY DETAILS FOR THIS CUSTOMER-->
+                        <ag-grid-angular style="width: 100%; height: 400px ;" 
+                        class="ag-theme-balham" [animateRows]="true"
+                        [pagination]="true" [paginationPageSize]="25" 
+                        [gridOptions]="gridOptions" 
+                        [rowStyle]="rowStyle"
+                        [suppressRowClickSelection]="true"
+                        (cellClicked)='onViewCellClicked($event)'
+                        [columnDefs]="columnTaxdefs"
+                        (gridReady)="onGridTaxReady($event)"></ag-grid-angular>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </div>
+        <div class="col-1"></div>
+    </div>
+</div>

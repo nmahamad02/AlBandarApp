@@ -1,0 +1,88 @@
+<div class="container-fluid">
+    <br>
+    <div class="col-12">
+        <mat-card style="color: darkblue; background-color:rgb(251, 252, 249);">
+            <mat-card-header>
+                <div class="col-12">
+                    <mat-card-title i18n="@@CMMContactsTitle">
+                        Member Analytics
+                    </mat-card-title> 
+                </div>
+            </mat-card-header>
+            <hr>
+            <mat-card-content>
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col">
+                            <button class="btn btn-outline-primary btn-block" (click)="showPrimaryMembers()">Primary Members</button>
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-outline-primary btn-block" (click)="showActiveMembers()">Active Members</button>
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-outline-primary btn-block" (click)="showExpiringAgreements()">Expiring Agreements</button>
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-outline-primary btn-block" (click)="showMemberBirthdays()">Member Birthdays</button>
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-outline-primary btn-block" (click)="showCorporateMembers()">Corporate Members</button>
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-outline-primary btn-block" (click)="showFamilyMembers()">Family Members</button>
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-outline-primary btn-block" (click)="showComplimentaryMembers()">Complimentary Members</button>
+                        </div>
+                    </div>
+                    <div class="col-12" *ngIf="priMemBool">
+                        <h3>Primary Members List</h3>
+                        <table class="table table-hover table-striped table-bordered table-responsive">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>CPR</th>
+                                    <th>Address</th>
+                                    <th>Telephone</th>
+                                    <th>Email</th>
+                                    <th>Account Code</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let member of memberData">
+                                    <td>{{ member.MemberNo }}</td>
+                                    <td>{{ member.TITLE }} {{ member.NAME }} {{ member.SURNAME }}</td>
+                                    <td>{{ member.CPRNo }}</td>
+                                    <td>{{ member.ADD1 }}, {{ member.ADD2 }}, {{ member.ADD3 }}</td>
+                                    <td>{{ member.TELOFF }}</td>
+                                    <td>{{ member.Email }}</td>
+                                    <td>{{ member.ACCODE }}</td>                                    
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-12" *ngIf="actMemBool">
+                        <h3>Active Members List</h3>
+                    </div>
+                    <div class="col-12" *ngIf="expAgrBool">
+                        <h3>Expiring Agreements List</h3>
+                    </div>
+                    <div class="col-12" *ngIf="memBirthBool">
+                        <h3>Member Birthday List</h3>
+                    </div>
+                    <div class="col-12" *ngIf="corMemBool">
+                        <h3>Corporate Members List</h3>
+                    </div>
+                    <div class="col-12" *ngIf="famMemBool">
+                        <h3>Family Members List</h3>
+                    </div>
+                    <div class="col-12" *ngIf="comMemBool">
+                        <h3>Complimentary Members List</h3>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>
+                

@@ -1,5 +1,7 @@
+import { formatDate } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { _MatDialogBase } from '@angular/material/dialog';
 import { GridOptions } from 'ag-grid-community';
 import { FinanceService } from 'src/app/services/finance/finance.service';
 
@@ -27,6 +29,8 @@ export class TaxcatergoryComponent implements OnInit {
   varpostacc: string = "";
   varremarks: string = "";
   varactive: string = "";
+  utc = new Date();
+  mCurDate = this.formatDate(this.utc);
 
   constructor(private financeservice : FinanceService) { 
     this.taxFrom = new FormGroup({
@@ -91,26 +95,52 @@ export class TaxcatergoryComponent implements OnInit {
   onViewCellClicked(event: any){
     console.log(event.data);
     if (event.column.colId =="TAX_CATEGORY_NAME" ){
-     this.vartaxid = event.data.TAX_CATEGORY_CD;
-     this.vartaxname= event.data.TAX_CATEGORY_NAME;
-     this.varsequence= event.data.SEQUENCE;
-     this.vartaxper = event.data.TAX_1_PERC;
-     this.varpostacc = event.data.TAX_1_GL_AC_NO;
-     if(event.data.ACTIVE){
-      this.varactive ="Yes";
-     }else{
-      this.varactive ="No";
-     }
-     
-     this.vartaxGroup = event.data.TAX_GROUP_ID;
-     this.varremarks = event.data.DESCRIPTION;
+      this.taxFrom.patchValue({
+        taxid: event.data.TAX_CATEGORY_CD,
+        taxName: event.data.TAX_CATEGORY_NAME,
+        TaxGroup: event.data.TAX_GROUP_ID,
+        Sequence: event.data.SEQUENCE,
+        TaxPer:  event.data.TAX_1_PERC,
+        PostAcc: event.data.TAX_1_GL_AC_NO,
+        remarks: event.data.DESCRIPTION,
+        active: event.data.ACTIVE,
+      })
     }
+  }
+
+  submitForm(){
+    const data = this.taxFrom.value
+
+    console.log(data)
+    this.financeservice.getTaxCategorybytaxcode(data.taxid).subscribe((res: any) =>{
+      
+      this.financeservice.updatetax('01',data.remarks,data.TaxGroup,data.TaxPer,'0',data.Sequence,data.active,'DBA',this.mCurDate,data.taxid)
+    },(err: any) =>{
+      this.financeservice.getMaxTax().subscribe((res: any) => {
+        const maxtax = res.recordset[0].MAXTAX + 1;
+        this.financeservice.posttax('01',maxtax,data.taxid,data.taxName,data.remarks,data.TaxGroup,data.TaxPer,data.PostAcc,data.Sequence,data.active,'DBA',this.mCurDate)
+      },(err: any) =>{
+        console.log(err)
+      })
+     
+    })
   }
 
   quickSeriveSearch() { 
     this.gridApi.setQuickFilter(this.searchValue);
   }
-  
+
+  formatDate(date: any) {
+    var d = new Date(date), day = '' + d.getDate(), month = '' + (d.getMonth() + 1), year = d.getFullYear();
+
+    if (day.length < 2) {
+      day = '0' + day;
+    } 
+    if (month.length < 2) {
+      month = '0' + month;
+    }
+    return [day, month, year].join('-');
+  }
 
   ngOnInit(): void {
   }

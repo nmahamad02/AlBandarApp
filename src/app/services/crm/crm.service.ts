@@ -1,4 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { Injectable } from '@angular/core';
 
 
@@ -129,6 +130,18 @@ export class CrmService {
     return this.http.get(this.url + '/coa/getbANKDETAiLSbODe/'+ bankname)
   }
 
+  getSumofMemberprice(agrementno:any){
+    return this.http.get(this.url + '/crm/getSumofMemberprice/'+ agrementno)
+  }
+
+  getAgreementBLA(agrementno:any,membercode: any){
+    return this.http.get(this.url + '/crm/getAgreementBLA/'+ agrementno + '/' + membercode)
+  }
+
+  deleteAgreementBLA(agrementno:any,membercode: any){
+    return this.http.get(this.url + '/coa/deleteAgreementBLA/'+ agrementno + '/' + membercode)
+  }
+
   getExpenseMaster(expid){
     return this.http.get(this.url + '/coa/getExpenseMaster/' + expid)
   }
@@ -145,9 +158,19 @@ export class CrmService {
     return this.http.get(this.url + '/crm/getSOMaster/' + sono)
   }
 
+  getagreementmaster(argno: any){
+    return this.http.get(this.url + '/coa/getAgreementsMaster/' + argno)
+  }
+
+  getagreementDetails(argno: any){
+    return this.http.get(this.url + '/coa/getAgreementsDetails/' + argno)
+  }
+
   getExpenseMasterExpid(){
     return this.http.get(this.url + '/coa/getExpenseMasterExpid')
   }
+
+  
 
   getDependentMembers(memberno:any){
     return this.http.get(this.url + '/crm/getDependentMembers/'+ memberno)
@@ -275,6 +298,8 @@ export class CrmService {
     return this.http.post(this.url + '/coa/postExpenseMaster', JSON.stringify(newMember), { headers: headers })
   }
 
+  
+
   UpdateExpenseMaster(expname: string, glcode: string, active: string, user: string, date: string, expcode: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
     const newMember = {
@@ -354,6 +379,10 @@ export class CrmService {
 
   getPartyDetails(partyid:string){
     return this.http.get(this.url + '/coa/PartyDetails/'+ partyid)
+  }
+
+  getPartyFromName(name: string){
+    return this.http.get(this.url + '/coa/partyFromName/'+ name)
   }
 
   getReferenceCode(pcode:any){

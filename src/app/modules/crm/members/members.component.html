@@ -61,6 +61,43 @@
             <hr>
             <mat-card-content>
                 <div class="col-12">
+                    <div class="row">
+                        <div class="col-4">
+                            <button mat-raised-button 
+                            class="btn btn-primary btn-block" 
+                            style="border-radius: 10%;" 
+                            (click)="exportAsXLSX()">
+                                <mat-icon>print</mat-icon> ALL MEMBERS
+                            </button>
+                        </div>                                
+                        <div class="col-4">
+                            <button mat-raised-button 
+                            class="btn btn-primary btn-block" 
+                            style="border-radius: 10%;" 
+                            (click)="exportPrimaryAsXLSX()">
+                                <mat-icon>print</mat-icon> ALL PRIMARY MEMBERS
+                            </button>
+                        </div>                                
+                        <div class="col-4">
+                            <button mat-raised-button 
+                            class="btn btn-primary btn-block" 
+                            style="border-radius: 10%;" 
+                            (click)="getPrimarySIngleMember()">
+                                <mat-icon>print</mat-icon> PRIMARY MEMEBERS
+                            </button>
+                        </div> 
+                        <div class="col-4">
+                            <button mat-raised-button 
+                            class="btn btn-primary btn-block" 
+                            style="border-radius: 10%;" 
+                            (click)="getBoatmember()">
+                                <mat-icon>print</mat-icon> MEMBER BOAT
+                            </button>
+                        </div>                                
+                    </div>
+                </div>
+                <hr>
+                <div class="col-12">
                     <form class="form-container"
                     [formGroup]="memberForm">
                         <div class="row">
@@ -309,40 +346,6 @@
                                             </mat-label>
                                             <input formControlName="faxNbr" matInput>
                                         </mat-form-field>
-                                    </div>                                
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <button mat-raised-button 
-                                        class="btn btn-primary btn-block" 
-                                        style="border-radius: 10%;" 
-                                        (click)="exportAsXLSX()">
-                                            <mat-icon>print</mat-icon> ALL MEMBERS
-                                        </button>
-                                    </div>                                
-                                    <div class="col">
-                                        <button mat-raised-button 
-                                        class="btn btn-primary btn-block" 
-                                        style="border-radius: 10%;" 
-                                        (click)="exportPrimaryAsXLSX()">
-                                            <mat-icon>print</mat-icon> ALL PRIMARY MEMBERS
-                                        </button>
-                                    </div>                                
-                                    <div class="col">
-                                        <button mat-raised-button 
-                                        class="btn btn-primary btn-block" 
-                                        style="border-radius: 10%;" 
-                                        (click)="getPrimarySIngleMember()">
-                                            <mat-icon>print</mat-icon> PRIMARY MEMEBERS
-                                        </button>
-                                    </div> 
-                                    <div class="col">
-                                        <button mat-raised-button 
-                                        class="btn btn-primary btn-block" 
-                                        style="border-radius: 10%;" 
-                                        (click)="getBoatmember()">
-                                            <mat-icon>print</mat-icon> MEMBER BOAT
-                                        </button>
                                     </div>                                
                                 </div>
                             </div>

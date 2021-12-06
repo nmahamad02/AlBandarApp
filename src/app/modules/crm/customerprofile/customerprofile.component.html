@@ -12,28 +12,28 @@
                             <mat-card-actions>
                                 <div class="row">
                                     <div class="col">
-                                        <button mat-raised-button class="bg-primary text-white btn btn-block" style="border-radius: 50%;" [routerLink]="['/crm/dashboard']">
+                                        <button mat-raised-button class="bg-primary text-white btn btn-block" style="border-radius: 50%;" (click)="newForm()" >
                                             <mat-icon>add</mat-icon> New
                                         </button>
                                     </div>
                                     <div class="col">
-                                        <button type="submit" mat-raised-button class="bg-secondary text-white btn btn-block" style="border-radius: 50%;" [routerLinkActive]="['active']" [routerLink]="['/crm/contactllist']">
+                                        <button type="submit" mat-raised-button class="bg-secondary text-white btn btn-block" style="border-radius: 50%;" (click)="exportTOexcel()"  >
                                             <mat-icon>print</mat-icon> Print
                                         </button>
                                     </div>
                                     <div class="col">
-                                        <button mat-raised-button class="bg-success  text-white btn btn-block" style="border-radius: 50%;">
+                                        <button mat-raised-button class="bg-success  text-white btn btn-block" style="border-radius: 50%;" (click)="submitForm()" >
                                             <mat-icon>note_add</mat-icon> Submit 
                                         </button>
                                     </div>
                                     <div class="col">
-                                        <button mat-raised-button class="bg-info text-white btn btn-block" style="border-radius: 50%;" [routerLink]="['/crm/dashboard']">
-                                            <mat-icon>Delete</mat-icon> Delete
+                                        <button mat-raised-button class="bg-info text-white btn btn-block" style="border-radius: 50%;" >
+                                            <mat-icon>delete</mat-icon> Delete
                                         </button>   
                                     </div>
                                     <div class="col">
-                                        <button mat-raised-button class="bg-danger text-white btn btn-block" style="border-radius: 50%;" [routerLink]="['/crm/dashboard']">
-                                            <mat-icon>cancel</mat-icon> Exit
+                                        <button mat-raised-button class="bg-danger text-white btn btn-block" style="border-radius: 50%;" (click)="refreshForm()" >
+                                            <mat-icon>cancel</mat-icon> Cancel
                                         </button>
                                     </div>  
                                 </div>
@@ -47,20 +47,21 @@
                     <div class="row">
                         <div class="col-2">
                             <mat-form-field class="full-width">
-                                <input formControlName="pcode" matInput required  value="{{varpcode}}">
+                                <mat-label >Customer Code </mat-label>
+                                <input matInput #pcode formControlName="pcode" matInput required  value="{{varpcode}}"
+                                (keydown.enter)="getCustmerDetails(pcode.value)" >
                             </mat-form-field>
                         </div>
                         <div class="col-4">
                             <mat-form-field class="full-width">
                                 <mat-label >Name</mat-label>
                                 <input formControlName="cname" matInput required  value="{{varName}}">
-                                <mat-error >Name is <strong>required</strong></mat-error>
                             </mat-form-field>
                         </div>
                         <div class="col-2">
                             <mat-form-field class="full-width">
                                     <mat-label>Account Category</mat-label>
-                                <mat-select [(ngModel)]="varAccountCategory">
+                                <mat-select formControlName="cAccountCategory">
                                     <mat-option *ngFor="let type of AccountsCategoryList" [value]="type.CATEGORY_CD">{{ type.CATEGORY_CD }} - {{ type.CATEGORY_DESC}}</mat-option>
                                 </mat-select>
                             </mat-form-field> 
@@ -68,16 +69,15 @@
                         <div class="col-2">
                             <mat-form-field class="full-width">
                                 <mat-label>Branch</mat-label>
-                                <mat-select formControlName="cBranch"  value="{{varBranch}}">
-                                    <mat-option  value="true">True</mat-option>
-                                    <mat-option  value="false">False</mat-option>
-                                  </mat-select>
+                                  <mat-select formControlName="cBranch">
+                                    <mat-option *ngFor="let brh of BranchArr" [value]="brh.BRANCH_ID">{{ brh.BRANCH_NAME }}</mat-option>
+                                </mat-select>
                             </mat-form-field>
                         </div>
                         <div class="col-2">
                             <mat-form-field class="full-width">
                                 <mat-label>Type</mat-label>
-                                <mat-select [(ngModel)]="varAccountType">
+                                <mat-select formControlName="cType">
                                     <mat-option *ngFor="let type of AccountsTypeList" [value]="type.TYPE_CD">{{ type.TYPE_CD }} - {{ type.TYPE_DESC}}</mat-option>
                                 </mat-select>
                            </mat-form-field> 
@@ -88,24 +88,20 @@
                             <mat-form-field class="full-width">
                                 <mat-label >Account Group</mat-label>
                                 <mat-select formControlName="CAccountGroupName" matInput required value="{{varAccountGroupName}}">
-                                    <mat-option value="TRADE DEBTORS">TRADE DEBTORS</mat-option>
-                                    <mat-option value="CLIMATIC DEBTORS">CLIMATIC DEBTORS</mat-option>
-                                  </mat-select>
-                                
+                                    <mat-option value="TRADE">TRADE DEBTORS</mat-option>
+                                </mat-select>
                             </mat-form-field>
                         </div>
                         <div class="col-3">
                             <mat-form-field class="full-width">
                                 <mat-label>External Code</mat-label>
                                 <input formControlName="cExternalCode" matInput required>
-                                <mat-error >exteranl code is <strong>required</strong></mat-error>
                               </mat-form-field> 
                         </div>
                         <div class="col-3">
                             <mat-form-field class="full-width">
-                                <mat-label>Credit Peroid</mat-label>
+                                <mat-label>Credit Period</mat-label>
                                 <input formControlName="cCreditPeriod" matInput required value="{{varcreditPeriod}}">
-                                <mat-error >exteranl code is <strong>required</strong></mat-error>
                             </mat-form-field>
                         </div>
 
@@ -113,7 +109,6 @@
                             <mat-form-field class="full-width">
                                 <mat-label>Limit</mat-label>
                                 <input formControlName="cLimit" matInput required value="{{varLimit}}">
-                                <mat-error >Limit is <strong>required</strong></mat-error>
                               </mat-form-field> 
                         </div>
 
@@ -122,11 +117,10 @@
                         <div class="col-3">
                             <mat-form-field class="full-width">
                                 <mat-label >Active</mat-label>
-                                <mat-select formControlName="cActive">
-                                    <mat-option value="true">True</mat-option>
-                                    <mat-option value="false">False</mat-option>
-                                  </mat-select>
-                                
+                                <mat-select formControlName="cStatus">
+                                    <mat-option value="O">True</mat-option>
+                                    <mat-option value="I">False</mat-option>
+                                </mat-select>
                             </mat-form-field>
                         </div>
                         
@@ -134,14 +128,12 @@
                             <mat-form-field class="full-width">
                                 <mat-label>CR/CPR</mat-label>
                                 <input formControlName="cCR" matInput required value="{{varCrCpr}}">
-                                <mat-error >CR/CPR is <strong>required</strong></mat-error>
                             </mat-form-field>
                         </div>
                         <div class="col-6">
                             <mat-form-field class="full-width">
                                 <mat-label>TAX NO</mat-label>
                                 <input formControlName="cTaxNo" matInput required value="{{varTaxNo}}">
-                                <mat-error >Tax No is <strong>required</strong></mat-error>
                             </mat-form-field>
                         </div>
                     </div>

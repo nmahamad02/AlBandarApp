@@ -8,6 +8,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { GridOptions } from 'ag-grid-community';
 import { CrmService } from 'src/app/services/crm/crm.service';
+import * as ExcelJS from  'exceljs/dist/exceljs.min.js';
+import * as FileSaver from 'file-saver';
+import { FinanceService } from 'src/app/services/finance/finance.service';
+import { DataSharingService } from 'src/app/services/data-sharing/data-sharing.service';
+const EXCEL_EXTENSION = '.xlsx';
+const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
 
 
 @Component({
@@ -18,6 +24,7 @@ import { CrmService } from 'src/app/services/crm/crm.service';
 export class ContactsComponent implements OnInit {
   mYear = '2021';
   pcodeArr : any[] = [];
+  AreaArr : any[] = [];
   varPartyId: string = "";
   public contactsForm: FormGroup;
   searchValue: any;
@@ -34,7 +41,10 @@ export class ContactsComponent implements OnInit {
   mCurDate = this.formatDate(this.utc);
   pcodeDisplayedColumns: string[] = ['pcode', 'custname', 'opbal', 'glcode'];
   pcodeDataSource = new MatTableDataSource(this.pcodeArr);
-
+  areaDisplayedColumns: string[] = ['areano', 'areaname'];
+  areaDataSource = new MatTableDataSource(this.AreaArr);
+  columns: any[];
+  partyArr: any[] = [];
   /*varContactID: any;
   varConatctPerson: any;
   varName: String = "";
@@ -57,9 +67,13 @@ export class ContactsComponent implements OnInit {
   mpcode: String = "";
   mPartyDetails: any;
   @ViewChild('pcodeLookupDailoug') pcodeLookupDailoug!: TemplateRef<any>;
+  @ViewChild('areaLookupDailoug') areaLookupDailoug!: TemplateRef<any>;
   selectedRowIndex: any = 0;
 
-  constructor(private crmservices:CrmService, public snackbar: MatSnackBar,private dialog:MatDialog) { 
+  invReportApiUrl: string = "";
+  invReportName: string = "";
+
+  constructor(private crmservices:CrmService, public snackbar: MatSnackBar,private dialog:MatDialog,private financeservice: FinanceService,private dataSharing: DataSharingService ) { 
     this.contactsForm = new FormGroup({
       contactId: new FormControl('', [Validators.required]),
       contactPerson: new FormControl('', [Validators.required]),
@@ -82,6 +96,9 @@ export class ContactsComponent implements OnInit {
       phone1: new FormControl('', []),
       phone2: new FormControl('', []),
     });
+
+    this.columns = ["Customer Code","Party ID","Party Name","Address 1","Address 3","Phone Number","Mobile","Email id","Fax1","Contact"];
+
     this.columnDefs = [
       { 
         headername: "ContactPerson NO",sortable: true ,
@@ -135,6 +152,9 @@ export class ContactsComponent implements OnInit {
  
   
   ngOnInit(): void {
+    this.getPartyexcel();
+    this.invReportApiUrl = "coa/getOpbalForPrint";
+    this.invReportName = "CLINETLIST.rdlx-json";
   }
 
   onGridPartyrDetails(params: any){ 
@@ -208,6 +228,40 @@ export class ContactsComponent implements OnInit {
     }
   }
   
+  
+  getPartyDetails(value : any){
+    this.crmservices.getPartyDetails(value).subscribe((res: any) => {
+      this.selectParty(res.recordset[0])
+    }, (err: any) => {
+      console.log(err);
+    })
+
+  }
+
+  selectParty(data: any){
+    this.contactsForm.patchValue({
+      contactId: data.PARTY_ID,
+      contactPerson: data.NAME,
+      name: data.NAME,
+      pcode:data.PCODE,
+      address1: data.ADD1,
+      address2: data.ADD2,
+      address3: data.ADD3,
+      flat: data.FLAT,
+      buildingHouse: data.BUILDING,
+      road: data.STREET,
+      block: data.BLOCK,
+      area: data.CITY,
+      poBox: data.POBOX,
+      refNo: data.REFNO,
+      mobileNo:  data.MOBILE,
+      fax1: data.FAX1,
+      fax2: data.FAX2,
+      email: data.EMAIL_ID,
+      phone1: data.PHONE1,
+      phone2: data.PHONE2
+    })
+  }
   getPartyData(partyNo:any) {
     this.crmservices.getPartyDetails(partyNo).subscribe((res: any) => {
       this.mPartyDetails = res.recordset[0];
@@ -222,9 +276,21 @@ export class ContactsComponent implements OnInit {
     console.log(value)
     this.selectedRowIndex = 0;
     let dialogRef = this.dialog.open(this.pcodeLookupDailoug);    
-    this.crmservices.getPcode(value, this.mYear).subscribe((res: any) => {
+    this.crmservices.getPcodeFromName(value, this.mYear).subscribe((res: any) => {
       this.pcodeArr = res.recordset;
       this.pcodeDataSource = new MatTableDataSource(this.pcodeArr);
+    }, (err: any) => {
+      console.log(err);
+    })
+  }
+
+  lookUpArea(value: string) {
+    console.log(value)
+    this.selectedRowIndex = 0;
+    let dialogRef = this.dialog.open(this.areaLookupDailoug);    
+    this.financeservice.getAreaName(value).subscribe((res: any) => {
+      this.AreaArr = res.recordset;
+      this.areaDataSource = new MatTableDataSource(this.AreaArr);
     }, (err: any) => {
       console.log(err);
     })
@@ -233,6 +299,9 @@ export class ContactsComponent implements OnInit {
   highlight(type: string, index: number){
     if(type === "prod"){
       if(index >= 0 && index <= this.pcodeArr.length - 1)
+      this.selectedRowIndex = index;
+    }else if(type === "area"){
+      if(index >= 0 && index <= this.AreaArr.length - 1)
       this.selectedRowIndex = index;
     }
       
@@ -253,6 +322,16 @@ export class ContactsComponent implements OnInit {
    
     let dialogRef = this.dialog.closeAll();
   }
+
+  selectarea(obj: any) {
+    
+    this.contactsForm.patchValue({
+      area: obj.AreaName
+    })
+   let dialogRef = this.dialog.closeAll();
+ }
+
+
 
   submitForm() {
     const data = this.contactsForm.value;
@@ -294,6 +373,123 @@ export class ContactsComponent implements OnInit {
     // console.log(data);
     // this.crmservices.postParty('01',data.contactId,data.contactPerson,data.address1,data.address2,data.address3,data.phone1,data.phone2,data.mobileNo,data.email,
     // data.fax1,data.fax2,data.refNo,data.contactPerson,data.flat,data.buildingHouse,data.road,data.block,data.area,data.poBox,'','','Rakshak','08-08-2021','','08-08-2021')
+  }
+
+  getPartyexcel(){
+    this.financeservice.getPartyForExcel().subscribe((res: any) => {
+      this.partyArr = res.recordset
+      console.log(res)
+    },(err: any) =>{
+      console.log(err)
+    })
+  }
+  public exportAsExcelFile(
+    reportHeading: string,
+    reportSubheading: string,
+    headerArray: any[],
+    excelfileName: string,
+    sheetname:string
+    
+    ) {
+      const data = this.partyArr;
+      const header = headerArray;
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = 'ifasoft';
+      workbook.lastModifiedBy = 'ifasoft';
+      workbook.created = new Date();
+      workbook.modified = new Date();
+      const worksheet = workbook.addWorksheet(sheetname);
+
+      worksheet.addRow([]);
+      worksheet.mergeCells('A1:' + this.numToAlpha(header.length - 1) + '1');
+      worksheet.getCell('A1').value = reportHeading;
+      worksheet.getCell('A1').alignment = {horizontal: 'center'};
+      worksheet.getCell('A1').font = {name:'Times New Roman',size:20 ,bold:false};
+
+      if (reportSubheading !== ''){
+        worksheet.addRow([]);
+      worksheet.mergeCells('A2:' + this.numToAlpha(header.length - 1) + '2');
+      worksheet.getCell('A2').value = reportSubheading;
+      worksheet.getCell('A2').alignment = {horizontal: 'center'};
+      worksheet.getCell('A2').font = {size:14 ,bold:false};
+      
+      }
+
+      worksheet.addRow([]);
+
+      const HeaderRow = worksheet.addRow(header);
+
+      HeaderRow.eachCell((cell,index) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFFFFF00'},
+          bgColor: { argb: 'FF0000FF'}
+        };
+        cell.border = {top: {style: 'thin'},left: {style: 'thin'},bottom: {style: 'thin'},right: {style: 'thin'}};
+        cell.font = {name: 'Times New Roman', size: 12, bold: false};
+        cell.alignment = {horizontal: 'center'};
+        worksheet.getColumn(1).width = 15;
+        worksheet.getColumn(2).width = 22;
+        worksheet.getColumn(3).width = 40;
+        worksheet.getColumn(4).width = 15;
+        worksheet.getColumn(5).width = 32;
+        worksheet.getColumn(6).width = 32;
+        worksheet.getColumn(7).width = 32;
+        worksheet.getColumn(8).width = 36;
+        worksheet.getColumn(9).width = 21;
+        worksheet.getColumn(10).width = 21;
+        // worksheet.getColumn(index).width = header[index - 1].length < 20 ? 20 : header[index - 1].length;
+
+      });
+
+      let columnsArray: any[];
+      for (const key in this.partyArr){
+        if(this.partyArr.hasOwnProperty(key)){
+          columnsArray = Object.keys(this.partyArr[key]);
+        }
+      }
+
+      data.forEach((element: any) => {
+        const eachrow = [];
+        columnsArray.forEach((column) => {
+          eachrow.push(element[column]);
+        });
+
+        if(element.isDeleted === 'Y'){
+          const deleteRow = worksheet.addRow(eachrow);
+          deleteRow.eachCell((cell) => {
+            cell.font = {name: 'Times New Roman', family: 4, size:11, bold: false, strike: true};
+          });
+        } else {
+          worksheet.addRow(eachrow);
+        }
+      });
+
+      workbook.xlsx.writeBuffer().then((data: ArrayBuffer) => {
+        const blob = new Blob([data], {type: EXCEL_TYPE});
+        FileSaver.saveAs(blob, excelfileName + EXCEL_EXTENSION);
+      })
+  }
+
+  numToAlpha(num: number) {
+    let alpha = '';
+    for (; num >=0; num = parseInt((num / 26).toString(),10)-1){
+      alpha = String.fromCharCode(num %  26 + 0x41) + alpha;
+    }
+    return alpha;
+  }
+
+  setReportData(apiUrl: string, reportType: string){
+    const reportData = {
+      apiUrl: apiUrl,
+      reportType: reportType
+    };
+    this.dataSharing.setData(reportData);
+  }
+
+  ExportToExcel(){
+    this.exportAsExcelFile('AL Bander Hotel & Resort','All Party List',this.columns,'Party-Report','sheet1')
   }
 
   formatDate(date: any) {

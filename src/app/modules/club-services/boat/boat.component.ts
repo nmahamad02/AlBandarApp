@@ -90,6 +90,8 @@ export class BoatComponent implements OnInit {
       jetskiExpiry: new FormControl('', []),
       boatNo: new FormControl('', [Validators.required]),
       licenseExpiry: new FormControl('', [Validators.required]),
+      boatlength: new FormControl('', [Validators.required]),
+      parkingslot: new FormControl('', [Validators.required]),
     });
 
     this.columnBoatDefs = [
@@ -356,7 +358,9 @@ export class BoatComponent implements OnInit {
         jetskiReg: event.data.JetSkiRegNo,
         jetskiExpiry: event.data.JetSkiExpDate,
         boatNo: event.data.BoatNo,
-        licenseExpiry: event.data.LicenseExpiryDate
+        licenseExpiry: event.data.LicenseExpiryDate,
+        boatlength: event.data.boatlength,
+        parkingslot: event.data.boatslot
       });
     }else if (event.column.colId =="BoatNo" ){
       this.boatForm.patchValue({
@@ -377,7 +381,9 @@ export class BoatComponent implements OnInit {
         jetskiReg: event.data.JetSkiRegNo,
         jetskiExpiry: event.data.JetSkiExpDate,
         boatNo: event.data.BoatNo,
-        licenseExpiry: event.data.LicenseExpiryDate
+        licenseExpiry: event.data.LicenseExpiryDate,
+        boatlength: event.data.boatlength,
+        parkingslot: event.data.boatslot
       });
     }
 
@@ -402,31 +408,43 @@ export class BoatComponent implements OnInit {
       jetskiReg: new FormControl('', []),
       jetskiExpiry: new FormControl('', []),
       boatNo: new FormControl('', [Validators.required]),
-      licenseExpiry: new FormControl('', [Validators.required]), 
+      licenseExpiry: new FormControl('', [Validators.required]),
+      boatlength: new FormControl('', [Validators.required]),
+      parkingslot: new FormControl('', [Validators.required]), 
     });
+    
   }
 
   newForm() {
-    this.boatForm = new FormGroup({
-      memberCode: new FormControl('', [Validators.required]),
-      boatType: new FormControl('', [Validators.required]),
-      registrationNo: new FormControl('', [Validators.required]),
-      boatColor: new FormControl('', []),
-      boatEngineType: new FormControl('', [Validators.required]),
-      modelNo: new FormControl('', [Validators.required]),
-      boatEngineNo: new FormControl('', [Validators.required]),
-      hostPower: new FormControl('', []),
-      expiryDate: new FormControl('', [Validators.required]),
-      regExpiry: new FormControl('', [Validators.required]),
-      deleteFlag: new FormControl('', []),
-      boatName: new FormControl('', [Validators.required]),
-      insuranceNo: new FormControl('', []),
-      insuranceExpiry: new FormControl('', []),
-      jetskiReg: new FormControl('', []),
-      jetskiExpiry: new FormControl('', []),
-      boatNo: new FormControl('***NEW***', [Validators.required]),
-      licenseExpiry: new FormControl('', [Validators.required]), 
-    });
+    this.clubservice.getBoatDocNo(this.mYear).subscribe(( res: any )=> {
+      this.mNewBoatNo = res.recordset[0].FIELD_VALUE_NM + 1;
+      const newBoatDocno = 'BOAT-' + this.mNewBoatNo.toString();
+      this.boatForm = new FormGroup({
+        memberCode: new FormControl('', [Validators.required]),
+        boatType: new FormControl('', [Validators.required]),
+        registrationNo: new FormControl('', [Validators.required]),
+        boatColor: new FormControl('', []),
+        boatEngineType: new FormControl('', [Validators.required]),
+        modelNo: new FormControl('', [Validators.required]),
+        boatEngineNo: new FormControl('', [Validators.required]),
+        hostPower: new FormControl('', []),
+        expiryDate: new FormControl('', [Validators.required]),
+        regExpiry: new FormControl('', [Validators.required]),
+        deleteFlag: new FormControl('', []),
+        boatName: new FormControl('', [Validators.required]),
+        insuranceNo: new FormControl('', []),
+        insuranceExpiry: new FormControl('', []),
+        jetskiReg: new FormControl('', []),
+        jetskiExpiry: new FormControl('', []),
+        boatNo: new FormControl(newBoatDocno, [Validators.required]),
+        licenseExpiry: new FormControl('', [Validators.required]),
+        boatlength: new FormControl('', [Validators.required]),
+        parkingslot: new FormControl('', [Validators.required]), 
+      });
+    },(err: any) =>{
+
+    })
+    
   }
 
   onGridBoatReady(params: any){ 
@@ -467,7 +485,9 @@ export class BoatComponent implements OnInit {
       jetskiReg: obj.JetSkiRegNo,
       jetskiExpiry: obj.JetSkiExpDate,
       boatNo: obj.BoatNo,
-      licenseExpiry: obj.LicenseExpiryDate
+      licenseExpiry: obj.LicenseExpiryDate,
+      boatlength: obj.boatlength,
+      parkingslot: obj.boatslot
     });
     let dialogRef = this.dailog.closeAll();
   }
@@ -476,40 +496,40 @@ export class BoatComponent implements OnInit {
     const data = this.boatForm.value;
     console.log(data);
     console.log(data.boatType)
-    if(data.boatNo == '***NEW***'){
-      this.clubservice.getBoatDocNo(this.mYear).subscribe(( res: any )=> {
-        this.mNewBoatNo = res.recordset[0].FIELD_VALUE_NM + 1;
-        const newBoatDocno = 'BOAT-' + this.mNewBoatNo.toString();
-        data.boatNo = newBoatDocno;
+    this.clubservice.getBoatDocNo(this.mYear).subscribe(( res: any )=> {
+      this.mNewBoatNo = res.recordset[0].FIELD_VALUE_NM + 1;
+      const newBoatDocno = 'BOAT-' + this.mNewBoatNo.toString();
+        if(data.boatNo == newBoatDocno){
+          this.clubservice.postBoatMaster(data.memberCode,data.boatType,data.registrationNo,data.boatColor,data.boatEngineType,
+          data.modelNo,data.boatEngineNo,data.hostPower,this.formatDate(data.expiryDate),this.formatDate(data.regExpiry),this.mCurDate,
+          data.boatName,data.insuranceNo,this.formatDate(data.insuranceExpiry),data.jetskiReg,this.formatDate(data.jetskiExpiry),newBoatDocno,this.formatDate(data.licenseExpiry),data.boatlength,data.parkingslot);
+        
+          this.clubservice.UpdateBoatDocNo(this.mYear,this.mNewBoatNo);
 
-        this.clubservice.postBoatMaster(data.memberCode,data.boatType,data.registrationNo,data.boatColor,data.boatEngineType,
+          this.snackBar.open(newBoatDocno + " successfully added", "close", {
+            duration: 10000,
+            verticalPosition: 'top',
+            panelClass: ['sbBg']
+          });
+          this.searchBoat(newBoatDocno);
+        
+        this.refreshForm();
+      }else{
+        this.clubservice.updateBoatMaster(data.memberCode,data.boatType,data.registrationNo,data.boatColor,data.boatEngineType,
         data.modelNo,data.boatEngineNo,data.hostPower,this.formatDate(data.expiryDate),this.formatDate(data.regExpiry),this.mCurDate,
-        data.boatName,data.insuranceNo,this.formatDate(data.insuranceExpiry),data.jetskiReg,this.formatDate(data.jetskiExpiry),data.boatNo,this.formatDate(data.licenseExpiry));
+        data.boatName,data.insuranceNo,this.formatDate(data.insuranceExpiry),data.jetskiReg,this.formatDate(data.jetskiExpiry),data.boatNo,this.formatDate(data.licenseExpiry),data.boatlength,data.parkingslot);
       
-        this.clubservice.UpdateBoatDocNo(this.mYear,this.mNewBoatNo);
-
-        this.snackBar.open(newBoatDocno + " successfully added", "close", {
+        this.snackBar.open(data.boatNo + " successfully Updated", "close", {
           duration: 10000,
           verticalPosition: 'top',
           panelClass: ['sbBg']
         });
-        this.searchBoat(newBoatDocno);
-      },(err: any ) => {
-        console.log(err);
-      })
-    }else{
-      this.clubservice.updateBoatMaster(data.memberCode,data.boatType,data.registrationNo,data.boatColor,data.boatEngineType,
-      data.modelNo,data.boatEngineNo,data.hostPower,this.formatDate(data.expiryDate),this.formatDate(data.regExpiry),this.mCurDate,
-      data.boatName,data.insuranceNo,this.formatDate(data.insuranceExpiry),data.jetskiReg,this.formatDate(data.jetskiExpiry),data.boatNo,this.formatDate(data.licenseExpiry));
-    
-      this.snackBar.open(data.boatNo + " successfully Updated", "close", {
-        duration: 10000,
-        verticalPosition: 'top',
-        panelClass: ['sbBg']
-      });
 
-      this.refreshForm()
-    }
+        this.refreshForm()
+      }
+    },(err: any ) => {
+      console.log(err);
+    })
   }
 
   formatDate(date: any) {

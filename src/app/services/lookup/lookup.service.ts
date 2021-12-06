@@ -33,6 +33,10 @@ export class LookupService {
     return this.http.get(this.url + '/lookup/getReferenceType')
   }
 
+  searchReference(){
+    return this.http.get(this.url + '/lookup/searchReference')
+  }
+
   
 
   

@@ -65,15 +65,18 @@
                                 </div>
                                 <div class="col-6">
                                     <mat-form-field appearance="fill">
-                                        <mat-label>Active</mat-label>
-                                        <input matInput formControlName="active" value="{{varactive}}">
+                                        <mat-label >Active</mat-label>
+                                        <mat-select formControlName="active">
+                                            <mat-option value="1">True</mat-option>
+                                            <mat-option value="0">False</mat-option>
+                                        </mat-select>
                                     </mat-form-field>
                                 </div>
                             </div>
                             <hr>
                             <div class="row">
                                 <div class="col-3">
-                                    <button  mat-button style="background-color: green; color: white; width: 100%">Submit</button> 
+                                    <button  mat-button style="background-color: green; color: white; width: 100%"  (click)="submitForm()">Submit</button> 
                                 </div>
                                 <div class="col-2">
                                     <button mat-button style="background-color: red; color: white; width: 100%;">Cancel</button>

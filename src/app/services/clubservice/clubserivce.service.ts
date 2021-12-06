@@ -43,7 +43,7 @@ export class ClubserivceService {
     return this.http.get(this.url + 'club/getMaxofServiceid')
   }
 
-  postBoatMaster( membercode: string, boattype: string, regno: string, boatcolor: string, boatenginetype: string,modelno: string, boatenggineno: string, hostpower: string,sallexpirydate: string, regexpiry: string,createdate: string,boatname: string, insurenceno: string, insurenceexpdate: string,jetskipregno: string, jetskiexpdate: string,boatno: string,linexpdate: string) {
+  postBoatMaster( membercode: string, boattype: string, regno: string, boatcolor: string, boatenginetype: string,modelno: string, boatenggineno: string, hostpower: string,sallexpirydate: string, regexpiry: string,createdate: string,boatname: string, insurenceno: string, insurenceexpdate: string,jetskipregno: string, jetskiexpdate: string,boatno: string,linexpdate: string,boatlength: string,boatslot: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     const newTran = {
@@ -65,6 +65,8 @@ export class ClubserivceService {
       jetskiexpdate: jetskiexpdate,
       boatno:boatno,
       linexpdate:linexpdate,
+      boatlength: boatlength,
+      boatslot: boatslot
     }
 
     this.http.post(this.url + 'club/postBoatMaster', JSON.stringify(newTran), { headers: headers }).subscribe((res: any) => {
@@ -85,7 +87,7 @@ export class ClubserivceService {
     })
   }
 
-  updateBoatMaster(membercode: string, boattype: string, regno: string, boatcolor: string, boatenginetype: string,modelno: string,  boatengineno: string, hostpower: string,sailexpdate: string, regexpiry: string,uppdatedate: string,boatname: string, insurenceno: string, insurenceexpdate: string,jetskipregno: string, jetskiexpdate: string,boatno: string,linexpdate: string) {
+  updateBoatMaster(membercode: string, boattype: string, regno: string, boatcolor: string, boatenginetype: string,modelno: string,  boatengineno: string, hostpower: string,sailexpdate: string, regexpiry: string,uppdatedate: string,boatname: string, insurenceno: string, insurenceexpdate: string,jetskipregno: string, jetskiexpdate: string,boatno: string,linexpdate: string,boatlength : string,boatslot: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     const newTran = {
@@ -106,8 +108,10 @@ export class ClubserivceService {
       jetskipregno: jetskipregno,
       jetskiexpdate: jetskiexpdate,
       boatno:boatno,
-      linexpdate:linexpdate
-
+      linexpdate:linexpdate,
+      boatlength: boatlength,
+      boatslot: boatslot,
+      
     }
 
     this.http.post(this.url + 'club/updateBoatMaster', JSON.stringify(newTran), { headers: headers }).subscribe((res: any) => {

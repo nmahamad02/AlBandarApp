@@ -302,10 +302,23 @@ export class DepartmentComponent implements OnInit {
     } 
   }
 
+  newForm(){
+    this.DepartMentForm = new FormGroup({
+      dptPrefix : new FormControl('' , []),
+      dptName : new FormControl('' , []),
+      dptLastSerial : new FormControl('' , []),
+      dptActive: new FormControl('', []),
+      dptType: new FormControl('', []),
+      dptItemArry: new FormArray([])
+    });
+  }
+
   onViewCellClicked(event: any){
+    
     console.log(event.data);
     this.mDeptid = event.data.DEPT_ID 
     if (event.column.colId =="DEPT_ID" ){
+      this.newForm();
       this.DepartMentForm.patchValue({
         dptPrefix : event.data.PREFIX,
         dptName : event.data.DEPT_NAME,
@@ -329,6 +342,7 @@ export class DepartmentComponent implements OnInit {
           })
       let dialogRef = this.dailog.closeAll();
     }else if (event.column.colId =="DEPT_NAME" ){
+      this.newForm();
       this.DepartMentForm.patchValue({
         dptPrefix : event.data.PREFIX,
         dptName : event.data.DEPT_NAME,

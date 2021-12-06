@@ -41,8 +41,9 @@ export class InvoicereportComponent implements AfterViewInit {
     const headers = new Headers();
 
     const dataRequest = new Request(
-      // "http://15.185.46.105:5001/api/" + this.reportMetaData.apiUrl,
-      "http://15.185.46.105:5000/api/getrptstockissue/SI21-15413",
+      "http://15.185.46.105:5001/api/" + this.reportMetaData.apiUrl,
+      // "http://15.185.46.105:5001/api/coa/getOpbalForPrint",
+
       {
         headers: headers,
       }
@@ -52,12 +53,11 @@ export class InvoicereportComponent implements AfterViewInit {
     const data = await response.json();
     return data;
   }
-
   async loadReport() {
     // load report definition from the file
     const reportResponse = await fetch(
-      // "assets/" + this.reportMetaData.reportType
-      "assets/stockissue.rdlx-json"
+      "assets/" + this.reportMetaData.reportType
+      // "assets/CLINETLIST.rdlx-json"
 
     );
     const report = await reportResponse.json();

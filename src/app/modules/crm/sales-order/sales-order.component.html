@@ -11,7 +11,10 @@
                             <mat-card-actions>
                                 <div class="row">
                                     <div class="col-2">
-                                        <button mat-raised-button class="bg-primary text-white btn btn-block" style="border-radius: 50%;">
+                                        <button mat-raised-button 
+                                        class="bg-primary text-white btn btn-block" 
+                                        style="border-radius: 50%;" 
+                                        (click)="newForm()" >
                                             <mat-icon>add</mat-icon> New
                                         </button>
                                     </div>
@@ -21,12 +24,18 @@
                                         </button>
                                     </div>
                                     <div class="col-2">
-                                        <button type="submit" mat-raised-button class="bg-secondary text-white btn btn-block" style="border-radius: 50%;" >  
+                                        <button type="submit" mat-raised-button 
+                                        class="bg-secondary text-white btn btn-block" 
+                                        style="border-radius: 50%;"
+                                        [routerLinkActive]="['active']" [routerLink]="['/crm/invoicereport']" (click)="setReportData(invReportApiUrl, invReportName)">  
                                             <mat-icon>print</mat-icon> Print
                                         </button>
                                     </div>
                                     <div class="col-2">
-                                        <button mat-raised-button class="bg-success text-white btn btn-block" style="border-radius: 50%;">
+                                        <button mat-raised-button 
+                                        class="bg-success text-white btn btn-block" 
+                                        style="border-radius: 50%;"
+                                        (click)="onFormSubmit()">
                                             <mat-icon>note_add</mat-icon> Submit 
                                         </button>
                                     </div>
@@ -36,8 +45,9 @@
                                         </button>   
                                     </div>
                                     <div class="col-2">
-                                        <button mat-raised-button class="bg-danger text-white btn btn-block" style="border-radius: 50%;">
-                                            <mat-icon>cancel</mat-icon> Exit
+                                        <button mat-raised-button class="bg-danger text-white btn btn-block" style="border-radius: 50%;"
+                                        (click)="refreshForm()">
+                                            <mat-icon>cancel</mat-icon> Cancel
                                         </button>
                                     </div>  
                                 </div>
@@ -48,106 +58,79 @@
             </mat-card-header>
             <mat-card-content>
                 <form [formGroup]="salesOrderForm" class="form-container">
-                    <div class="col-12">
+                    <div class="col-12"> 
                         <div class="form-row">
                             <div class="row">
-                                <div class="col-4" style="padding: 5px;">
-                                    <mat-form-field class="full-width">
-                                        <mat-label i18n="@@CMMContactsNameFormControl">Voucher Number</mat-label>
-                                        <input matInput 
-                                        #sono formControlName="voucherNo" 
-                                        (keydown.f2)="lookupSalesorder(sono.value)"
-                                        (keydown.enter)="getSalesorder(sono.value)" >
-                                    </mat-form-field>
+                                <div class="col-9">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <mat-form-field class="full-width">
+                                                <mat-label i18n="@@CMMContactsNameFormControl">Agreement Number</mat-label>
+                                                <input matInput 
+                                                #sono formControlName="voucherNo" 
+                                                (keydown.f2)="lookupSalesorder(sono.value)"
+                                                (keydown.enter)="getSalesorder(sono.value)" >
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-4">
+                                        </div>
+                                        <div class="col-4">
+                                            <mat-form-field class="full-width"> 
+                                                <mat-label i18n="@@CMMContactsMobileFormControl">Agreement Date</mat-label>
+                                                <input type="text" formControlName="voucherDate" matInput>
+                                                <mat-error i18n="@@CMMContactsMobileFormControlError">Agreement Date <strong>required</strong></mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <mat-form-field class="full-width"> 
+                                                <mat-label i18n="@@CMMContactsMobileFormControl">Quotation No</mat-label>
+                                                <input matInput type="text" formControlName="quotationNo" >
+                                                <mat-error i18n="@@CMMContactsMobileFormControlError">Quotation No <strong>required</strong></mat-error>
+                                            </mat-form-field> 
+                                        </div>
+                                        <div class="col-4">
+                                            <mat-form-field class="full-width"> 
+                                                <mat-label i18n="@@CMMContactsMobileFormControl">Purchase Order No</mat-label>
+                                                <input matInput type="text" formControlName="purchaseOrderNo" >
+                                                <mat-error i18n="@@CMMContactsMobileFormControlError">Purchase Order No<strong>required</strong></mat-error>
+                                            </mat-form-field> 
+                                        </div>
+                                        <div class="col-4">
+                                            <mat-form-field class="full-width"> 
+                                                <mat-label i18n="@@CMMContactsMobileFormControl">Customer Code</mat-label>
+                                                <input type="text" formControlName="customerCode" matInput>
+                                                <mat-error i18n="@@CMMContactsMobileFormControlError">Customer code <strong>required</strong></mat-error>
+                                            </mat-form-field>                             
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <mat-form-field class="full-width"> 
+                                                <mat-label i18n="@@CMMContactsMobileFormControl">Subject </mat-label>
+                                                <input type="text" formControlName="subject" matInput>
+                                                <mat-error i18n="@@CMMContactsMobileFormControlError">Subject <strong>required</strong></mat-error>
+                                            </mat-form-field>
+                                        </div> 
+                                    </div>
                                 </div>
-                                <div class="col-4" style="padding: 5px;">
-                                </div>
-                                <div class="col-4" style="padding: 5px;">
-                                    <mat-form-field class="full-width"> 
-                                        <mat-label i18n="@@CMMContactsMobileFormControl">Voucher Date</mat-label>
-                                        <input type="text" formControlName="voucherDate" matInput>
-                                        <mat-error i18n="@@CMMContactsMobileFormControlError">Voucher Date <strong>required</strong></mat-error>
-                                    </mat-form-field>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-4" style="padding: 5px;">
-                                    <mat-form-field class="full-width"> 
-                                        <mat-label i18n="@@CMMContactsMobileFormControl">Quotation No</mat-label>
-                                        <input matInput type="text" formControlName="quotationNo" >
-                                        <mat-error i18n="@@CMMContactsMobileFormControlError">Quotation No <strong>required</strong></mat-error>
-                                    </mat-form-field> 
-                                </div>
-                                <div class="col-4" style="padding: 5px;">
-                                    <mat-form-field class="full-width"> 
-                                        <mat-label i18n="@@CMMContactsMobileFormControl">Purchase Order No</mat-label>
-                                        <input matInput type="text" formControlName="purchaseOrderNo" >
-                                        <mat-error i18n="@@CMMContactsMobileFormControlError">Purchase Order No<strong>required</strong></mat-error>
-                                    </mat-form-field> 
-                                </div>
-                                <div class="col-4" style="padding: 5px;">
-                                    <mat-form-field class="full-width"> 
-                                        <mat-label i18n="@@CMMContactsMobileFormControl">Party</mat-label>
-                                        <input type="text" formControlName="party" matInput>
-                                        <mat-error i18n="@@CMMContactsMobileFormControlError">Party<strong>required</strong></mat-error>
-                                    </mat-form-field>                             
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-4" style="padding: 5px;">
-                                    <mat-form-field class="full-width"> 
-                                        <mat-label i18n="@@CMMContactsMobileFormControl">Customer Code</mat-label>
-                                        <input type="text" formControlName="customerCode" matInput>
-                                        <mat-error i18n="@@CMMContactsMobileFormControlError">Customer Code<strong>required</strong></mat-error>
-                                    </mat-form-field>
-                                </div>
-                                <div class="col-4" style="padding: 5px;">
-                                    <mat-form-field class="full-width"> 
-                                        <mat-label i18n="@@CMMContactsMobileFormControl">Name</mat-label>
-                                        <input type="text" formControlName="name" matInput>
-                                        <mat-error i18n="@@CMMContactsMobileFormControlError"> Name <strong>required</strong></mat-error>
-                                    </mat-form-field>
-                                </div>
-                                <div class="col-4" style="padding: 5px;">
-                                    <mat-form-field class="full-width"> 
-                                        <mat-label i18n="@@CMMContactsMobileFormControl">Address</mat-label>
-                                        <input type="text" formControlName="address" matInput>
-                                        <mat-error i18n="@@CMMContactsMobileFormControlError">Address<strong>required</strong></mat-error>
-                                    </mat-form-field>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-4" style="padding: 5px;">
-                                    <mat-form-field class="full-width"> 
-                                        <mat-label i18n="@@CMMContactsMobileFormControl">Phone No</mat-label>
-                                        <input type="text" formControlName="phoneNo" matInput>
-                                        <mat-error i18n="@@CMMContactsMobileFormControlError">Phone Number<strong>required</strong></mat-error>
-                                    </mat-form-field>
-                                </div>
-                                <div class="col-4" style="padding: 5px;">
-                                    <mat-form-field class="full-width"> 
-                                        <mat-label i18n="@@CMMContactsMobileFormControl">Email Address</mat-label>
-                                        <input type="text" formControlName="emailAddress" matInput>
-                                        <mat-error i18n="@@CMMContactsMobileFormControlError">Email Address <strong>required</strong></mat-error>
-                                    </mat-form-field>
-                                </div>
-                                <div class="col-4" style="padding: 5px;">
-                                    <mat-form-field class="full-width"> 
-                                        <mat-label i18n="@@CMMContactsMobileFormControl">Telephone :</mat-label>
-                                        <input type="text" formControlName="telephone" matInput>
-                                        <mat-error i18n="@@CMMContactsMobileFormControlError">Telephone Address <strong>required</strong></mat-error>
-                                    </mat-form-field>
+                                <div class="col-3">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <mat-form-field class="full-width"> 
+                                                <mat-label i18n="@@CMMContactsMobileFormControl">Contact Person</mat-label>
+                                                <input matInput type="text" #contactPerson formControlName="party" 
+                                                (keydown.f2)="lookUpParty(contactPerson.value)">
+                                                <mat-error i18n="@@CMMContactsMobileFormControlError">Contact Person <strong>required</strong></mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12">
+                                            <p><strong>{{ mPartyName }}</strong> <br> {{ mPartyAdd1 }}, {{ mPartyAdd2 }}, {{ mPartyAdd3 }} <br> {{ mPartyPhone }} / {{ mPartyTelephone}} <br> {{ mPartyEmail }}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="col-10">
-                                <mat-form-field class="full-width"> 
-                                    <mat-label i18n="@@CMMContactsMobileFormControl">Subject </mat-label>
-                                    <input type="text" formControlName="subject" matInput>
-                                    <mat-error i18n="@@CMMContactsMobileFormControlError">Subject <strong>required</strong></mat-error>
-                                </mat-form-field>
-                            </div> 
                         </div> 
                         <hr>
                     </div>
@@ -155,7 +138,23 @@
                         <mat-tab-group> <!-- mat-align-tabs="center" -->
                             <mat-tab label="Member Details">
                                 <div class="col-12">
-                                    
+                                    <div class="col-11">
+                                        <b>Search</b>
+                                        <mat-form-field class="full-width">
+                                            <mat-icon matPrefix>search</mat-icon>
+                                            <input matInput type="text" style="color: black;" placeholder="Please Enter Your Seach Keyword to filter" (keyup)=" quickMemberSearch()"><!--  [(ngModel)]="searchValue">-->
+                                        </mat-form-field>
+                                    </div>
+                                    <!-- GET PARTY DETAILS FOR THIS CUSTOMER-->
+                                    <ag-grid-angular style="width: 100%; height: 360px ;" 
+                                    class="ag-theme-balham" [animateRows]="true"
+                                    [pagination]="true" [paginationPageSize]="25" 
+                                    [gridOptions]="gridOptions" 
+                                    [rowStyle]="rowStyle"
+                                    [rowData]="memberList"
+                                    [suppressRowClickSelection]="true"
+                                    [columnDefs]="columnMemberDefs"
+                                    (gridReady)="onGridMemberReady($event)"></ag-grid-angular>     
                                 </div>    
                             </mat-tab>
                             <mat-tab label="Service Details">
@@ -164,97 +163,109 @@
                                         <div class="col-12" 
                                         style="height: 25vh; overflow-y: auto;" >
                                             <table class="table table-borderless table-hover table-responsive-xxl"
-                                            formArrayName="srvItemArry">
+                                            formArrayName="srvItemArr">
                                                 <thead>
                                                     <tr class="table-reflow" 
-                                                    style="background-color: rgb(25, 129, 129); color: white;">
-                                                        <th style="width: 10%;">Code</th>
-                                                        <th style="width: 20%;">Category</th>
-                                                        <th style="width: 30%;">Description</th>
-                                                        <th style="width: 10%;">Qunatity</th>
-                                                        <th style="width: 10%;">UnitPrice</th>
-                                                        <th style="width: 10%;">Value</th>
-                                                        <th style="width: 10%;">Disc%</th>
-                                                        <th style="width: 10%;">Discount</th>
-                                                        <th style="width: 10%;">NetValue</th>
-                                                        <th style="width: 10%;">Tax</th>
+                                                    style="background-color: rgb(2, 46, 82); color: white;">
+                                                        <th style="width: 8%;">Code</th>
+                                                        <th style="width: 20%;">Description </th>
+                                                        <th style="width: 7%;">Member</th>
+                                                        <th style="width: 15%;">Member Name</th>
+                                                        <th style="width: 8%;">From</th>
+                                                        <th style="width: 8%;">To</th>                                                                                                     
+                                                        <th style="width: 6%;">Value</th>
+                                                        <th style="width: 4%;">%</th>
+                                                        <th style="width: 5%;">Disc</th>
+                                                        <th style="width: 6%;">Gross</th>
+                                                        <th style="width: 7%;">vat</th>
+                                                        <th style="width: 15%;">VatValue</th>
+                                                        <th style="width: 15%;">NetAmount</th>
                                                         <th></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody (keydown.alt.n)="addServiceItem()">
                                                     <tr 
                                                     #rptItem 
-                                                    *ngFor="let rp of srvItem.controls; let i = index;" 
+                                                    *ngFor="let rp of srvItem?.controls; let i = index;" 
                                                     [formGroupName]="i" 
                                                     (keydown.alt.x)="deleteServiceItem(i)">
                                                         <td>
                                                             <input #itemCode 
                                                             class="form-control form-control-sm" 
                                                             type="text"
-                                                            formControlName="srvCode">
-                                                            <!-- (keydown.f2)="lookupCostCenter(itemCode.value,'cost',i)"
-                                                            (change)="checkcostcenter(itemCode.value,i)"> -->
-                                                            
+                                                            formControlName="srvCode"
+                                                            (keydown.f2)="lookUpReference(i)"
+                                                            (change)="getRefData(itemCode.value,i)">
+                                                             
                                                         </td>
                                                         <td>
-                                                            <input class="form-control form-control-sm" 
-                                                            type="text" 
-                                                            formControlName="srvCategory" >
-                                                            <!-- (keydown.f2)="lookUpLocs(itemCode.value)"> -->
+                                                            <textarea  class="form-control form-control-sm" 
+                                                            formControlName="srvDesc" >
+                                                            </textarea>
                                                         </td>              
                                                         <td>
                                                             <input #pcode
                                                             class="form-control form-control-sm" 
                                                             type="text"
-                                                            formControlName="srvDescription">
-                                                            <!-- (keydown.f2)="lookupOpbal(pcode.value,'opbal',i)"
-                                                            (change)="checkopbal(pcode.value,i)"> -->
+                                                            formControlName="srvMember"
+                                                            (keydown.f2)="lookUpMembers(pcode.value)"
+                                                            (change)="getMemberdata(pcode.value,i)">
                                                         </td>
                                                         <td>
                                                             <input class="form-control form-control-sm" 
                                                             type="text" 
-                                                            formControlName="srvQunt">
-                                                        </td>
-                                                        <td>
-                                                            <input #itemCode 
-                                                            class="form-control form-control-sm" 
-                                                            type="text"
-                                                            formControlName="srvUnitprice">
-                                                            <!-- (keydown.f2)="lookupCostCenter(itemCode.value,'cost',i)"
-                                                            (change)="checkcostcenter(itemCode.value,i)"> -->
-                                                            
+                                                            formControlName="srvMemberName">
                                                         </td>
                                                         <td>
                                                             <input class="form-control form-control-sm" 
-                                                            type="text" 
-                                                            formControlName="srvValue" >
-                                                            <!-- (keydown.f2)="lookUpLocs(itemCode.value)"> -->
+                                                            type="date" formControlName="srvFrom">
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-control form-control-sm" 
+                                                            type="date" formControlName="srvTo">
                                                         </td>              
                                                         <td>
                                                             <input #pcode
                                                             class="form-control form-control-sm" 
                                                             type="text"
-                                                            formControlName="srvDiscper">
-                                                            <!-- (keydown.f2)="lookupOpbal(pcode.value,'opbal',i)"
-                                                            (change)="checkopbal(pcode.value,i)"> -->
+                                                            formControlName="srvValue"
+                                                            (keydown.f2)="lookupAgreementAndMember(i)">
                                                         </td>
                                                         <td>
-                                                            <input class="form-control form-control-sm" 
+                                                            <input #disc 
+                                                            class="form-control form-control-sm" 
                                                             type="text" 
+                                                            formControlName="srvDisc"
+                                                            (change)="getdiscount(disc.value,i)">
+                                                        </td>
+                                                        <td>
+                                                            <input #pcode
+                                                            class="form-control form-control-sm" 
+                                                            type="text"
                                                             formControlName="srvDiscount">
                                                         </td>
                                                         <td>
+                                                            <input class="form-control form-control-sm" 
+                                                            type="text" 
+                                                            formControlName="srvGross">
+                                                        </td>
+                                                        <td>
+                                                            <mat-select formControlName="srvVatCat" (valueChange)="gettaxValue($event,i)" required>
+                                                                <mat-option *ngFor="let tax of taxArr" [value]="tax.TAX_1_PERC">
+                                                                    {{ tax.TAX_CATEGORY_NAME }}
+                                                                </mat-option>
+                                                              </mat-select>
+                                                        </td>
+                                                        <td>
                                                             <input #pcode
                                                             class="form-control form-control-sm" 
                                                             type="text"
-                                                            formControlName="srvNetvalue">
-                                                            <!-- (keydown.f2)="lookupOpbal(pcode.value,'opbal',i)"
-                                                            (change)="checkopbal(pcode.value,i)"> -->
+                                                            formControlName="srvVat">
                                                         </td>
                                                         <td>
                                                             <input class="form-control form-control-sm" 
                                                             type="text" 
-                                                            formControlName="srvTax">
+                                                            formControlName="srvNetValue">
                                                         </td>
                                                         <td>
                                                             <button class="btn btn-danger" 
@@ -279,9 +290,101 @@
                         </mat-tab-group>
                     </div>
                 </form>
+
                 <div class="col-12">
-                    <ng-template #SOLookUpDailouge 
+                    <ng-template #partyLookupDialog 
                     style="width: 60%;">
+                        <h3 matDialogTitle>
+                            <b>Look up contacts: {{ partyArr.length }}</b>
+                        </h3>
+                        <hr>
+                        <div mat-dialog-content>
+                            <table mat-table 
+                            [dataSource]="partyDataSource" 
+                            class="mat-elevation-z8" 
+                            style="width: 65vw; height: 50vh;">
+                                <ng-container matColumnDef="pcode">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> PCODE </th>
+                                    <td mat-cell 
+                                    *matCellDef="let party"> {{ party.pcode }} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="cust_name">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Customer Name </th>
+                                    <td mat-cell 
+                                    *matCellDef="let party"> {{ party.cust_name }} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="party_id">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Contact ID </th>
+                                    <td mat-cell 
+                                    *matCellDef="let party"> {{ party.party_id }} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="name">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Contact Name </th>
+                                    <td mat-cell 
+                                    *matCellDef="let party"> {{ party.name }} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="add1">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Address 1 </th>
+                                    <td mat-cell 
+                                    *matCellDef="let party"> {{ party.add1 }} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="add2">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Address 2 </th>
+                                    <td mat-cell 
+                                    *matCellDef="let party"> {{ party.add2 }} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="add3">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Address 3 </th>
+                                    <td mat-cell 
+                                    *matCellDef="let party"> {{ party.add3 }} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="phone1">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Phone number </th>
+                                    <td mat-cell 
+                                    *matCellDef="let party"> {{ party.phone1 }} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="mobile">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Telephone </th>
+                                    <td mat-cell 
+                                    *matCellDef="let party"> {{ party.mobile }} </td>
+                                </ng-container>
+                                <ng-container matColumnDef="email_id">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Email </th>
+                                    <td mat-cell 
+                                    *matCellDef="let party"> {{ party.email_id }} </td>
+                                </ng-container>
+                                <tr mat-header-row 
+                                *matHeaderRowDef="partyDisplayedColumns"></tr>
+                                <tr mat-row 
+                                *matRowDef="let row; columns: partyDisplayedColumns;  let i= index"
+                                [ngClass]="{'highlight': selectedRowIndex == i}"
+                                (click)="highlight('party',i)"
+                                tabindex="999"
+                                (keydown.arrowdown)="arrowDownEvent('party',selectedRowIndex)"
+                                (keydown.arrowup)="arrowUpEvent('party',selectedRowIndex)" 
+                                (keydown.enter)="selectParty(partyArr[selectedRowIndex])"></tr>
+                                <!-- (keydown.enter)="selectMemb(membArr[selectedRowIndex])" ></tr> -->
+                            </table>
+                        </div>
+                        <mat-dialog-actions align="end">
+                            <button mat-button 
+                            matDialogClose="close">Close</button>
+                        </mat-dialog-actions>
+                    </ng-template>
+                </div>
+
+                <div class="col-12">
+                    <ng-template #SOLookUpDailouge style="width: 60%;">
                         <h3 matDialogTitle>
                             <b>Look up for Sales Order: {{ SOArr.length }}</b>
                         </h3>
@@ -324,30 +427,298 @@
                                 </ng-container>
                                 <tr mat-header-row 
                                 *matHeaderRowDef="SalesOrderDisplayedColumns"></tr>
-                                <tr mat-row 
-                                *matRowDef="let row; columns: SalesOrderDisplayedColumns;  let i= index"
-                                [ngClass]="{'highlight': selectedRowIndex == i}"
-                                (click)="highlight('salesorder',i)"
-                                tabindex="999"
-                                (keydown.arrowdown)="arrowDownEvent('salesorder',selectedRowIndex)"
+                                <tr mat-row *matRowDef="let row; columns: SalesOrderDisplayedColumns;  let i= index" [ngClass]="{'highlight': selectedRowIndex == i}" (click)="highlight('salesorder',i)" tabindex="999" (keydown.arrowdown)="arrowDownEvent('salesorder',selectedRowIndex)"
                                 (keydown.arrowup)="arrowUpEvent('salesorder',selectedRowIndex)" 
                                 (keydown.enter)="selectSalesOrder(SOArr[selectedRowIndex])"></tr>
+                            </table>
+                        </div>
+                        <mat-dialog-actions align="end">
+                            <button mat-button matDialogClose="close">Close</button>
+                        </mat-dialog-actions>
+                    </ng-template>
+                </div>
+
+                <div class="col-12">
+                    <ng-template #agreementLookUpDialog 
+                    style="width: 80%;">
+                        <h3 matDialogTitle>
+                            <b>Manage Services</b>
+                        </h3>
+                        <hr>
+                        <form [formGroup]="agreementForm" class="form-container">
+                            <div class="col-12">
+                                <div class="form-row">
+                                    <div class="col-12" 
+                                    style="height: 25vh; overflow-y: auto;" >
+                                        <table class="table table-borderless table-hover table-responsive-xxl"
+                                        formArrayName="serviceArr">
+                                            <thead>
+                                                <tr class="table-reflow" 
+                                                style="background-color: rgb(2, 46, 82); color: white;">
+                                                    <th style="width: 30%;">Service No</th>
+                                                    <th style="width: 50%;">Service Description</th>
+                                                    <th style="width: 20%;">Price</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody (keydown.alt.n)="addAgreementItem()">
+                                                <tr 
+                                                #rptItem 
+                                                *ngFor="let rp of agreementForm.controls.serviceArr.controls; let i = index;" 
+                                                [formGroupName]="i" 
+                                                (keydown.alt.x)="deleteAgreementItem(i)">
+                                                    <td>
+                                                        <input #serviceno
+                                                        class="form-control form-control-sm" 
+                                                        type="text" 
+                                                        formControlName="serviceNo" 
+                                                        (keydown.f2)="lookUpSrv(serviceno.value, i)"
+                                                        (keydown.enter)="getsrvData(serviceno.value,i)">
+                                                    </td>  
+                                                    <td>
+                                                        <input class="form-control form-control-sm" 
+                                                        type="text" 
+                                                        formControlName="serviceDesc" >
+                                                    </td>             
+                                                    <td>
+                                                        <input #pcode
+                                                        class="form-control form-control-sm" 
+                                                        type="text"
+                                                        formControlName="Price">
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-danger" 
+                                                        type="button" 
+                                                        (click)="deleteAgreementItem(i)">&#10005;</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <button class="btn btn-success" 
+                                        type="button" 
+                                        (click)="addAgreementItem()">&#43;</button>
+                                    </div>
+                                </div>  
+                            </div>   
+                            <mat-dialog-actions align="end">
+                                <button class="btn btn-primary" 
+                                type="button" 
+                                (click)="submitAgreement()">Submit</button>
+                            </mat-dialog-actions>
+                        </form>
+                    </ng-template>
+                </div>
+
+                <div class="col-12">
+                    <div class="col-12">
+                        <ng-template #membLookupDialog 
+                        style="width: 60%;">
+                            <h3 matDialogTitle>
+                                <b>Look up Members: {{ membArr.length }}</b>
+                            </h3>
+                            <hr>
+                            <div mat-dialog-content>
+                                <table mat-table 
+                                [dataSource]="membDataSource" 
+                                class="mat-elevation-z8" 
+                                style="width: 65vw; height: 50vh;">
+                                    <ng-container matColumnDef="memberNo">
+                                        <th mat-header-cell 
+                                        *matHeaderCellDef> Member Nbr </th>
+                                        <td mat-cell 
+                                        *matCellDef="let memb"> {{ memb.MemberNo }} </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="memberRefNo">
+                                        <th mat-header-cell 
+                                        *matHeaderCellDef> Reference Nbr </th>
+                                        <td mat-cell 
+                                        *matCellDef="let memb"> {{ memb.REFMEMBNO }} </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="title">
+                                        <th mat-header-cell 
+                                        *matHeaderCellDef> Title </th>
+                                        <td mat-cell 
+                                        *matCellDef="let memb"> {{ memb.TITLE }} </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="firstname">
+                                        <th mat-header-cell 
+                                        *matHeaderCellDef> Firstname </th>
+                                        <td mat-cell 
+                                        *matCellDef="let memb"> {{ memb.NAME }} </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="surname">
+                                        <th mat-header-cell 
+                                        *matHeaderCellDef> LName </th>
+                                        <td mat-cell 
+                                        *matCellDef="let memb"> {{ memb.SURNAME }} </td>
+                                    </ng-container>
+                                    <ng-container matColumnDef="cprno">
+                                        <th mat-header-cell 
+                                        *matHeaderCellDef> CPR Nbr </th>
+                                        <td mat-cell 
+                                        *matCellDef="let memb"> {{ memb.CPRNo }} </td>
+                                    </ng-container>
+                                    <tr mat-header-row 
+                                    *matHeaderRowDef="membDisplayedColumns"></tr>
+                                    <tr mat-row 
+                                    *matRowDef="let row; columns: membDisplayedColumns;  let i= index"
+                                    [ngClass]="{'highlight': selectedRowIndex == i}"
+                                    (click)="highlight('membs',i)"
+                                    tabindex="999"
+                                    (keydown.arrowdown)="arrowDownEvent('membs',selectedRowIndex)"
+                                    (keydown.arrowup)="arrowUpEvent('membs',selectedRowIndex)" 
+                                    (keydown.enter)="selectMember(membArr[selectedRowIndex])"></tr>
+                                </table>
+                            </div>
+                            <mat-dialog-actions align="end">
+                                <button mat-button 
+                                matDialogClose="close">Close</button>
+                            </mat-dialog-actions>
+                        </ng-template>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <ng-template #sivLookupDialog 
+                    style="width: 60%;">
+                        <h3 matDialogTitle>
+                            <b>Look up Service Number: {{ srvArr.length }}</b>
+                        </h3>
+                        <hr>
+                        <!-- <mat-form-field >
+                        <input matInput #input
+                        (keyup)="applyFilter($event)" >
+                        </mat-form-field> --->
+                        <div mat-dialog-content>
+                            <table mat-table 
+                            [dataSource]="serviceDataSouuce" 
+                            class="mat-elevation-z8" 
+                            style="width: 65vw; height: 50vh;">
+                                <ng-container matColumnDef="ServiceID">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Service Nbr </th>
+                                    <td mat-cell 
+                                    *matCellDef="let srv"> {{ srv.ServiceID }} </td>
+                                </ng-container>
                               
-                                <!-- // Row shown when there is no matching data.  -->
-                                <!-- <tr class="mat-row" 
+                                <ng-container matColumnDef="servicedesc">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Service Description</th>
+                                    <td mat-cell 
+                                    *matCellDef="let srv"> {{ srv.ServiceDescription }} </td>
+                                </ng-container>
+        
+                                <ng-container matColumnDef="actualprice">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Actual Price </th>
+                                    <td mat-cell 
+                                    *matCellDef="let srv"> {{ srv.ActualPrice }} </td>
+                                </ng-container>
+                              
+                                <ng-container matColumnDef="memberprice">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> LName </th>
+                                    <td mat-cell 
+                                    *matCellDef="let srv"> {{ srv.MemberPrice }} </td>
+                                </ng-container>
+                          
+                                <tr mat-header-row 
+                                *matHeaderRowDef="serviceDisplayedColumns"></tr>
+                                <tr mat-row 
+                                *matRowDef="let row; columns: serviceDisplayedColumns;  let i= index"
+                                [ngClass]="{'highlight': selectedRowIndex == i}"
+                                (click)="highlight('srvs',i)"
+                                tabindex="999"
+                                (keydown.arrowdown)="arrowDownEvent('srvs',selectedRowIndex)"
+                                (keydown.arrowup)="arrowUpEvent('srvs',selectedRowIndex)" 
+                                (keydown.enter)="selectSiv()"></tr>
+                  
+                                <!-- Row shown when there is no matching data. 
+                                <tr class="mat-row" 
                                 *matNoDataRow>
                                   <td class="mat-cell" 
                                   colspan="4">No data matching the filter "{{input.value}}"</td>
-                                                                        </tr> -->
-                        </table>
-                    </div>
-                    <mat-dialog-actions align="end">
-                        <button mat-button 
-                        matDialogClose="close">Close</button>
-                    </mat-dialog-actions>
-                </ng-template>
+                                </tr> -->
+                            </table>
+                        </div>
+                        <mat-dialog-actions align="end">
+                            <button mat-button
+                            matDialogClose="close">Close</button>
+                        </mat-dialog-actions>
+                    </ng-template>
                 </div>
-            </mat-card-content>            
+
+                <div class="col-12">
+                    <ng-template #RefLookupDialog 
+                    style="width: 60%;">
+                        <h3 matDialogTitle>
+                            <b>Look up Reference Details: {{ refArr.length }}</b>
+                        </h3>
+                        <hr>
+                        <!-- <mat-form-field >
+                        <input matInput #input
+                        (keyup)="applyFilter($event)" >
+                        </mat-form-field> --->
+                        <div mat-dialog-content>
+                            <table mat-table 
+                            [dataSource]="referenceDataSouuce" 
+                            class="mat-elevation-z8" 
+                            style="width: 65vw; height: 50vh;">
+                                <ng-container matColumnDef="refid">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Reference Code </th>
+                                    <td mat-cell 
+                                    *matCellDef="let ref"> {{ ref.PCODE }} </td>
+                                </ng-container>
+                              
+                                <ng-container matColumnDef="name">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Reference Name </th>
+                                    <td mat-cell 
+                                    *matCellDef="let ref"> {{ ref.NAME }} </td>
+                                </ng-container>
+        
+                                <ng-container matColumnDef="desc">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Description </th>
+                                    <td mat-cell 
+                                    *matCellDef="let ref"> {{ ref.DESCRIPTION }} </td>
+                                </ng-container>
+                              
+                                <ng-container matColumnDef="type">
+                                    <th mat-header-cell 
+                                    *matHeaderCellDef> Type </th>
+                                    <td mat-cell 
+                                    *matCellDef="let ref"> {{ ref.TYPE }} </td>
+                                </ng-container>
+                          
+                                <tr mat-header-row 
+                                *matHeaderRowDef="referenceDisplayedColumns"></tr>
+                                <tr mat-row 
+                                *matRowDef="let row; columns: referenceDisplayedColumns;  let i= index"
+                                [ngClass]="{'highlight': selectedRowIndex == i}"
+                                (click)="highlight('ref',i)"
+                                tabindex="999"
+                                (keydown.arrowdown)="arrowDownEvent('ref',selectedRowIndex)"
+                                (keydown.arrowup)="arrowUpEvent('ref',selectedRowIndex)" 
+                                (keydown.enter)="selectRef(refArr[selectedRowIndex])"></tr>
+                  
+                                <!-- Row shown when there is no matching data. 
+                                <tr class="mat-row" 
+                                *matNoDataRow>
+                                  <td class="mat-cell" 
+                                  colspan="4">No data matching the filter "{{input.value}}"</td>
+                                </tr> -->
+                            </table>
+                        </div>
+                        <mat-dialog-actions align="end">
+                            <button mat-button
+                            matDialogClose="close">Close</button>
+                        </mat-dialog-actions>
+                    </ng-template>
+                </div>
+            </mat-card-content>   
+                   
         </mat-card>
     </div>
 </div>

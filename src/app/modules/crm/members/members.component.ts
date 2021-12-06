@@ -100,7 +100,7 @@ export class MembersComponent implements OnInit {
       corporateMembers: new FormArray([]),
       billingname: new FormControl({ value: 'Billing Name', disabled: true })
     });
-    const famMember = new FormGroup({
+    /*const famMember = new FormGroup({
       dMemberNo: new FormControl('', [Validators.required]),
       dMemberRefNo: new FormControl('', [Validators.required]),
       dTitle: new FormControl('', [Validators.required]),
@@ -128,7 +128,7 @@ export class MembersComponent implements OnInit {
       dPosition: new FormControl('', []),
       dEmail: new FormControl('', [Validators.required])
     });
-    this.corporateMembers.push(copMember);
+    this.corporateMembers.push(copMember);*/
     this.getMemberExport();
     this.getMebersPrimaryData();
     this.columns = ["Member No","Name","Surname","Type","Address 1","Address 2","Address 3","Email","Primary Number","Billing Code"];
@@ -956,7 +956,7 @@ export class MembersComponent implements OnInit {
       familyMembers: new FormArray([]),
       corporateMembers: new FormArray([])
     });
-    const famMember = new FormGroup({
+    /*const famMember = new FormGroup({
       dMemberNo: new FormControl('***NEW***', [Validators.required]),
       dMemberRefNo: new FormControl('', [Validators.required]),
       dTitle: new FormControl('', [Validators.required]),
@@ -982,7 +982,7 @@ export class MembersComponent implements OnInit {
       dPosition: new FormControl('', []),
       dEmail: new FormControl('', [Validators.required])
     });
-    this.corporateMembers.push(copMember);
+    this.corporateMembers.push(copMember);*/
   }
     
   quickMemberSearch() {

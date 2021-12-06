@@ -1,10 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { GridOptions } from 'ag-grid-community';
 //import { ChartOptions, ChartType, ChartDataset } from 'chart.js';
 //import { Color, Label } from 'ng2-charts';
 import * as moment from 'moment';
 import { FinanceService } from 'src/app/services/finance/finance.service';
+import * as ExcelJS from  'exceljs/dist/exceljs.min.js';
+import * as FileSaver from 'file-saver';
+import { DataSharingService } from 'src/app/services/data-sharing/data-sharing.service';
+const EXCEL_EXTENSION = '.xlsx';
+const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
 
 @Component({
   selector: 'app-customerprofile',
@@ -23,6 +29,8 @@ export class CustomerprofileComponent implements OnInit {
   CustAgreementList: any[] = [];
   AccountsCategoryList: any[] = [];
   AccountsTypeList: any[] = [];
+  BranchArr: any[] = [];
+  custExcelArr: any[] = [];
   gridApi: any;
   gridColumnApi:any;
   gridApiCust: any;
@@ -59,6 +67,11 @@ export class CustomerprofileComponent implements OnInit {
   varsfyear:string ="2021-01-01";
   varefyear:string ="2021-01-01";
   opbalChartBool: boolean = false;
+  
+  columns: any[];
+
+  
+
   /*varInvChartLabels: any[] = [];
   varInvChartValues: any[] = [];
 
@@ -76,10 +89,11 @@ export class CustomerprofileComponent implements OnInit {
     { backgroundColor: 'rgb(2, 46, 82)' }
   ];*/
 
-  constructor(private financeservice:FinanceService){ 
+  constructor(private financeservice:FinanceService,private snackbar:MatSnackBar,private dataSharing: DataSharingService){ 
     this.custForm = new FormGroup({
-      pcode: new FormControl({value: 'Pcode', disabled: true}),
+      pcode: new FormControl('', [ Validators.required]),
       cname: new FormControl('', [ Validators.required]),
+      cStatus: new FormControl('', [ Validators.required]),
       cAccountCategory: new FormControl('', [ Validators.required]),
       cAccountGroup: new FormControl('', [ Validators.required]),
       CAccountGroupName: new FormControl('', [ Validators.required]),
@@ -92,6 +106,8 @@ export class CustomerprofileComponent implements OnInit {
       cActive: new FormControl('', [ Validators.required]),
       cTaxNo: new FormControl('', [ Validators.required])
     });
+
+    this.columns = ["Customer Code","Customer Name","Account Type","Account Category","Branch Name","GL Code","GL Name","CPR Number","Limit","TAX No"];
 
     this.columnCustomerDefs = [
       { 
@@ -378,12 +394,48 @@ export class CustomerprofileComponent implements OnInit {
     this.gridApi= params.api;
     this.gridColumnApi= params.columnApi;
     this.financeservice.getCustomerList(String(this.currentYear)).subscribe((res: any) =>  {
-      console.log(this.customerlist);
       this.customerlist=res.recordset;
       params.api.setRowData(this.customerlist);
-      console.log(this.customerlist);
     }, (error: any) => {
       console.log(error);
+    });
+  }
+
+  newForm() {
+    this.custForm = new FormGroup({
+      pcode: new FormControl('', [ Validators.required]),
+      cname: new FormControl('', [ Validators.required]),
+      cStatus: new FormControl('', [ Validators.required]),
+      cAccountCategory: new FormControl('', [ Validators.required]),
+      cAccountGroup: new FormControl('', [ Validators.required]),
+      CAccountGroupName: new FormControl('', [ Validators.required]),
+      cType: new FormControl('', [ Validators.required]),
+      cBranch: new FormControl('', [ Validators.required]),
+      cExternalCode: new FormControl('', [ Validators.required]),
+      cCreditPeriod: new FormControl('', [ Validators.required]),
+      cLimit: new FormControl('', [ Validators.required]),
+      cCR: new FormControl('', [ Validators.required]),
+      cActive: new FormControl('', [ Validators.required]),
+      cTaxNo: new FormControl('', [ Validators.required])
+    });
+  }
+
+  refreshForm(){
+    this.custForm = new FormGroup({
+      pcode: new FormControl('', [ Validators.required]),
+      cname: new FormControl('', [ Validators.required]),
+      cStatus: new FormControl('', [ Validators.required]),
+      cAccountCategory: new FormControl('', [ Validators.required]),
+      cAccountGroup: new FormControl('', [ Validators.required]),
+      CAccountGroupName: new FormControl('', [ Validators.required]),
+      cType: new FormControl('', [ Validators.required]),
+      cBranch: new FormControl('', [ Validators.required]),
+      cExternalCode: new FormControl('', [ Validators.required]),
+      cCreditPeriod: new FormControl('', [ Validators.required]),
+      cLimit: new FormControl('', [ Validators.required]),
+      cCR: new FormControl('', [ Validators.required]),
+      cActive: new FormControl('', [ Validators.required]),
+      cTaxNo: new FormControl('', [ Validators.required])
     });
   }
 
@@ -392,21 +444,50 @@ export class CustomerprofileComponent implements OnInit {
     this.gridColumnApiCust= params.columnApi;
     this.financeservice.getCustomerParty(this.varpcode).subscribe((res: any) => {
       this.CustPartyList = res.recordset;
-      console.log(this.CustPartyList);
       params.api.setRowData(this.CustPartyList);
     }, (err: any) => {
       console.log(err);
     })
   }
 
+  getCustmerDetails(pcode: any){
+    this.financeservice.getCustomerBypcode(pcode).subscribe((res:any) => {
+      this.selectCustomer(res.recordset[0])
+    },(err: any)=>{
+      console.log(err);
+    })
+  }
+
+  selectCustomer(data: any){
+    this.custForm.patchValue({
+      pcode: data.PCODE,
+      cname: data.CUST_NAME,
+      cStatus: data.STATUS,
+      cAccountCategory: data.ACCOUNT_CATEGORY_CD,
+      cAccountGroup: data.GLCODE,
+      CAccountGroupName: data.GLNAME,
+      cType: data.ACCOUNT_TYPE_CD,
+      cBranch: data.BRANCH_ID,
+      cExternalCode: data.AFFECTING_TYPE_CODE,
+      cCreditPeriod: data.CREDITPERIOD,
+      cLimit: data.CR_LIMIT,
+      cCR: data.CR_CPR,
+      cTaxNo: data.TAX_1_NO  
+    });
+    this.varpcode = data.PCODE;
+    this.getCustmerParty(this.varpcode);
+    this.getCustmerInvoices(this.varpcode,this.varsfyear,this.varefyear);
+    this.getCustomerMember(this.varpcode)
+    this.getAggrementDetails(this.varpcode)
+    this.onGridCustomerMember(this.CustMemberList)
+  }
+
   onGridCustomerMember(params: any){ 
     this.gridApiCust= params.api;
     this.gridColumnApiCust= params.columnApi;
     this.financeservice.getCustomerMemner(this.varpcode).subscribe((res: any) =>  {
-      console.log(this.CustMemberList);
       this.CustMemberList=res.recordset;
       params.api.setRowData(this.CustMemberList);
-      console.log(this.CustMemberList);
     }, (error: any) => {
       console.log(error);
     });
@@ -416,10 +497,8 @@ export class CustomerprofileComponent implements OnInit {
     this.gridApiCust= params.api;
     this.gridColumnApiCust= params.columnApi;
     this.financeservice.getCustomerMemner(this.varpcode).subscribe((res: any) =>  {
-      console.log(this.CustAgreementList);
       this.CustAgreementList=res.recordset;
       params.api.setRowData(this.CustAgreementList);
-      console.log(this.CustAgreementList);
     }, (error: any) => {
       console.log(error);
     });
@@ -430,16 +509,13 @@ export class CustomerprofileComponent implements OnInit {
     this.gridColumnApiCust= params.columnApi;
     this.financeservice.getCustomerInvoices(this.varpcode, this.varsfyear, this.varefyear).subscribe((res: any) => {
       this.CustInvoiceList = res.recordset;
-      console.log(this.CustInvoiceList);
       params.api.setRowData(this.CustInvoiceList);
       /*for(let i=0; i<this.CustInvoiceList.length; i++) {
         var tempChartLbl: string = this.CustInvoiceList[i].INV_NO;
         var tempChartVal: number = this.CustInvoiceList[i].INV_AMOUNT;
         this.varInvChartLabels.push(tempChartLbl);
         this.varInvChartValues.push(tempChartVal);
-      }
-      console.log(this.varInvChartLabels);
-      console.log(this.varInvChartValues);*/
+      }*/
     }, (err: any) => {
       console.log(err);
     })
@@ -447,24 +523,59 @@ export class CustomerprofileComponent implements OnInit {
 
 
   onViewCellClicked(event: any){
-    console.log(event.data);
     if (event.column.colId =="CUST_NAME" ){
-     this.varName = event.data.CUST_NAME;
-     this.varAccountCategory= event.data.ACCOUNT_CATEGORY_DESC;
-     this.varBranch= event.data.BRANCH_NAME;
-     this.varAccountType = event.data.ACCOUNT_TYPE_CD;
-     this.varAccountGroup = event.data.GLCODE;
-     this.varcreditPeriod = event.data.CREDITPERIOD;
-     this.varAccountGroupName = event.data.GLNAME;
-     this.varLimit = event.data.CR_LIMIT;
-     this.varCrCpr = event.data.CR_CPR;
-     this.varTaxNo = event.data.TAX_1_NO;
-     this.varpcode = event.data.PCODE;
-     this.getCustmerParty(this.varpcode);
-     this.getCustmerInvoices(this.varpcode,this.varsfyear,this.varefyear);
-     this.getCustomerMember(this.varpcode)
-     this.getAggrementDetails(this.varpcode)
+      this.custForm.patchValue({
+        pcode: event.data.PCODE,
+        cname: event.data.CUST_NAME,
+        cStatus: event.data.STATUS,
+        cAccountCategory: event.data.ACCOUNT_CATEGORY_CD,
+        cAccountGroup: event.data.GLCODE,
+        CAccountGroupName: event.data.GLNAME,
+        cType: event.data.ACCOUNT_TYPE_CD,
+        cBranch: event.data.BRANCH_ID,
+        cExternalCode: event.data.AFFECTING_TYPE_CODE,
+        cCreditPeriod: event.data.CREDITPERIOD,
+        cLimit: event.data.CR_LIMIT,
+        cCR: event.data.CR_CPR,
+        cTaxNo: event.data.TAX_1_NO
+        
+      });
+      this.varpcode = event.data.PCODE;
+      this.getCustmerParty(this.varpcode);
+      this.getCustmerInvoices(this.varpcode,this.varsfyear,this.varefyear);
+      this.getCustomerMember(this.varpcode)
+      this.getAggrementDetails(this.varpcode)
     }
+  }
+
+  submitForm(){
+    const data = this.custForm.value
+    if (data.pcode == ''){
+      this.snackbar.open("Please Enter Pcode", "close", {
+        duration: 10000,
+        verticalPosition: 'top',
+        panelClass: ['sbBg']
+      });
+    }
+    else{
+      this.financeservice.getCustomerBypcode(data.pcode).subscribe((res: any) => {
+        this.financeservice.updateOPbalDeatils(data.cname,data.cAccountCategory,data.cAccountGroup,data.cType,data.cBranch,data.cExternalCode,data.cCreditPeriod,data.cLimit,data.cCR,data.cTaxNo,data.pcode)
+        this.snackbar.open(data.pcode + " Updated Successfully", "close", {
+          duration: 10000,
+          verticalPosition: 'top',
+          panelClass: ['sbBg']
+        });
+      },(err:any) =>{
+        this.financeservice.postOpbalDetails('01',data.pcode,data.cname,data.cAccountCategory,data.cAccountGroup,data.cType,data.cBranch,data.cExternalCode,data.cCreditPeriod,data.cLimit,data.cCR,data.cTaxNo,'2021')
+        this.snackbar.open( data.pcode + " inserted Successfully", "close", {
+          duration: 10000,
+          verticalPosition: 'top',
+          panelClass: ['sbBg']
+        });
+      })
+      
+    }
+    
   }
 
   quickCustomerSearch() {
@@ -474,7 +585,6 @@ export class CustomerprofileComponent implements OnInit {
   getCustmerParty(pcode:string) {
     this.financeservice.getCustomerParty(pcode).subscribe((res: any) => {
       this.CustPartyList = res.recordset;
-      console.log(this.CustPartyList);
     }, (err: any) => {
       console.log(err);
     })
@@ -483,7 +593,6 @@ export class CustomerprofileComponent implements OnInit {
   getCustomerMember(pcode:string) {
     this.financeservice.getCustomerMemner(pcode).subscribe((res: any) => {
       this.CustMemberList = res.recordset;
-      console.log(this.CustMemberList);
     }, (err: any) => {
       console.log(err);
     })
@@ -492,7 +601,6 @@ export class CustomerprofileComponent implements OnInit {
   getAccountsCategoryData() {
     this.financeservice.getAccountsCategory().subscribe((res: any) =>  {
       this.AccountsCategoryList=res.recordset;
-      console.log(this.AccountsCategoryList);
     }, (error: any) => {
       console.log(error);
     });
@@ -501,7 +609,14 @@ export class CustomerprofileComponent implements OnInit {
   getAccountsTypeData() {
     this.financeservice.getAccountsType().subscribe((res: any) =>  {
       this.AccountsTypeList=res.recordset;
-      console.log(this.AccountsTypeList);
+    }, (error: any) => {
+      console.log(error);
+    }); 
+  }
+
+  getBranchData() {
+    this.financeservice.getBranch().subscribe((res: any) =>  {
+      this.BranchArr=res.recordset;
     }, (error: any) => {
       console.log(error);
     }); 
@@ -510,7 +625,6 @@ export class CustomerprofileComponent implements OnInit {
   getCustmerInvoices(pcode: string,sfyear: string,efyear: string) {
     this.financeservice.getCustomerInvoices(pcode, sfyear,efyear).subscribe((res: any) => {
       this.CustInvoiceList = res.recordset;
-      console.log(this.CustInvoiceList);
       /*this.varInvChartLabels = [];
       this.varInvChartValues = [];
       for(let i=0; i<this.CustInvoiceList.length; i++) {
@@ -518,32 +632,148 @@ export class CustomerprofileComponent implements OnInit {
         var tempChartVal: number = this.CustInvoiceList[i].INV_AMOUNT;
         this.varInvChartLabels.push(tempChartLbl);
         this.varInvChartValues.push(tempChartVal);
-      }
-      console.log(this.varInvChartLabels);
-      console.log(this.varInvChartValues);*/
+      }*/
     }, (err: any) => {
       console.log(err);
     })
   }
 
+ 
   getAggrementDetails(pcode: string) {
     this.financeservice.getAggrementDetails(pcode).subscribe((res: any) => {
       this.CustAgreementList = res.recordset;
-      console.log(this.CustAgreementList);
     }, (err: any) => {
       console.log(err);
     })
   }
   
+  getCustomerExcel(){
+    this.financeservice.getCustomerForExcel().subscribe((res:any) => {
+      this.custExcelArr = res.recordset
+      console.log(res.recordset)
+    },(err: any) =>{
+      console.log(err)
+    })
+  }
+
+  public exportAsExcelFile(
+    reportHeading: string,
+    reportSubheading: string,
+    headerArray: any[],
+    excelfileName: string,
+    sheetname:string
+    
+    ) {
+      const data = this.custExcelArr;
+      const header = headerArray;
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = 'ifasoft';
+      workbook.lastModifiedBy = 'ifasoft';
+      workbook.created = new Date();
+      workbook.modified = new Date();
+      const worksheet = workbook.addWorksheet(sheetname);
+
+      worksheet.addRow([]);
+      worksheet.mergeCells('A1:' + this.numToAlpha(header.length - 1) + '1');
+      worksheet.getCell('A1').value = reportHeading;
+      worksheet.getCell('A1').alignment = {horizontal: 'center'};
+      worksheet.getCell('A1').font = {name:'Times New Roman',size:20 ,bold:false};
+
+      if (reportSubheading !== ''){
+        worksheet.addRow([]);
+      worksheet.mergeCells('A2:' + this.numToAlpha(header.length - 1) + '2');
+      worksheet.getCell('A2').value = reportSubheading;
+      worksheet.getCell('A2').alignment = {horizontal: 'center'};
+      worksheet.getCell('A2').font = {size:14 ,bold:false};
+      
+      }
+
+      worksheet.addRow([]);
+
+      const HeaderRow = worksheet.addRow(header);
+
+      HeaderRow.eachCell((cell,index) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFFFFF00'},
+          bgColor: { argb: 'FF0000FF'}
+        };
+        cell.border = {top: {style: 'thin'},left: {style: 'thin'},bottom: {style: 'thin'},right: {style: 'thin'}};
+        cell.font = {name: 'Times New Roman', size: 12, bold: false};
+        cell.alignment = {horizontal: 'center'};
+        worksheet.getColumn(1).width = 15;
+        worksheet.getColumn(2).width = 40;
+        worksheet.getColumn(3).width = 22;
+        worksheet.getColumn(4).width = 15;
+        worksheet.getColumn(5).width = 32;
+        worksheet.getColumn(6).width = 32;
+        worksheet.getColumn(7).width = 32;
+        worksheet.getColumn(8).width = 36;
+        worksheet.getColumn(9).width = 21;
+        worksheet.getColumn(10).width = 21;
+        // worksheet.getColumn(index).width = header[index - 1].length < 20 ? 20 : header[index - 1].length;
+
+      });
+
+      let columnsArray: any[];
+      for (const key in this.custExcelArr){
+        if(this.custExcelArr.hasOwnProperty(key)){
+          columnsArray = Object.keys(this.custExcelArr[key]);
+        }
+      }
+
+      data.forEach((element: any) => {
+        const eachrow = [];
+        columnsArray.forEach((column) => {
+          eachrow.push(element[column]);
+        });
+
+        if(element.isDeleted === 'Y'){
+          const deleteRow = worksheet.addRow(eachrow);
+          deleteRow.eachCell((cell) => {
+            cell.font = {name: 'Times New Roman', family: 4, size:11, bold: false, strike: true};
+          });
+        } else {
+          worksheet.addRow(eachrow);
+        }
+      });
+
+      workbook.xlsx.writeBuffer().then((data: ArrayBuffer) => {
+        const blob = new Blob([data], {type: EXCEL_TYPE});
+        FileSaver.saveAs(blob, excelfileName + EXCEL_EXTENSION);
+      })
+  }
+
+
+  numToAlpha(num: number) {
+    let alpha = '';
+    for (; num >=0; num = parseInt((num / 26).toString(),10)-1){
+      alpha = String.fromCharCode(num %  26 + 0x41) + alpha;
+    }
+    return alpha;
+  }
+  
+  setReportData(apiUrl: string, reportType: string){
+    const reportData = {
+      apiUrl: apiUrl,
+      reportType: reportType
+    };
+    this.dataSharing.setData(reportData);
+  }
+
+  exportTOexcel(){
+    this.exportAsExcelFile('AL Bander Hotel & Resort','All Customer List',this.columns,'Customer-Report','sheet1')
+  }
+
   ngOnInit(): void {
     this.getAccountsCategoryData();
     this.getAccountsTypeData();
+    this.getBranchData();
+    this.getCustomerExcel();
   }
   
   flipChartGrid() {
     this.opbalChartBool = !this.opbalChartBool;
   }
-
-  
-
 }

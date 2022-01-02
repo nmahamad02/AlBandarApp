@@ -64,8 +64,8 @@ export class CustomerprofileComponent implements OnInit {
   varTaxNo: string = "";
   varselected: string = "";
   varpcode:string = "";
-  varsfyear:string ="2021-01-01";
-  varefyear:string ="2021-01-01";
+  varsfyear:string ="2022-01-01";
+  varefyear:string ="2022-01-01";
   opbalChartBool: boolean = false;
   
   columns: any[];
@@ -128,7 +128,7 @@ export class CustomerprofileComponent implements OnInit {
       },
       { 
         headername: "TYPE",
-        field: "TYPE",
+        field: "ACCOUNT_TYPE_CD",
         filter: true,
         rowGroup:true,
         enableRowGroup: true,
@@ -159,6 +159,18 @@ export class CustomerprofileComponent implements OnInit {
         headername: "EMAIL",
         filter: true,
         field: "EMAIL_ID",
+        width:200
+      },
+      { 
+        headername: "TAX",
+        filter: true,
+        field: "TAX_1_NO",
+        width:200
+      },
+      { 
+        headername: "PHONE",
+        filter: true,
+        field: "PHONE1",
         width:200
       }
     ];
@@ -559,14 +571,14 @@ export class CustomerprofileComponent implements OnInit {
     }
     else{
       this.financeservice.getCustomerBypcode(data.pcode).subscribe((res: any) => {
-        this.financeservice.updateOPbalDeatils(data.cname,data.cAccountCategory,data.cAccountGroup,data.cType,data.cBranch,data.cExternalCode,data.cCreditPeriod,data.cLimit,data.cCR,data.cTaxNo,data.pcode)
+        this.financeservice.updateOPbalDeatils(data.cname,data.cAccountCategory,data.cStatus,data.cType,data.cCR,data.cTaxNo,data.pcode)
         this.snackbar.open(data.pcode + " Updated Successfully", "close", {
           duration: 10000,
           verticalPosition: 'top',
           panelClass: ['sbBg']
         });
       },(err:any) =>{
-        this.financeservice.postOpbalDetails('01',data.pcode,data.cname,data.cAccountCategory,data.cAccountGroup,data.cType,data.cBranch,data.cExternalCode,data.cCreditPeriod,data.cLimit,data.cCR,data.cTaxNo,'2021')
+        this.financeservice.postOpbalDetails('01',data.pcode,data.cname,data.cAccountCategory,data.cType,data.cCR,data.cTaxNo,data.cStatus,'2022')
         this.snackbar.open( data.pcode + " inserted Successfully", "close", {
           duration: 10000,
           verticalPosition: 'top',

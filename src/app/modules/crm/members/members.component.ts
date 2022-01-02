@@ -39,6 +39,7 @@ export class MembersComponent implements OnInit {
   accArr: any[] = [];
   boatArr: any[] = [];
   mode: string = 'U';
+  mNewMembNbr: string = '';
   columns: any[];
   columnsBoat: any[];
   exportmember : any[] = [];
@@ -54,7 +55,7 @@ export class MembersComponent implements OnInit {
   
   utc = new Date();
   mCurDate = this.formatDate(this.utc);
-  mYear = '2021';
+  mCYear = new Date().getFullYear();
 
   imageSrc: string = '';
   errMes: string = '';
@@ -70,7 +71,7 @@ export class MembersComponent implements OnInit {
 
   selectedRowIndex: any = 0;
 
-  constructor(private router: Router, private clubservice:ClubserivceService, private crmservice:CrmService, private lookupservice: LookupService, private dialog: MatDialog,  public snackBar: MatSnackBar, private dataService: DataSharingService) { 
+  constructor(private router: Router, private clubservice:ClubserivceService, private crmservice:CrmService, private lookupservice: LookupService, private dialog: MatDialog, public snackBar: MatSnackBar, private dataService: DataSharingService) { 
     this.memberForm = new FormGroup({ 
       memberNo: new FormControl('', [Validators.required]),
       memberRefNo: new FormControl('', [Validators.required]),
@@ -131,7 +132,7 @@ export class MembersComponent implements OnInit {
     this.corporateMembers.push(copMember);*/
     this.getMemberExport();
     this.getMebersPrimaryData();
-    this.columns = ["Member No","Name","Surname","Type","Address 1","Address 2","Address 3","Email","Primary Number","Billing Code"];
+    this.columns = ["Bill Code","Primary Member","Relation","Member No","Name","Type","Address","Birth Date","Employer","CPR No"];
     this.columnsBoat = ["Boat No","Registration No","Boat Color","Boat Engine No","Boat Name","Model No","Host Power","Insurance No","Registration Expiry","Insurance Expiry date"];
 
     this.columnMemberDefs = [
@@ -483,7 +484,7 @@ export class MembersComponent implements OnInit {
   lookUpAccode(name:any) {
     this.selectedRowIndex = 0;
     let dialogRef = this.dialog.open(this.accodeLookupDialog);
-    this.crmservice.getPcodeFromName(name,this.mYear).subscribe((res: any) => {
+    this.crmservice.getPcodeFromName(name,this.mCYear).subscribe((res: any) => {
       this.accArr = res.recordset;
       this.accDataSource = new MatTableDataSource(this.accArr);
     }, (err: any) => {
@@ -494,7 +495,7 @@ export class MembersComponent implements OnInit {
   getAccode(name:any) {
     this.selectedRowIndex = 0;
     let dialogRef = this.dialog.open(this.accodeLookupDialog);
-    this.crmservice.getPcodeFromName(name,this.mYear).subscribe((res: any) => {
+    this.crmservice.getPcodeFromName(name,this.mCYear).subscribe((res: any) => {
       this.accArr = res.recordset;
       this.accDataSource = new MatTableDataSource(this.accArr);
       this.selectAccode(res.recordset[0]);
@@ -588,6 +589,7 @@ export class MembersComponent implements OnInit {
       this.crmservice.getMembers(value).subscribe((res: any) => {
         console.log(res);
         const data = res.recordset[0];
+        this.mNewMembNbr = data.MemberNo;
         this.memberForm.patchValue({
           memberNo: data.MemberNo,
           memberRefNo: data.REFMEMBNO,
@@ -662,6 +664,7 @@ export class MembersComponent implements OnInit {
       this.crmservice.getMemberFromREF(value).subscribe((res: any) => {
         console.log(res);
         const data = res.recordset[0];
+        this.mNewMembNbr = data.MemberNo;
         this.memberForm.patchValue({
           memberNo: data.MemberNo,
           memberRefNo: data.REFMEMBNO,
@@ -736,6 +739,7 @@ export class MembersComponent implements OnInit {
       this.crmservice.getMemberFromCPR(value).subscribe((res: any) => {
         console.log(res);
         const data = res.recordset[0];
+        this.mNewMembNbr = data.MemberNo;
         this.memberForm.patchValue({
           memberNo: data.MemberNo,
           memberRefNo: data.REFMEMBNO,
@@ -824,10 +828,12 @@ export class MembersComponent implements OnInit {
     }
   }
 
-  addDependentMember(type: string) {
+  addDependentMember(type: string,) {
     if (type === 'F') {
+      const index = this.familyMembers.length + 1;
+      const newMembNbr = this.mNewMembNbr + '-' + index.toString();
       const famMember = new FormGroup({
-        dMemberNo: new FormControl('***NEW***', [Validators.required]),
+        dMemberNo: new FormControl(newMembNbr, [Validators.required]),
         dMemberRefNo: new FormControl('', [Validators.required]),
         dTitle: new FormControl('', [Validators.required]),
         dFirstname: new FormControl('', [Validators.required]),
@@ -840,8 +846,10 @@ export class MembersComponent implements OnInit {
       this.familyMembers.push(famMember);
     }
     else if (type === 'C') {
+      const index = this.corporateMembers.length + 1;
+      const newMembNbr = this.mNewMembNbr + '-' + index.toString();
       const copMember = new FormGroup({
-        dMemberNo: new FormControl('***NEW***', [Validators.required]),
+        dMemberNo: new FormControl(newMembNbr, [Validators.required]),
         dMemberRefNo: new FormControl('', [Validators.required]),
         dTitle: new FormControl('', [Validators.required]),
         dFirstname: new FormControl('', [Validators.required]),
@@ -890,6 +898,7 @@ export class MembersComponent implements OnInit {
   refreshForm() {
     this.imageSrc = '';
     this.mode = 'U';
+    this.mNewMembNbr = '';
     this.openFamilyMembers = false;
     this.openCorporateMembers = false;
     this.memberForm = new FormGroup({ 
@@ -928,34 +937,42 @@ export class MembersComponent implements OnInit {
     this.mode = 'I';
     this.openFamilyMembers = false;
     this.openCorporateMembers = false;
-    this.memberForm = new FormGroup({ 
-      memberNo: new FormControl('***NEW***', [Validators.required]),
-      memberRefNo: new FormControl('', [Validators.required]),
-      title: new FormControl('', [Validators.required]),
-      image: new FormControl('', []),
-      firstname: new FormControl('', [Validators.required]),
-      surname: new FormControl('', [Validators.required]),
-      memberType: new FormControl('', [Validators.required]),
-      billingCode: new FormControl('', [Validators.required]),
-      birthdate: new FormControl('', []),
-      relation: new FormControl('Self', []),
-      marital: new FormControl('', [Validators.required]),
-      add1: new FormControl('', []),
-      add2: new FormControl('', []),
-      add3: new FormControl('', []), 
-      nation: new FormControl('', []),
-      telOff: new FormControl('', []),
-      telRes: new FormControl('', [Validators.required]),
-      faxNbr: new FormControl('', [Validators.required]),
-      employer: new FormControl('', []),
-      position: new FormControl('', []),
-      email: new FormControl('', [Validators.required]),
-      insuranceNbr: new FormControl('', []),
-      primaryMember: new FormControl('', [Validators.required]),
-      cprNbr: new FormControl('', [Validators.required]),
-      familyMembers: new FormArray([]),
-      corporateMembers: new FormArray([])
-    });
+    const year = String(this.mCYear);
+    this.crmservice.getDocForMemb(year).subscribe((res: any) => {
+      //const yearStr = String(res.recordset[0].CYEAR).substring(2);
+      const docNbr = res.recordset[0].FIELD_VALUE_NM + 1;
+      this.mNewMembNbr = docNbr.toString();
+      this.memberForm = new FormGroup({ 
+        memberNo: new FormControl(this.mNewMembNbr, [Validators.required]),
+        memberRefNo: new FormControl('', [Validators.required]),
+        title: new FormControl('', [Validators.required]),
+        image: new FormControl('', []),
+        firstname: new FormControl('', [Validators.required]),
+        surname: new FormControl('', [Validators.required]),
+        memberType: new FormControl('', [Validators.required]),
+        billingCode: new FormControl('', [Validators.required]),
+        birthdate: new FormControl('', []),
+        relation: new FormControl('Self', []),
+        marital: new FormControl('', [Validators.required]),
+        add1: new FormControl('', []),
+        add2: new FormControl('', []),
+        add3: new FormControl('', []), 
+        nation: new FormControl('', []),
+        telOff: new FormControl('', []),
+        telRes: new FormControl('', [Validators.required]),
+        faxNbr: new FormControl('', [Validators.required]),
+        employer: new FormControl('', []),
+        position: new FormControl('', []),
+        email: new FormControl('', [Validators.required]),
+        insuranceNbr: new FormControl('', []),
+        primaryMember: new FormControl('', [Validators.required]),
+        cprNbr: new FormControl('', [Validators.required]),
+        familyMembers: new FormArray([]),
+        corporateMembers: new FormArray([])
+      });
+    }, (err: any) => {
+      console.log(err)
+    })
     /*const famMember = new FormGroup({
       dMemberNo: new FormControl('***NEW***', [Validators.required]),
       dMemberRefNo: new FormControl('', [Validators.required]),
@@ -1010,14 +1027,14 @@ export class MembersComponent implements OnInit {
     const data = this.memberForm.value;
     console.log(data);
     if (this.mode === 'I') {
-      this.crmservice.postNewMember(data.memberRefNo,data.title, data.firstname, data.surname, data.memberType, this.formatDate(data.birthdate), data.marital, data.add1, data.add2, data.add3, data.nation, data.telOff, data.telRes, data.faxNbr, data.employer, data.position, 'Y', data.relation, data.image, data.primaryMember, data.email, this.mCurDate, data.insuranceNbr, data.cprNbr, data.billingCode).subscribe((res: any) => {
+      this.crmservice.postNewMember(data.memberNo, data.memberRefNo,data.title, data.firstname, data.surname, data.memberType, this.formatDate(data.birthdate), data.marital, data.add1, data.add2, data.add3, data.nation, data.telOff, data.telRes, data.faxNbr, data.employer, data.position, 'Y', data.relation, data.image, data.primaryMember, data.email, this.mCurDate, data.insuranceNbr, data.cprNbr, data.billingCode).subscribe((res: any) => {
         console.log(res);
         this.crmservice.getMemberFromCPR(data.cprNbr).subscribe((res: any) => {
           const pM = res.recordset[0].MemberNo;
           console.log(pM);
           if (data.memberType === 'F') {
              for(let i=0; i<data.familyMembers.length; i++) {
-              this.crmservice.postNewMember(data.familyMembers[i].dMemberRefNo,data.familyMembers[i].dTitle, data.familyMembers[i].dFirstname, data.familyMembers[i].dSurname, data.familyMembers[i].dMemberType, this.formatDate(data.familyMembers[i].dDob), '', data.add1, data.add2, data.add3, data, data.telOff, data.telRes, data.faxNbr, '', '', 'N', data.familyMembers[i].dRelation, '', pM, data.email, this.mCurDate, data.insuranceNbr, data.familyMembers[i].dCprNbr, data.billingCode).subscribe((res: any) => {
+              this.crmservice.postNewMember(data.familyMembers[i].dMemberNo, data.familyMembers[i].dMemberRefNo,data.familyMembers[i].dTitle, data.familyMembers[i].dFirstname, data.familyMembers[i].dSurname, data.familyMembers[i].dMemberType, this.formatDate(data.familyMembers[i].dDob), '', data.add1, data.add2, data.add3, data, data.telOff, data.telRes, data.faxNbr, '', '', 'N', data.familyMembers[i].dRelation, '', pM, data.email, this.mCurDate, data.insuranceNbr, data.familyMembers[i].dCprNbr, data.billingCode).subscribe((res: any) => {
                 console.log(res);
               }, (err: any) => {
                 console.log(err);
@@ -1026,7 +1043,7 @@ export class MembersComponent implements OnInit {
           }
           else if (data.memberType === 'C') {
             for(let i=0; i<data.corporateMembers.length; i++) {
-              this.crmservice.postNewMember(data.corporateMembers[i].dMemberRefNo,data.corporateMembers[i].dTitle, data.corporateMembers[i].dFirstname, data.corporateMembers[i].dSurname, data.corporateMembers[i].dMemberType, this.formatDate(data.corporateMembers[i].dDob), '', data.add1, data.add2, data.add3, data.nation, data.telOff, data.corporateMembers[i].dTelRes, data.faxNbr, '', data.corporateMembers[i].dPosition, 'Y', data.corporateMembers[i].dRelation, '', pM, data.corporateMembers[i].dEmail, this.mCurDate, data.insuranceNbr, data.corporateMembers[i].dCprNbr, data.billingCode).subscribe((res: any) => {
+              this.crmservice.postNewMember(data.corporateMembers[i].dMemberNo, data.corporateMembers[i].dMemberRefNo,data.corporateMembers[i].dTitle, data.corporateMembers[i].dFirstname, data.corporateMembers[i].dSurname, data.corporateMembers[i].dMemberType, this.formatDate(data.corporateMembers[i].dDob), '', data.add1, data.add2, data.add3, data.nation, data.telOff, data.corporateMembers[i].dTelRes, data.faxNbr, '', data.corporateMembers[i].dPosition, 'Y', data.corporateMembers[i].dRelation, '', pM, data.corporateMembers[i].dEmail, this.mCurDate, data.insuranceNbr, data.corporateMembers[i].dCprNbr, data.billingCode).subscribe((res: any) => {
                 console.log(res);
               }, (err: any) => {
                 console.log(err);
@@ -1062,7 +1079,7 @@ export class MembersComponent implements OnInit {
           console.log(resp);
           if (data.memberType === 'F') {
             for(let i=0; i<data.familyMembers.length; i++) {
-              this.crmservice.postNewMember(data.familyMembers[i].dMemberRefNo,data.familyMembers[i].dTitle, data.familyMembers[i].dFirstname, data.familyMembers[i].dSurname, data.familyMembers[i].dMemberType, this.formatDate(data.familyMembers[i].dDob), '', data.add1, data.add2, data.add3, data.nation, data.telOff, data.telRes, data.faxNbr, '', '', 'N', data.familyMembers[i].dRelation, '', data.memberNo, data.email, this.mCurDate, data.insuranceNbr, data.familyMembers[i].dCprNbr, data.billingCode).subscribe((response: any) => {
+              this.crmservice.postNewMember(data.familyMembers[i].dMemberNo, data.familyMembers[i].dMemberRefNo,data.familyMembers[i].dTitle, data.familyMembers[i].dFirstname, data.familyMembers[i].dSurname, data.familyMembers[i].dMemberType, this.formatDate(data.familyMembers[i].dDob), '', data.add1, data.add2, data.add3, data.nation, data.telOff, data.telRes, data.faxNbr, '', '', 'N', data.familyMembers[i].dRelation, '', data.memberNo, data.email, this.mCurDate, data.insuranceNbr, data.familyMembers[i].dCprNbr, data.billingCode).subscribe((response: any) => {
                 console.log(response);
               }, (err: any) => {
                 console.log(err);
@@ -1071,7 +1088,7 @@ export class MembersComponent implements OnInit {
           }
           else if (data.memberType === 'C') {
             for(let i=0; i<data.corporateMembers.length; i++) {
-              this.crmservice.postNewMember(data.familyMembers[i].dMemberRefNo,data.corporateMembers[i].dTitle, data.corporateMembers[i].dFirstname, data.corporateMembers[i].dSurname, data.corporateMembers[i].dMemberType, this.formatDate(data.corporateMembers[i].dDob), '', data.add1, data.add2, data.add3, data.nation, data.telOff, data.corporateMembers[i].dTelRes, data.faxNbr, '', data.corporateMembers[i].dPosition, 'Y', data.corporateMembers[i].dRelation, '', data.memberNo, data.corporateMembers[i].dEmail, this.mCurDate, data.insuranceNbr, data.corporateMembers[i].dCprNbr, data.billingCode).subscribe((response: any) => {
+              this.crmservice.postNewMember(data.corporateMembers[i].dMemberNo, data.familyMembers[i].dMemberRefNo,data.corporateMembers[i].dTitle, data.corporateMembers[i].dFirstname, data.corporateMembers[i].dSurname, data.corporateMembers[i].dMemberType, this.formatDate(data.corporateMembers[i].dDob), '', data.add1, data.add2, data.add3, data.nation, data.telOff, data.corporateMembers[i].dTelRes, data.faxNbr, '', data.corporateMembers[i].dPosition, 'Y', data.corporateMembers[i].dRelation, '', data.memberNo, data.corporateMembers[i].dEmail, this.mCurDate, data.insuranceNbr, data.corporateMembers[i].dCprNbr, data.billingCode).subscribe((response: any) => {
                 console.log(response);
               }, (err: any) => {
                 console.log(err);
@@ -1142,15 +1159,15 @@ export class MembersComponent implements OnInit {
         cell.font = {name: 'Times New Roman', size: 12, bold: false};
         cell.alignment = {horizontal: 'center'};
         worksheet.getColumn(1).width = 12;
-        worksheet.getColumn(2).width = 32;
-        worksheet.getColumn(3).width = 22;
-        worksheet.getColumn(4).width = 7;
-        worksheet.getColumn(5).width = 32;
-        worksheet.getColumn(6).width = 32;
-        worksheet.getColumn(7).width = 32;
-        worksheet.getColumn(8).width = 36;
-        worksheet.getColumn(9).width = 21;
-        worksheet.getColumn(10).width = 21;
+        worksheet.getColumn(2).width = 21;
+        worksheet.getColumn(3).width = 12;
+        worksheet.getColumn(4).width = 14;
+        worksheet.getColumn(5).width = 42;
+        worksheet.getColumn(6).width = 14;
+        worksheet.getColumn(7).width = 82;
+        worksheet.getColumn(8).width = 15;
+        worksheet.getColumn(9).width = 32;
+        worksheet.getColumn(10).width = 16;
         // worksheet.getColumn(index).width = header[index - 1].length < 20 ? 20 : header[index - 1].length;
 
       });
@@ -1230,15 +1247,15 @@ export class MembersComponent implements OnInit {
         cell.font = {name: 'Times New Roman', size: 12, bold: false};
         cell.alignment = {horizontal: 'center'};
         worksheet.getColumn(1).width = 12;
-        worksheet.getColumn(2).width = 32;
-        worksheet.getColumn(3).width = 22;
-        worksheet.getColumn(4).width = 7;
-        worksheet.getColumn(5).width = 32;
-        worksheet.getColumn(6).width = 32;
-        worksheet.getColumn(7).width = 32;
-        worksheet.getColumn(8).width = 36;
-        worksheet.getColumn(9).width = 21;
-        worksheet.getColumn(10).width = 21;
+        worksheet.getColumn(2).width = 21;
+        worksheet.getColumn(3).width = 12;
+        worksheet.getColumn(4).width = 14;
+        worksheet.getColumn(5).width = 42;
+        worksheet.getColumn(6).width = 14;
+        worksheet.getColumn(7).width = 82;
+        worksheet.getColumn(8).width = 15;
+        worksheet.getColumn(9).width = 32;
+        worksheet.getColumn(10).width = 16;
         // worksheet.getColumn(index).width = header[index - 1].length < 20 ? 20 : header[index - 1].length;
 
       });
@@ -1411,15 +1428,15 @@ export class MembersComponent implements OnInit {
         cell.font = {name: 'Times New Roman', size: 12, bold: false};
         cell.alignment = {horizontal: 'center'};
         worksheet.getColumn(1).width = 12;
-        worksheet.getColumn(2).width = 32;
-        worksheet.getColumn(3).width = 22;
-        worksheet.getColumn(4).width = 7;
-        worksheet.getColumn(5).width = 32;
-        worksheet.getColumn(6).width = 32;
-        worksheet.getColumn(7).width = 32;
-        worksheet.getColumn(8).width = 36;
-        worksheet.getColumn(9).width = 21;
-        worksheet.getColumn(10).width = 21;
+        worksheet.getColumn(2).width = 21;
+        worksheet.getColumn(3).width = 12;
+        worksheet.getColumn(4).width = 14;
+        worksheet.getColumn(5).width = 42;
+        worksheet.getColumn(6).width = 14;
+        worksheet.getColumn(7).width = 82;
+        worksheet.getColumn(8).width = 15;
+        worksheet.getColumn(9).width = 32;
+        worksheet.getColumn(10).width = 16;
         // worksheet.getColumn(index).width = header[index - 1].length < 20 ? 20 : header[index - 1].length;
 
       });

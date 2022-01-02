@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class LookupService {
-  private url = 'http://15.185.46.105:5001/api';
+  private url = 'http://15.185.46.105:5000/api';
 
   constructor(private http:HttpClient) { }
 

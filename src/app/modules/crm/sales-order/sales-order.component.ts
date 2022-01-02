@@ -25,12 +25,14 @@ export class SalesOrderComponent implements OnInit {
   partyArr: any[] = [];
   srvArr: any[] = [];
   refArr: any[] = [];
+
   refIndex:number  = 0;
   srvIndex:number = 0;
   argIndex: number = 0;
   serviceIndex: number = 0;
   memberIndex: number = 0;
   valueIndex: number = 0;
+
   docArgNo: any;
   docArg: any;
   columnMemberDefs:any;
@@ -56,6 +58,7 @@ export class SalesOrderComponent implements OnInit {
 
   utc = new Date();
   mCurDate = this.formatDate(this.utc);
+  mCYear = new Date().getFullYear();
 
   invReportApiUrl: string = "";
   invReportName: string = "";
@@ -146,6 +149,7 @@ export class SalesOrderComponent implements OnInit {
   } 
 
    refreshForm() {
+     this.agrArr = [];
     this.docArgNo = '';
     this.docArg = '';
     this.mPartyName = "";
@@ -182,7 +186,8 @@ export class SalesOrderComponent implements OnInit {
    newForm() {
     this.docArgNo = '';
     this.docArg = '';
-    this.financeService.getDocForArg().subscribe((res: any) => {
+    const year = String(this.mCYear);
+    this.financeService.getDocForArg(year).subscribe((res: any) => {
       const yearStr = String(res.recordset[0].CYEAR).substring(2);
       const docNbr = res.recordset[0].FIELD_VALUE_NM + 1;
       const agrNbr = 'AGR' + yearStr + '-' + docNbr.toString();
@@ -421,7 +426,7 @@ export class SalesOrderComponent implements OnInit {
         Price: res.recordset[0].MemberPrice,
       }
       this.agrItem.at(index).patchValue(rowData);
-      let dialogRef = this.dialog.closeAll();
+      //let dialogRef = this.dialog.closeAll();
       console.log(res);
     }, (err: any) => {
       console.log(err);
@@ -683,16 +688,25 @@ export class SalesOrderComponent implements OnInit {
     }
   }
 
+  captureGridIndex(index: number){
+    this.valueIndex = index;
+  }
+
   submitAgreement(index: number) {
     const data = this.agreementForm.value;
     var value = 0;
     //console.log(data);
     this.agrArr.push(data);
-    for(let i=0; i<this.agrArr.length; i++) {
-      console.log(this.agrItem.at(i));
-      //value = value + this.agrItem.at()
+    for(let i=0; i<this.agrArr[this.valueIndex].serviceArr.length; i++) {
+      console.log(this.agrArr[this.valueIndex].serviceArr[i].Price);
+      value = value + this.agrArr[this.valueIndex].serviceArr[i].Price;
     }
-    console.log(this.agrArr);
+    console.log(value);
+    const rowData: any = {
+      srvValue: value
+    }
+    this.srvItem.at(this.valueIndex).patchValue(rowData);
+
     let dialogRef = this.dialog.closeAll();
   }
 

@@ -7,7 +7,7 @@ import { SortController } from 'ag-grid-community';
   providedIn: 'root'
 })
 export class FinanceService {
-  private url = 'http://15.185.46.105:5001/api';
+  private url = 'http://15.185.46.105:5000/api';
  
   constructor(private http: HttpClient) { }
   
@@ -23,7 +23,6 @@ export class FinanceService {
     return this.http.get(this.url + '/coa/getPartyForExcel')
   }
   
-
   getCoa(year: string) {
     return this.http.get(this.url + '/coa/getcoa/' + year)
   }
@@ -143,8 +142,8 @@ export class FinanceService {
     return this.http.get(this.url + '/coa/getServicesDetails/'+ serviceid)
   }
 
-  getDocForArg() {
-    return this.http.get(this.url + '/coa/getDocForArg')
+  getDocForArg(year: string) {
+    return this.http.get(this.url + '/coa/getDocForArg/' + year)
   }
 
   searchServicesDetails(serviceid:string) {
@@ -351,7 +350,7 @@ export class FinanceService {
     })
   }
 
-  postOpbalDetails(compcode: string, pcode: string, custname: string, accountcategory: string, glcode: string,acounttype: string, branchid: string, afectingtype: string, creditperiod: string, limit: string,cprno: string, tax1no: string,fyear: string) {
+  postOpbalDetails(compcode: string, pcode: string, custname: string, accountcategory: string, acounttype: string,cprno: string, tax1no: string,status: string,fyear: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     const newTran = {
@@ -359,14 +358,10 @@ export class FinanceService {
       pcode : pcode,
       custname : custname,
       accountcategory : accountcategory,
-      glcode : glcode,
       acounttype : acounttype,
-      branchid : branchid,
-      afectingtype : afectingtype,
-      creditperiod : creditperiod,
-      limit : limit,
       cprno : cprno,
       tax1no : tax1no,
+      status : status,
       fyear: fyear
     }
 
@@ -375,19 +370,15 @@ export class FinanceService {
     })
   }
 
-  updateOPbalDeatils(custname: string, accountcategory: string, glcode: string,accountype: string, branch: string, affectingtype: string, creditperiod: string, limit: string,cpr: string, tax1no: string,pcode: string) {
+  updateOPbalDeatils(custname: string, accountcategory: string,status: string,accountype: string,cpr: string, tax1no: string,pcode: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     const newTran = {
       pcode : pcode,
       custname : custname,
       accountcategory : accountcategory,
-      glcode : glcode,
+      status : status,
       accountype : accountype,
-      branch : branch,
-      affectingtype : affectingtype,
-      creditperiod : creditperiod,
-      limit : limit,
       cpr : cpr,
       tax1no : tax1no
     }

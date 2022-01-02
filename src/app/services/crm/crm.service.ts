@@ -7,7 +7,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class CrmService {
-  private url = 'http://15.185.46.105:5001/api';
+  private url = 'http://15.185.46.105:5000/api';
 
   constructor(private http:HttpClient) { }
 
@@ -170,7 +170,9 @@ export class CrmService {
     return this.http.get(this.url + '/coa/getExpenseMasterExpid')
   }
 
-  
+  getDocForMemb(year: string) {
+    return this.http.get(this.url + '/coa/getDocForMemb/' + year)
+  }
 
   getDependentMembers(memberno:any){
     return this.http.get(this.url + '/crm/getDependentMembers/'+ memberno)
@@ -247,10 +249,11 @@ export class CrmService {
     })
   }
 
-  postNewMember(refmembno:string,title: string, firstName: string, surName: string, memberType: string, birthDate: string, maritalStatus: string, add1: string, add2: string, add3: string, nationality: string, telOff: string, telRes: string, faxNbr: string, employer: string, position: string, isPrimary: string, relation: string, image: string, primaryMember: string, email: string, createdDate: string, insuranceNbr: string, cprNbr: string, accode: string) {
+  postNewMember(membno: string,refmembno:string,title: string, firstName: string, surName: string, memberType: string, birthDate: string, maritalStatus: string, add1: string, add2: string, add3: string, nationality: string, telOff: string, telRes: string, faxNbr: string, employer: string, position: string, isPrimary: string, relation: string, image: string, primaryMember: string, email: string, createdDate: string, insuranceNbr: string, cprNbr: string, accode: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     const newMember = {
+      membno:membno,
       refmembno:refmembno,
       title: title,
       firstName: firstName,

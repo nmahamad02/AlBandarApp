@@ -29,7 +29,7 @@ export class BoatComponent implements OnInit {
   boatForm: any;
   selectedRowIndex: any = 0;
   columns: any[];
-  mYear = '2021';
+  mYear = '2022';
   mBoatNo = '';
   gridApi: any;
   gridColumnApi:any;

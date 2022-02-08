@@ -150,16 +150,20 @@ export class CrmService {
     return this.http.get(this.url + '/crm/searchSOMaster/' + sono)
   }
 
-  getSoDetails(sono: any){
+  /*getSoDetails(sono: any){
     return this.http.get(this.url + '/crm/getSoDetails/' + sono)
   }
 
   getSOmaster(sono: any){
     return this.http.get(this.url + '/crm/getSOMaster/' + sono)
-  }
+  }*/
 
   getagreementmaster(argno: any){
     return this.http.get(this.url + '/coa/getAgreementsMaster/' + argno)
+  }
+
+  searchagreementmaster(argno: any){
+    return this.http.get(this.url + '/coa/searchAgreementsMaster/' + argno)
   }
 
   getagreementDetails(argno: any){
@@ -174,7 +178,7 @@ export class CrmService {
     return this.http.get(this.url + '/coa/getDocForMemb/' + year)
   }
 
-  getDependentMembers(memberno:any){
+  getDependentMembers(memberno:any){ 
     return this.http.get(this.url + '/crm/getDependentMembers/'+ memberno)
   }
 
@@ -351,6 +355,19 @@ export class CrmService {
     }
 
     return this.http.post(this.url + '/crm/updateMember', JSON.stringify(newMember), { headers: headers })
+  }
+
+  updateDocForMemb(fieldvalue: string, year: string) {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+
+    const newTran = {
+      fieldvalue : fieldvalue,
+      cyear: year
+    }
+
+    this.http.post(this.url + '/coa/updateDocForMemb', JSON.stringify(newTran), { headers: headers }).subscribe((res: any) => {
+      console.log(res);
+    })
   }
 
   deleteMember(membNo: any) {

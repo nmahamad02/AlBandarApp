@@ -609,8 +609,8 @@
                                     tabindex="999"
                                     (keydown.arrowdown)="arrowDownEvent('membs',selectedRowIndex)"
                                     (keydown.arrowup)="arrowUpEvent('membs',selectedRowIndex)" 
-                                    (keydown.f4)="lookUpBoat(membArr[selectedRowIndex])"></tr>
-                                    <!-- (keydown.enter)="selectMemb(membArr[selectedRowIndex])" ></tr> -->
+                                    (keydown.f4)="lookUpBoat(membArr[selectedRowIndex])"
+                                    (keydown.enter)="selectMemb(membArr[selectedRowIndex])" ></tr>
                                 </table>
                             </div>
                             <mat-dialog-actions align="end">
@@ -622,7 +622,7 @@
                 </div>
                 <div class="col-12">
                     <div class="col-12">
-                        <ng-template #accodeLookupDialog 
+                        <ng-template #accodeLookupDialog    
                         style="width: 60%;">
                             <h3 matDialogTitle>
                                 <b>Look up Accode</b>

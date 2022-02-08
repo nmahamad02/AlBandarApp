@@ -19,6 +19,7 @@ const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.
 })
 export class CustomerprofileComponent implements OnInit {
   public custForm: FormGroup;
+  public balForm: FormGroup;
   currentYear = new Date().getFullYear()
   searchValue: any;
   gridOptions!: Partial<GridOptions>;

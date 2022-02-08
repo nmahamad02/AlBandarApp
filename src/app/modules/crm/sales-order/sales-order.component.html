@@ -135,17 +135,16 @@
                         <hr>
                     </div>
                     <div class="col-12">
-                        <mat-tab-group> <!-- mat-align-tabs="center" -->
-                            <mat-tab label="Member Details">
+                        <mat-tab-group> 
+                            <!--<mat-tab label="Member Details">
                                 <div class="col-12">
                                     <div class="col-11">
                                         <b>Search</b>
                                         <mat-form-field class="full-width">
                                             <mat-icon matPrefix>search</mat-icon>
-                                            <input matInput type="text" style="color: black;" placeholder="Please Enter Your Seach Keyword to filter" (keyup)=" quickMemberSearch()"><!--  [(ngModel)]="searchValue">-->
+                                            <input matInput type="text" style="color: black;" placeholder="Please Enter Your Seach Keyword to filter" (keyup)=" quickMemberSearch()">
                                         </mat-form-field>
                                     </div>
-                                    <!-- GET PARTY DETAILS FOR THIS CUSTOMER-->
                                     <ag-grid-angular style="width: 100%; height: 360px ;" 
                                     class="ag-theme-balham" [animateRows]="true"
                                     [pagination]="true" [paginationPageSize]="25" 
@@ -156,30 +155,30 @@
                                     [columnDefs]="columnMemberDefs"
                                     (gridReady)="onGridMemberReady($event)"></ag-grid-angular>     
                                 </div>    
-                            </mat-tab>
+                            </mat-tab> -->
                             <mat-tab label="Service Details">
                                 <div class="col-12">
                                     <div class="form-row">
                                         <div class="col-12" 
-                                        style="height: 25vh; overflow-y: auto;" >
+                                        style="height: 35vh; overflow-y: auto;" >
                                             <table class="table table-borderless table-hover table-responsive-xxl"
                                             formArrayName="srvItemArr">
                                                 <thead>
                                                     <tr class="table-reflow" 
                                                     style="background-color: rgb(2, 46, 82); color: white;">
-                                                        <th style="width: 8%;">Code</th>
-                                                        <th style="width: 20%;">Description </th>
-                                                        <th style="width: 7%;">Member</th>
-                                                        <th style="width: 15%;">Member Name</th>
-                                                        <th style="width: 8%;">From</th>
-                                                        <th style="width: 8%;">To</th>                                                                                                     
-                                                        <th style="width: 6%;">Value</th>
-                                                        <th style="width: 4%;">%</th>
+                                                        <th style="width: 5%;">Code</th>
+                                                        <th style="width: 15%;">Description </th>
+                                                        <th style="width: 5%;">Member</th>
+                                                        <th style="width: 17.5%;">Member Name</th>
+                                                        <th style="width: 10%;">From</th>
+                                                        <th style="width: 10%;">To</th>                                                                                                     
+                                                        <th style="width: 7.5%;">Value</th>
+                                                        <th style="width: 5%;">Disc %</th>
                                                         <th style="width: 5%;">Disc</th>
-                                                        <th style="width: 6%;">Gross</th>
-                                                        <th style="width: 7%;">vat</th>
-                                                        <th style="width: 15%;">VatValue</th>
-                                                        <th style="width: 15%;">NetAmount</th>
+                                                        <!--<th style="width: 5%;">Gross</th> -->
+                                                        <th style="width: 5%;">VAT %</th>
+                                                        <th style="width: 7.5%;">VAT</th>
+                                                        <th style="width: 7.5%;">Gross</th>
                                                         <th></th>
                                                     </tr>
                                                 </thead>
@@ -217,12 +216,18 @@
                                                             formControlName="srvMemberName">
                                                         </td>
                                                         <td>
-                                                            <input class="form-control form-control-sm" 
-                                                            type="date" formControlName="srvFrom">
+                                                            <input matInput [matDatepicker]="fromPicker" formControlName="srvFrom">
+                                                            <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+                                                            <mat-datepicker #fromPicker></mat-datepicker>
+                                                            <!-- <input class="form-control form-control-sm" 
+                                                            type="date" formControlName="srvFrom"> -->
                                                         </td>
                                                         <td>
-                                                            <input class="form-control form-control-sm" 
-                                                            type="date" formControlName="srvTo">
+                                                            <input matInput [matDatepicker]="toPicker" formControlName="srvTo">
+                                                            <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+                                                            <mat-datepicker #toPicker></mat-datepicker>
+                                                            <!-- <input class="form-control form-control-sm" 
+                                                            type="date" formControlName="srvTo"> -->
                                                         </td>              
                                                         <td>
                                                             <input #pcode
@@ -230,7 +235,7 @@
                                                             type="text"
                                                             formControlName="srvValue"
                                                             (keydown.f2)="lookupAgreementAndMember(i)"
-                                                            (focusout)="captureGridIndex(i)">
+                                                            (focus)="captureGridIndex(i)">
                                                         </td>
                                                         <td>
                                                             <input #disc 
@@ -245,11 +250,11 @@
                                                             type="text"
                                                             formControlName="srvDiscount">
                                                         </td>
-                                                        <td>
+                                                       <!--- <td>
                                                             <input class="form-control form-control-sm" 
                                                             type="text" 
                                                             formControlName="srvGross">
-                                                        </td>
+                                                        </td> -->
                                                         <td>
                                                             <mat-select formControlName="srvVatCat" (valueChange)="gettaxValue($event,i)" required>
                                                                 <mat-option *ngFor="let tax of taxArr" [value]="tax.TAX_1_PERC">
@@ -290,8 +295,31 @@
                             </mat-tab>
                         </mat-tab-group>
                     </div>
+                    <hr>
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-9"></div>
+                            <div class="col-3">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h4 style="color: darkblue;">Total:</h4>
+                                        <h4 style="color: darkblue;">Discount:</h4>
+                                        <h4 style="color: darkblue;">VAT:</h4>
+                                        <hr>
+                                        <h3 style="color: darkblue;">Grand Total:</h3>
+                                    </div>                                    
+                                    <div class="col-6" style="float: right;">
+                                        <h4 style="color: darkblue;">BHD {{ mAgrTotal | number : '1.3' }}</h4>
+                                        <h4 style="color: darkblue;">BHD {{ mAgrDisc | number : '1.3'}}</h4>
+                                        <h4 style="color: darkblue;">BHD {{ mAgrVAT | number : '1.3'}}</h4>
+                                        <hr>
+                                        <h3 style="color: darkblue;">BHD {{ mAgrGTotal | number : '1.3'}}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
-
                 <div class="col-12">
                     <ng-template #partyLookupDialog 
                     style="width: 60%;">

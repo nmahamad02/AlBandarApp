@@ -11,6 +11,7 @@ import * as FileSaver from 'file-saver';
 import { DataSharingService } from 'src/app/services/data-sharing/data-sharing.service';
 import { GridOptions } from 'ag-grid-community';
 import { ClubserivceService } from 'src/app/services/clubservice/clubserivce.service';
+import { UploadService } from 'src/app/services/upload/upload.service';
 const EXCEL_EXTENSION = '.xlsx';
 const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
 
@@ -58,6 +59,7 @@ export class MembersComponent implements OnInit {
   mCYear = new Date().getFullYear();
 
   imageSrc: string = '';
+  selectedFileToUpload = new File([""], "img");
   errMes: string = '';
 
   membDisplayedColumns: string[] = ['memberNo', 'memberRefNo', 'title', 'firstname', 'surname', 'cprno'];
@@ -71,7 +73,7 @@ export class MembersComponent implements OnInit {
 
   selectedRowIndex: any = 0;
 
-  constructor(private router: Router, private clubservice:ClubserivceService, private crmservice:CrmService, private lookupservice: LookupService, private dialog: MatDialog, public snackBar: MatSnackBar, private dataService: DataSharingService) { 
+  constructor(private router: Router, private clubservice:ClubserivceService, private crmservice:CrmService, private lookupservice: LookupService, private dialog: MatDialog, public snackBar: MatSnackBar, private dataService: DataSharingService, private uploadService: UploadService) { 
     this.memberForm = new FormGroup({ 
       memberNo: new FormControl('', [Validators.required]),
       memberRefNo: new FormControl('', [Validators.required]),
@@ -101,7 +103,7 @@ export class MembersComponent implements OnInit {
       corporateMembers: new FormArray([]),
       billingname: new FormControl({ value: 'Billing Name', disabled: true })
     });
-    /*const famMember = new FormGroup({
+    const famMember = new FormGroup({
       dMemberNo: new FormControl('', [Validators.required]),
       dMemberRefNo: new FormControl('', [Validators.required]),
       dTitle: new FormControl('', [Validators.required]),
@@ -129,7 +131,7 @@ export class MembersComponent implements OnInit {
       dPosition: new FormControl('', []),
       dEmail: new FormControl('', [Validators.required])
     });
-    this.corporateMembers.push(copMember);*/
+    this.corporateMembers.push(copMember);
     this.getMemberExport();
     this.getMebersPrimaryData();
     this.columns = ["Bill Code","Primary Member","Relation","Member No","Name","Type","Address","Birth Date","Employer","CPR No"];
@@ -180,8 +182,6 @@ export class MembersComponent implements OnInit {
     this.getRelations();
     this.getTitles();
     this.getPositions();
-
-    
   }
 
   getMebersPrimaryData() {
@@ -585,6 +585,7 @@ export class MembersComponent implements OnInit {
   }
 
   getMemberData(value:string, condition: string) {
+    console.log(value)
     if(condition === 'I') { //MEMBERCODE
       this.crmservice.getMembers(value).subscribe((res: any) => {
         console.log(res);
@@ -616,6 +617,14 @@ export class MembersComponent implements OnInit {
           primaryMember: data.PRIMARYMEMBER,
           cprNbr: data.CPRNo
         });
+        console.log(data.IMAGENAME);
+        var imgVal: string = data.IMAGENAME;
+        if (imgVal === "") {
+          this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/imgNaN.png";
+        } else {
+          var imgName: string = imgVal.slice(12);
+          this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgName;
+        }
         this.fillOpbalName(data.ACCODE)
         this.checkDependents(data.MEMBTYPE);
         this.crmservice.getDependentMembers(data.MemberNo).subscribe((res: any) => {
@@ -691,6 +700,14 @@ export class MembersComponent implements OnInit {
           primaryMember: data.PRIMARYMEMBER,
           cprNbr: data.CPRNo
         });
+        console.log(data.IMAGENAME);
+        var imgVal: string = data.IMAGENAME;
+        if (imgVal === "") {
+          this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/imgNaN.png";
+        } else {
+          var imgName: string = imgVal.slice(12);
+          this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgName;
+        }
         this.fillOpbalName(data.ACCODE);
         this.checkDependents(data.MEMBTYPE);
         this.crmservice.getDependentMembers(data.MemberNo).subscribe((res: any) => {
@@ -766,6 +783,14 @@ export class MembersComponent implements OnInit {
           primaryMember: data.PRIMARYMEMBER,
           cprNbr: data.CPRNo
         });
+        console.log(data.IMAGENAME);
+        var imgVal: string = data.IMAGENAME;
+        if (imgVal === "") {
+          this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/imgNaN.png";
+        } else {
+          var imgName: string = imgVal.slice(12);
+          this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgName;
+        }
         this.fillOpbalName(data.ACCODE)
         this.checkDependents(data.MEMBTYPE);
         this.crmservice.getDependentMembers(data.MemberNo).subscribe((res: any) => {
@@ -1007,19 +1032,33 @@ export class MembersComponent implements OnInit {
   }
 
   onFileChange(event: any) {
+
+    var filesList: FileList = event.target.files;
     const reader = new FileReader();
+
     if(event.target.files && event.target.files.length) {
-      const [file] = event.target.files;
-      console.log(file.name);
-      
-      reader.readAsDataURL(file);
+      const fileToUpload: any = filesList.item(0);
+      console.log(fileToUpload.name);
+      const imgNm: string = fileToUpload.name;
+      reader.readAsDataURL(fileToUpload);
       reader.onload = () => {
-        this.imageSrc = reader.result as string;
-        this.memberForm.patchValue({
-          //image: reader.result
-          image: file.name
-        });
+          this.imageSrc = reader.result as string;
+          this.memberForm.patchValue({
+            //image: reader.result
+            image: imgNm
+          });
       };
+      this.selectedFileToUpload = fileToUpload;
+    }
+  }
+
+  uploadImage() {
+    if (!this.selectedFileToUpload) {
+      alert('Please select a file first!'); // or any other message to the user to choose a file
+      return;
+    } else {
+      console.log('attempt to upload')
+      this.uploadService.uploadImage(this.selectedFileToUpload);
     }
   }
 
@@ -1031,6 +1070,7 @@ export class MembersComponent implements OnInit {
         console.log(res);
         this.crmservice.getMemberFromCPR(data.cprNbr).subscribe((res: any) => {
           const pM = res.recordset[0].MemberNo;
+          this.uploadImage();
           console.log(pM);
           if (data.memberType === 'F') {
              for(let i=0; i<data.familyMembers.length; i++) {
@@ -1064,6 +1104,7 @@ export class MembersComponent implements OnInit {
             });
           }
           this.getMemberData(pM, 'I');
+          this.crmservice.updateDocForMemb(pM, String(this.mCYear));
         }, (err: any) => {
           console.log(err);
         })

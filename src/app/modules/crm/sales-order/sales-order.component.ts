@@ -13,6 +13,7 @@ import { LookupService } from 'src/app/services/lookup/lookup.service';
   templateUrl: './sales-order.component.html',
   styleUrls: ['./sales-order.component.scss']
 })
+
 export class SalesOrderComponent implements OnInit {
   salesOrderForm: FormGroup;
   agreementForm: FormGroup;
@@ -35,6 +36,7 @@ export class SalesOrderComponent implements OnInit {
 
   docArgNo: any;
   docArg: any;
+  docInv: any;
   columnMemberDefs:any;
   taxArr: any;
   gridApi: any;
@@ -55,6 +57,10 @@ export class SalesOrderComponent implements OnInit {
   mPartyAdd3: string = "";
   mPartyEmail: string = "";
   mPartyTelephone: string = "";
+  mAgrTotal = 0;
+  mAgrVAT = 0;
+  mAgrDisc = 0;
+  mAgrGTotal = 0;
 
   utc = new Date();
   mCurDate = this.formatDate(this.utc);
@@ -93,6 +99,9 @@ export class SalesOrderComponent implements OnInit {
       purchaseOrderNo: new FormControl('', [ Validators.required]),
       party: new FormControl('', [ Validators.required]),
       customerCode: new FormControl('', [ Validators.required]),
+      total: new FormControl('', [ Validators.required]),
+      gtotal: new FormControl('', [ Validators.required]),
+      discount: new FormControl('', [ Validators.required]),
       name: new FormControl('', [ Validators.required]),
       add1: new FormControl('', [ Validators.required]),
       add2: new FormControl('', [ Validators.required]),
@@ -149,7 +158,7 @@ export class SalesOrderComponent implements OnInit {
   } 
 
    refreshForm() {
-     this.agrArr = [];
+    this.agrArr = [];
     this.docArgNo = '';
     this.docArg = '';
     this.mPartyName = "";
@@ -160,6 +169,10 @@ export class SalesOrderComponent implements OnInit {
     this.mPartyAdd3 = "";
     this.mPartyEmail = "";
     this.mPartyTelephone = "";
+    this.mAgrTotal = 0;
+    this.mAgrVAT = 0;
+    this.mAgrDisc = 0;
+    this.mAgrGTotal = 0;
     this.salesOrderForm = new FormGroup({
       voucherNo: new FormControl('', [ Validators.required]),
       voucherDate: new FormControl('', [ Validators.required]),
@@ -177,25 +190,27 @@ export class SalesOrderComponent implements OnInit {
       subject: new FormControl('', [ Validators.required]),
       srvItemArr: new FormArray([])
     });
-
     this.agreementForm = new FormGroup({
       serviceArr: new FormArray([])
     });
   }
 
    newForm() {
-    this.docArgNo = '';
-    this.docArg = '';
+    this.mAgrTotal = 0;
+    this.mAgrVAT = 0;
+    this.mAgrDisc = 0;
+    this.mAgrGTotal = 0;
     const year = String(this.mCYear);
     this.financeService.getDocForArg(year).subscribe((res: any) => {
       const yearStr = String(res.recordset[0].CYEAR).substring(2);
-      const docNbr = res.recordset[0].FIELD_VALUE_NM + 1;
-      const agrNbr = 'AGR' + yearStr + '-' + docNbr.toString();
-      console.log(agrNbr);
+      this.docArgNo = res.recordset[0].FIELD_VALUE_NM + 1;
+      this.docArg = 'AGR' + yearStr + '-' + this.docArgNo.toString();
+      this.docInv = 'INV' + yearStr + '-' + this.docArgNo.toString();
+      console.log(this.docArg);
       this.salesOrderForm = new FormGroup({
-        voucherNo: new FormControl(agrNbr, [ Validators.required]),
+        voucherNo: new FormControl(this.docArg, [ Validators.required]),
         voucherDate: new FormControl(this.mCurDate, [ Validators.required]),
-        quotationNo: new FormControl('', [ Validators.required]),
+        quotationNo: new FormControl(this.docInv, [ Validators.required]),
         purchaseOrderNo: new FormControl('', [ Validators.required]),
         party: new FormControl('', [ Validators.required]),
         customerCode: new FormControl('', [ Validators.required]),
@@ -246,29 +261,12 @@ export class SalesOrderComponent implements OnInit {
     console.log(value)
     this.selectedRowIndex = 0;
     let dialogRef = this.dialog.open(this.SOLookUpDailouge);    
-    this.crmservice.searchSoMaster(value).subscribe((res: any) => {
+    this.crmservice.searchagreementmaster(value).subscribe((res: any) => {
       this.SOArr = res.recordset;
       this.SalesOrderDataSource = new MatTableDataSource(this.SOArr);
     }, (err: any) => {
       console.log(err);
     })
-  }
-
-  lookupAgreementAndMember(index: any) {
-    const data = this.salesOrderForm.value;
-    let diialogRef = this.dialog.open(this.agreementLookUpDialog);
-
-    console.log(data)
-    this.agreementForm = new FormGroup({
-      serviceArr: new FormArray([])
-    });
-
-    const agreementGrid = new FormGroup({
-      serviceNo: new FormControl('', [ Validators.required]),
-      serviceDesc: new FormControl('', [Validators.required]),
-      Price: new FormControl('', [ Validators.required]),
-    });
-    this.agrItem.push(agreementGrid);
   }
 
   getSalesorder(argno: any) {
@@ -279,6 +277,30 @@ export class SalesOrderComponent implements OnInit {
       }, (err: any) => {
         console.log(err);
       })
+  }
+
+  lookupAgreementAndMember(index: any) {
+    let dialogRef = this.dialog.open(this.agreementLookUpDialog);
+    this.agreementForm = new FormGroup({
+      serviceArr: new FormArray([])
+    });
+    if(this.agrArr[index]) {
+      for(let i=0;i<this.agrArr[index].serviceArr.length;i++) {
+        const agreementGrid = new FormGroup({
+          serviceNo: new FormControl(this.agrArr[index].serviceArr[i].serviceNo, [ Validators.required]),
+          serviceDesc: new FormControl(this.agrArr[index].serviceArr[i].serviceDesc, [Validators.required]),
+          Price: new FormControl(this.agrArr[index].serviceArr[i].Price, [ Validators.required]),
+        });
+        this.agrItem.push(agreementGrid);
+      }
+    } else {
+      const agreementGrid = new FormGroup({
+        serviceNo: new FormControl('', [ Validators.required]),
+        serviceDesc: new FormControl('', [Validators.required]),
+        Price: new FormControl('', [ Validators.required]),
+      });
+      this.agrItem.push(agreementGrid);
+    }
   }
 
   highlight(type: string, index: number){
@@ -456,7 +478,7 @@ export class SalesOrderComponent implements OnInit {
       srvNetValue: netvalue
     }
     this.srvItem.at(index).patchValue(rowData);
-    
+    this.caliberateTotal();
   }
 
   getValueData(argno: any,index: any){
@@ -473,32 +495,29 @@ export class SalesOrderComponent implements OnInit {
   }
 
   onFormSubmit(){
-    const data = this.salesOrderForm.value;
-    console.log(data);
-    this.refreshForm();
-    /*this.docArgNo = '';
-
-      const data = this.salesOrderForm.value;
-      this.financeService.getDocForArg().subscribe((res: any) => {
-        const yearStr = String(res.recordset[0].CYEAR).substring(2);
-        const docNbr = res.recordset[0].FIELD_VALUE_NM + 1;
-        const agrNbr = 'AGR' + yearStr + '-' + docNbr.toString();
-      if(data.voucherNo == agrNbr){
-        this.financeService.getDocForArg().subscribe((res: any) =>{
-          this.financeService.postAgreementMaster('01',data.quotationNo,data.voucherNo,this.mCurDate,this.docArg,data.customerCode,data.customerCode,this.mPartyName,this.mPartyAdd1,this.mPartyPhone,this.mPartyTelephone,data.subject,this.mCurDate,'DBA')
-          for(let i=0; i<data.srvItemArry.length; i++) {
-            this.financeService.postAgreementDetails(data.voucherNo,'01',data.srvItemArry[i].srvCode,data.srvItemArry[i].srvDesc,data.srvItemArry[i].srvMember,data.srvItemArry[i].srvMemberName,this.formatDate(data.srvItemArry[i].srvFrom),this.formatDate(data.srvItemArry[i].srvTo),data.srvItemArry[i].srvValue,data.srvItemArry[i].srvGross,data.srvItemArry[i].srvDisc,data.srvItemArry[i].srvDiscount,data.srvItemArry[i].srvVatCat,data.srvItemArry[i].srvVat,data.srvItemArry[i].srvNetValue,this.mCurDate,'DBA')
-          }
-          this.financeService.updatedocAgreement(docNbr)
-        })
+    const agrData = this.salesOrderForm.value;
+    console.log(agrData);    
+    console.log(this.agrArr );
+    this.financeService.checkAgreement(agrData.voucherNo).subscribe((res: any) => {
+      this.financeService.updateAgreementMaster(agrData.quotationNo, agrData.voucherDate, agrData.customerCode, agrData.customerCode, agrData.name, agrData.add1, agrData.phoneNo, agrData.telephone, agrData.subject, this.mCurDate, 'DBA', agrData.voucherNo);
+      console.log(res)
+    }, (err: any) => {
+      console.log(this.docArgNo);
+      this.financeService.postAgreementMaster('01',agrData.quotationNo,agrData.voucherNo,this.mCurDate,this.docArg,agrData.customerCode,agrData.customerCode,agrData.name,String(this.mAgrTotal),String(this.mAgrDisc),String(this.mAgrGTotal),String(this.mAgrVAT),agrData.add1,agrData.phoneNo,agrData.telephone,agrData.subject,this.mCurDate,'DBA');
+      for(let i=0; i<agrData.srvItemArr.length; i++) {
+        this.financeService.postAgreementDetails(agrData.voucherNo,'01',agrData.srvItemArr[i].srvCode,agrData.srvItemArr[i].srvDesc,agrData.srvItemArr[i].srvMember,agrData.srvItemArr[i].srvMemberName,this.formatDate(agrData.srvItemArr[i].srvFrom),this.formatDate(agrData.srvItemArr[i].srvTo),agrData.srvItemArr[i].srvValue,agrData.srvItemArr[i].srvGross,agrData.srvItemArr[i].srvDisc,agrData.srvItemArr[i].srvDiscount,agrData.srvItemArr[i].srvVatCat,agrData.srvItemArr[i].srvVat,agrData.srvItemArr[i].srvNetValue,this.mCurDate,'DBA');
+        /*for (let j=0; j<this.agrArr[i].serviceArr.length; j++) {
+          const serArrData = this.agrArr[i].serviceArr[j];
+          this.financeService.postAggrementBLA(agrData.srvItemArr[i].srvMember,agrData.voucherNo,serArrData.serviceNo,serArrData.Price,'01').subscribe((res: any) => {
+            console.log(res);
+          }, (err: any) => {
+            console.log(err);
+          });
+        }*/
       }
-      else {
-        this.financeService.updateAgreementMaster(data.quotationNo,this.mCurDate,data.customerCode,data.customerCode,this.mPartyName,this.mPartyAdd1,this.mPartyAdd2,this.mPartyPhone,data.subject,this.mCurDate,'DBA',data.voucherNo)
-        for(let i=0; i<data.srvItemArry.length; i++) {
-          this.financeService.updateAgreementDetails(data.srvItemArry[i].srvCode,data.srvItemArry[i].srvDesc,data.srvItemArry[i].srvMember,data.srvItemArry[i].srvMemberName,this.formatDate(data.srvItemArry[i].srvFrom),this.formatDate(data.srvItemArry[i].srvTo),data.srvItemArry[i].srvValue,data.srvItemArry[i].srvGross,data.srvItemArry[i].srvDisc,data.srvItemArry[i].srvDiscount,data.srvItemArry[i].srvVatCat,data.srvItemArry[i].srvVat,data.srvItemArry[i].srvNetValue,this.mCurDate,'DBA',data.voucherNo)
-        }
-      }
-    })*/
+      this.financeService.updatedocAgreement(this.docArgNo, String(this.mCYear));
+    });
+    //this.refreshForm();
   }
 
   selectMember(obj: any) {
@@ -595,6 +614,7 @@ export class SalesOrderComponent implements OnInit {
           srvNetValue: new FormControl(itemArr[x].AMOUNT, [ Validators.required]),
         });
         this.srvItem.push(salesorderGrid);
+        this.caliberateTotal();
       }
     }, (error: any) => {
       console.log(error);
@@ -648,7 +668,6 @@ export class SalesOrderComponent implements OnInit {
     } else {
       this.srvItem.removeAt(index);
     }
-    //this.siItem.last.nativeElement.focus();
   }
 
   addServiceItem() {
@@ -692,24 +711,44 @@ export class SalesOrderComponent implements OnInit {
     this.valueIndex = index;
   }
 
-  submitAgreement(index: number) {
+  submitAgreement() {
     const data = this.agreementForm.value;
     var value = 0;
+    console.log(this.valueIndex);
+    console.log(this.agrArr.length);
+    console.log(this.agrArr);
     //console.log(data);
-    this.agrArr.push(data);
+    if(this.valueIndex===this.agrArr.length) {
+      this.agrArr.push(data);
+    } else {      
+      this.agrArr.splice(this.valueIndex,1,data);
+    }
     for(let i=0; i<this.agrArr[this.valueIndex].serviceArr.length; i++) {
       console.log(this.agrArr[this.valueIndex].serviceArr[i].Price);
       value = value + this.agrArr[this.valueIndex].serviceArr[i].Price;
+      console.log(this.agrArr);
     }
     console.log(value);
     const rowData: any = {
       srvValue: value
     }
     this.srvItem.at(this.valueIndex).patchValue(rowData);
-
     let dialogRef = this.dialog.closeAll();
   }
 
+  caliberateTotal() {
+    this.mAgrTotal = 0;
+    this.mAgrDisc = 0;
+    this.mAgrVAT = 0;
+    this.mAgrGTotal = 0;
+    for(let i=0; i<this.srvItem.length; i++) {
+     // console.log(this.srvItem);
+      this.mAgrTotal = this.mAgrTotal + this.srvItem.value[i].srvValue;
+      this.mAgrDisc = this.mAgrDisc + this.srvItem.value[i].srvDiscount;
+      this.mAgrVAT = this.mAgrVAT + this.srvItem.value[i].srvVat;
+      this.mAgrGTotal = this.mAgrTotal - this.mAgrDisc + this.mAgrVAT;
+    }
+  }
   formatDate(date: any) {
     var d = new Date(date), day = '' + d.getDate(), month = '' + (d.getMonth() + 1), year = d.getFullYear();
 

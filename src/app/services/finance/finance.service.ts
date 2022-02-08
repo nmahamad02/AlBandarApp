@@ -1,7 +1,6 @@
+import { VIRTUAL_SCROLL_STRATEGY } from '@angular/cdk/scrolling';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { throwToolbarMixedModesError } from '@angular/material/toolbar';
-import { SortController } from 'ag-grid-community';
 
 @Injectable({
   providedIn: 'root'
@@ -146,6 +145,11 @@ export class FinanceService {
     return this.http.get(this.url + '/coa/getDocForArg/' + year)
   }
 
+  checkAgreement(agrno: string) {
+    return this.http.get(this.url + '/coa/checkAgreement/'+ agrno)
+
+  }
+
   searchServicesDetails(serviceid:string) {
     return this.http.get(this.url + '/coa/searchServicesDetails/'+ serviceid)
   }
@@ -235,7 +239,7 @@ export class FinanceService {
     return this.http.post(this.url + '/coa/postAgrement', JSON.stringify(newTran), { headers: headers })
   }
 
-  postAgreementMaster(compcode: string, qutono: string, agrno: string, agrdate: string, sono:string, partyid: string, pcode: string, custname: string, custadd1: string, custadd2: string, custphone: string,remarks: string, createdate: string, createuser: string) {
+  postAgreementMaster(compcode: string, qutono: string, agrno: string, agrdate: string, sono:string, partyid: string, pcode: string, custname: string, total: string, discount: string, gtotal: string, vatamt: string, custadd1: string, custadd2: string, custphone: string,remarks: string, createdate: string, createuser: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     const newTran = {
@@ -247,6 +251,10 @@ export class FinanceService {
       partyid : partyid,
       pcode : pcode,
       custname : custname,
+      total : total,
+      discount : discount,
+      gtotal : gtotal,
+      vatamt : vatamt,
       custadd1 : custadd1,
       custadd2 : custadd2,
       custphone : custphone,
@@ -310,11 +318,12 @@ export class FinanceService {
     })
   }
 
-  updatedocAgreement(fieldvalue: string) {
+  updatedocAgreement(fieldvalue: string, year: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     const newTran = {
-      fieldvalue : fieldvalue
+      fieldvalue : fieldvalue,
+      cyear: year
     }
 
     this.http.post(this.url + '/coa/updatedocagrement', JSON.stringify(newTran), { headers: headers }).subscribe((res: any) => {

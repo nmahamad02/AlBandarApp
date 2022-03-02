@@ -239,12 +239,11 @@ export class FinanceService {
     return this.http.post(this.url + '/coa/postAgrement', JSON.stringify(newTran), { headers: headers })
   }
 
-  postAgreementMaster(compcode: string, qutono: string, agrno: string, agrdate: string, sono:string, partyid: string, pcode: string, custname: string, total: string, discount: string, gtotal: string, vatamt: string, custadd1: string, custadd2: string, custphone: string,remarks: string, createdate: string, createuser: string) {
+  postAgreementMaster(compcode: string, agrno: string, agrdate: string, sono:string, partyid: string, pcode: string, custname: string, total: string, discount: string, gtotal: string, vatamt: string, custadd1: string, custadd2: string, custphone: string,remarks: string, createdate: string, createuser: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     const newTran = {
       compcode : compcode,
-      qutono : qutono,
       agrno : agrno,
       agrdate : agrdate,
       sono: sono,
@@ -263,16 +262,13 @@ export class FinanceService {
       createuser : createuser
     }
 
-    this.http.post(this.url + '/coa/postagrementmaster', JSON.stringify(newTran), { headers: headers }).subscribe((res: any) => {
-      console.log(res);
-    })
+    return this.http.post(this.url + '/coa/postagrementmaster', JSON.stringify(newTran), { headers: headers })
   }
 
-  updateAgreementMaster(qutono: string, argdate: string, partyid:string, pcode: string, custname: string, add1: string, add2: string, phone: string, remarks: string,editdt: string, edituser: string, agrno: string) {
+  updateAgreementMaster(argdate: string, partyid:string, pcode: string, custname: string, add1: string, add2: string, phone: string, remarks: string,editdt: string, edituser: string, agrno: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     const newTran = {
-      qutono : qutono,
       argdate : argdate,
       partyid: partyid,
       pcode : pcode,
@@ -286,9 +282,7 @@ export class FinanceService {
       agrno : agrno
     }
 
-    this.http.post(this.url + '/coa/updateagrementmaster', JSON.stringify(newTran), { headers: headers }).subscribe((res: any) => {
-      console.log(res);
-    })
+    return this.http.post(this.url + '/coa/updateagrementmaster', JSON.stringify(newTran), { headers: headers })
   }
 
   updateAgreementDetails(itcode: string, desc: string, membercode: string, membername: string, frmdate:string, todate: string, value: string, price: string, disper: string, disamt: string, vatcategory: string,vat: string, amount: string, editdt: string,edituser: string, agrno: string) {
@@ -313,9 +307,16 @@ export class FinanceService {
       agrno : agrno
     }
 
-    this.http.post(this.url + '/coa/updateagrementdetails', JSON.stringify(newTran), { headers: headers }).subscribe((res: any) => {
-      console.log(res);
-    })
+    return this.http.post(this.url + '/coa/updateagrementdetails', JSON.stringify(newTran), { headers: headers })
+  }
+
+  
+  deleteAgreement(agrNo: any) {
+    return this.http.get(this.url + '/coa/deleteAgreement/'+ agrNo)
+  }
+
+  deleteAgreementDetails(agrNo: any) {    
+    return this.http.get(this.url + '/coa/deleteAgreementDetails/'+ agrNo)
   }
 
   updatedocAgreement(fieldvalue: string, year: string) {
@@ -326,9 +327,7 @@ export class FinanceService {
       cyear: year
     }
 
-    this.http.post(this.url + '/coa/updatedocagrement', JSON.stringify(newTran), { headers: headers }).subscribe((res: any) => {
-      console.log(res);
-    })
+    return this.http.post(this.url + '/coa/updatedocagrement', JSON.stringify(newTran), { headers: headers })
   }
 
   postAgreementDetails(argno: string, compcode: string, itcode: string, desc: string, membercode: string, memmbername: string, fromdate: string, todate: string, value: string, price: string,disper: string, disamt: string, vatcategory: string,vat: string,amount: string, createdate: string, createuser: string) {
@@ -354,9 +353,7 @@ export class FinanceService {
       createuser : createuser,
     }
 
-    this.http.post(this.url + '/coa/postagrementdetails', JSON.stringify(newTran), { headers: headers }).subscribe((res: any) => {
-      console.log(res);
-    })
+    return this.http.post(this.url + '/coa/postagrementdetails', JSON.stringify(newTran), { headers: headers })
   }
 
   postOpbalDetails(compcode: string, pcode: string, custname: string, accountcategory: string, acounttype: string,cprno: string, tax1no: string,status: string,fyear: string) {

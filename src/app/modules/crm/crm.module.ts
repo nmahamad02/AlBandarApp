@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ContactsComponent } from './contacts/contacts.component';
+import { ContactsComponent } from './contacts-component/contacts/contacts.component';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AgGridModule } from 'ag-grid-angular';
@@ -18,7 +18,7 @@ import { InvoiceComponent } from './invoice/invoice.component';
 import { InvoicereportComponent } from './invoicereport/invoicereport.component'; 
 import { ActiveReportsModule } from '@grapecity/activereports-angular';
 import { CustomerprofileComponent } from './customerprofile/customerprofile.component';
-import { MembersComponent } from './members/members.component';
+import { MembersComponent } from './members-component/members/members.component';
 import { MembershipComponent } from './membership/membership.component';
 import { ReferenceComponent } from './reference/reference.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -26,12 +26,20 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { ReceiptComponent } from './receipt/receipt.component';
 import { DepartmentComponent } from './department/department.component';
 import { CostcenterComponent } from './costcenter/costcenter.component';
-import { SalesOrderComponent } from './sales-order/sales-order.component';
-import { AgreementComponent } from './agreement/agreement.component';
+import { SalesOrderComponent } from './sales-order-component/sales-order/sales-order.component';
+import { AgreementComponent } from './agreement-component/agreement/agreement.component';
+import { AgreementListComponent } from './agreement-component/agreement-list/agreement-list.component';
+import { ContactsListComponent } from './contacts-component/contacts-list/contacts-list.component';
+import { MembersLisrComponent } from './members-component/members-lisr/members-lisr.component';
+import { SalesOrderListComponent } from './sales-order-component/sales-order-list/sales-order-list.component';
 
 export const crmRoutes = [
   {
     path: 'contacts',
+    component: ContactsListComponent
+  },
+  {
+    path: 'contacts/details',
     component: ContactsComponent
   },
   {
@@ -48,6 +56,10 @@ export const crmRoutes = [
   },
   {
     path: 'members',
+    component: MembersLisrComponent
+  },
+  {
+    path: 'member/details',
     component: MembersComponent
   },
   {
@@ -55,22 +67,31 @@ export const crmRoutes = [
     component: ReferenceComponent
   },
   {
-    path: 'member/details',
-    component: MembershipComponent
-  },{
     path: 'receipt',
     component: ReceiptComponent
-  },{
+  },
+  {
     path: 'deparment',
     component: DepartmentComponent
-  },{
+  },
+  {
     path: 'costcenter',
     component: CostcenterComponent
-  },{
+  },
+  {
     path: 'sales-order',
+    component: SalesOrderListComponent
+  },
+  {
+    path:'sales-order/details',
     component: SalesOrderComponent
-  },{
+  },
+  {
     path: "agreements",
+    component: AgreementListComponent
+  },
+  {
+    path: 'agreements/details',
     component: AgreementComponent
   }
 ]
@@ -88,7 +109,11 @@ export const crmRoutes = [
     DepartmentComponent,
     CostcenterComponent,
     SalesOrderComponent,
-    AgreementComponent
+    AgreementComponent,
+    AgreementListComponent,
+    ContactsListComponent,
+    MembersLisrComponent,
+    SalesOrderListComponent
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }

@@ -30,8 +30,11 @@ import { SalesOrderComponent } from './sales-order-component/sales-order/sales-o
 import { AgreementComponent } from './agreement-component/agreement/agreement.component';
 import { AgreementListComponent } from './agreement-component/agreement-list/agreement-list.component';
 import { ContactsListComponent } from './contacts-component/contacts-list/contacts-list.component';
-import { MembersLisrComponent } from './members-component/members-lisr/members-lisr.component';
+import { MembersListComponent } from './members-component/members-list/members-list.component';
 import { SalesOrderListComponent } from './sales-order-component/sales-order-list/sales-order-list.component';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from "@angular/material/sort";
+import { MatTableExporterModule } from 'mat-table-exporter';
 
 export const crmRoutes = [
   {
@@ -39,7 +42,7 @@ export const crmRoutes = [
     component: ContactsListComponent
   },
   {
-    path: 'contacts/details',
+    path: 'contacts/details/:id',
     component: ContactsComponent
   },
   {
@@ -56,10 +59,10 @@ export const crmRoutes = [
   },
   {
     path: 'members',
-    component: MembersLisrComponent
+    component: MembersListComponent
   },
   {
-    path: 'member/details',
+    path: 'member/details/:id',
     component: MembersComponent
   },
   {
@@ -112,7 +115,7 @@ export const crmRoutes = [
     AgreementComponent,
     AgreementListComponent,
     ContactsListComponent,
-    MembersLisrComponent,
+    MembersListComponent,
     SalesOrderListComponent
   ],
   providers: [
@@ -136,6 +139,9 @@ export const crmRoutes = [
     AgGridModule.withComponents(),
     ReactiveFormsModule,
     ActiveReportsModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatTableExporterModule,
     RouterModule.forChild(crmRoutes)
   ],
   bootstrap: [ContactsComponent]

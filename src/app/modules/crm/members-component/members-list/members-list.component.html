@@ -1,0 +1,110 @@
+<div class="container-fluid">
+  <br>
+  <div class="col-12">
+    <mat-card style="color: darkblue; background-color:rgb(251, 252, 249);">
+      <mat-card-header>
+        <div class="col-12">
+          <div class="row">
+            <div class="col-3">
+              <mat-card-title i18n="@@CMMContactsTitle">
+                Member Management
+              </mat-card-title>
+            </div>         
+          </div>
+        </div>
+      </mat-card-header>
+      <hr> 
+          <div class="row">
+            <b>Search</b>
+            <mat-form-field class="full-width">
+              <mat-icon matPrefix>search</mat-icon>
+              <input matInput type="text" style="color: black;" placeholder="Please Enter Your Seach Keyword to filter" (keyup)=" quickMemberSearch()" [(ngModel)]="searchValue">
+            </mat-form-field>
+          </div>
+    
+          <div style="text-align: end;padding: 10px 10px;">
+            <a mat-raised-button href="javascript:void(0)" (click)="toggleTableRows()" color="primary">Toggle Rows</a>
+          </div>
+          <mat-table [dataSource]="memberListDataSource" matTableExporter #exporter="matTableExporter"
+                     class="mat-table" matSort matSortDisableClear [multiTemplateDataRows]="true">
+            <ng-container matColumnDef="actions">
+              <mat-header-cell *matHeaderCellDef>  </mat-header-cell>
+              <mat-cell mat-cell *matCellDef="let row">
+                <a mat-button href="javascript:void()" (click)="row.isExpanded = !row.isExpanded">
+                  +
+                </a>
+              </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="MemberNo">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> Member Code </mat-header-cell>
+              <mat-cell *matCellDef="let row" (click)="onViewCellClicked(row)"> {{ row.MemberNo }} </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="NAME">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> Member Name </mat-header-cell>
+              <mat-cell *matCellDef="let row" (click)="onViewCellClicked(row)"> {{ row.NAME }} </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="DEPT_NAME">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> Member SurName </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{ row.DEPT_NAME }} </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="MEMBTYPE">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> Member Type </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{ row.MEMBTYPE }} </mat-cell>
+            </ng-container>
+             Button Column 
+            <ng-container matColumnDef="buttons">
+              <mat-header-cell *matHeaderCellDef mat-sort-header> Actions </mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <button mat-raised-button class="bg-primary text-white btn btn-block" style="border-radius: 50%;" (click)="gotoMemebersDetails('/crm/member/details', row.MemberNo)">
+                  View
+                </button>
+              </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="expandedDetail">
+              <mat-cell class="nested-detail-row-cell-narrow" *matCellDef="let row;">
+                <div class="detail-row-container" [@detailExpand]="row.isExpanded ? 'expanded' : 'collapsed'">
+                  <div class="detail-cell-container">
+                    <div class="detail-cell-content">
+                      <b>Dependents :</b>
+                    </div>
+                    <div class="detail-cell-content">
+                      <br />
+                    </div>
+                    <ng-container *ngFor="let depenedentMember of row.DepenedentMembers">
+                      <div class="detail-cell-content">
+                        Member Code : {{ depenedentMember.MemberNo }}
+                      </div>
+                      <div class="detail-cell-content">
+                        Member Name :   {{ depenedentMember.NAME }}
+                      </div>
+                      <div class="detail-cell-content">
+                        Member SurName : {{ depenedentMember.DEPT_NAME }}
+                      </div>
+                      <div class="detail-cell-content">
+                        Member Type : {{ depenedentMember.MEMBTYPE }}
+                      </div>
+                      <div class="detail-cell-content">
+                        <br />
+                      </div>
+                    </ng-container>
+                  </div>
+                </div>
+              </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="columnMemberDefs;sticky: true"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: columnMemberDefs;" class="student-element-row"
+                     [class.student-expanded-row]="row.isExpanded"></mat-row>
+            <mat-row class="student-detail-row" *matRowDef="let row; columns: ['expandedDetail'];"> </mat-row>
+          </mat-table>
+          <mat-paginator #paginator [pageSize]="50" [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons>
+          </mat-paginator>
+
+
+    </mat-card>
+  </div>
+</div>

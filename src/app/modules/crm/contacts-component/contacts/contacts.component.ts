@@ -14,6 +14,7 @@ import { FinanceService } from 'src/app/services/finance/finance.service';
 import { DataSharingService } from 'src/app/services/data-sharing/data-sharing.service';
 const EXCEL_EXTENSION = '.xlsx';
 const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -45,25 +46,6 @@ export class ContactsComponent implements OnInit {
   areaDataSource = new MatTableDataSource(this.AreaArr);
   columns: any[];
   partyArr: any[] = [];
-  /*varContactID: any;
-  varConatctPerson: any;
-  varName: String = "";
-  varAdd1: String = "";
-  VarAdd2: String = "";
-  varAdd3: string = "";
-  varFalt: string = "";
-  varBuildingHouse: string = ""
-  varRoad: any;
-  varBlock: String = "";
-  varArea: String = "";
-  varPoBox: String = "";
-  varRefNo: string = "";
-  varMobileNo: string = "";
-  varFax1: string = ""
-  Varfax2: any;
-  varEmail: string = "";
-  varPhone1: string = ""
-  varPhone2: any;*/
   mpcode: String = "";
   mPartyDetails: any;
   @ViewChild('pcodeLookupDailoug') pcodeLookupDailoug!: TemplateRef<any>;
@@ -73,7 +55,7 @@ export class ContactsComponent implements OnInit {
   invReportApiUrl: string = "";
   invReportName: string = "";
 
-  constructor(private crmservices:CrmService, public snackbar: MatSnackBar,private dialog:MatDialog,private financeservice: FinanceService,private dataSharing: DataSharingService ) { 
+  constructor(private crmservices: CrmService, public snackbar: MatSnackBar, private dialog: MatDialog, private financeservice: FinanceService, private dataSharing: DataSharingService, private route: ActivatedRoute ) {
     this.contactsForm = new FormGroup({
       contactId: new FormControl('', [Validators.required]),
       contactPerson: new FormControl('', [Validators.required]),
@@ -155,6 +137,8 @@ export class ContactsComponent implements OnInit {
     this.getPartyexcel();
     this.invReportApiUrl = "coa/getOpbalForPrint";
     this.invReportName = "CLINETLIST.rdlx-json";
+    this.getPartyDetails(this.route.snapshot.params.id);
+
   }
 
   onGridPartyrDetails(params: any){ 

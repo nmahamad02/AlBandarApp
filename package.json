@@ -30,6 +30,7 @@
     "chart.js": "^3.7.0",
     "exceljs": "^4.3.0",
     "file-saver": "^2.0.5",
+    "mat-table-exporter": "^10.2.4",
     "moment": "^2.29.1",
     "ng2-charts": "^2.4.3",
     "rxjs": "~6.6.0",

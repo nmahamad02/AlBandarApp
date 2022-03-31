@@ -1,0 +1,21 @@
+.mat-table .mat-header-cell {
+  border: 2px;
+  clip: rect(0 0 0 0);
+  margin: -1px;
+  padding: 0;
+  width: 1px;
+  font-weight: bold;
+  background-color: dodgerblue;
+  height: 80% ;
+}
+
+.mat-table .mat-row {
+  border-bottom: 2px solid #ddd;
+  background-color: aliceblue;
+  min-height: 1px !important;
+  height: 80% !important;
+}
+
+.mat-row:hover > .mat-cell {
+  cursor: pointer;
+}

@@ -2,7 +2,7 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CrmService } from 'src/app/services/crm/crm.service';
 import { LookupService } from 'src/app/services/lookup/lookup.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -73,7 +73,7 @@ export class MembersComponent implements OnInit {
 
   selectedRowIndex: any = 0;
 
-  constructor(private router: Router, private clubservice:ClubserivceService, private crmservice:CrmService, private lookupservice: LookupService, private dialog: MatDialog, public snackBar: MatSnackBar, private dataService: DataSharingService, private uploadService: UploadService) { 
+  constructor(private router: Router, private clubservice: ClubserivceService, private crmservice: CrmService, private lookupservice: LookupService, private dialog: MatDialog, public snackBar: MatSnackBar, private dataService: DataSharingService, private uploadService: UploadService, private route: ActivatedRoute) {
     this.memberForm = new FormGroup({ 
       memberNo: new FormControl('', [Validators.required]),
       memberRefNo: new FormControl('', [Validators.required]),
@@ -133,7 +133,7 @@ export class MembersComponent implements OnInit {
     });
     this.corporateMembers.push(copMember);
     this.getMemberExport();
-    this.getMebersPrimaryData();
+    this.getMembersPrimaryData();
     this.columns = ["Bill Code","Primary Member","Relation","Member No","Name","Type","Address","Birth Date","Employer","CPR No"];
     this.columnsBoat = ["Boat No","Registration No","Boat Color","Boat Engine No","Boat Name","Model No","Host Power","Insurance No","Registration Expiry","Insurance Expiry date"];
 
@@ -182,9 +182,17 @@ export class MembersComponent implements OnInit {
     this.getRelations();
     this.getTitles();
     this.getPositions();
+
+    this.crmservice.getMembers(this.route.snapshot.params.id).subscribe((res: any) => {
+      const data = res.recordset[0];
+      this.onViewCellClicked(data);
+    }, (err: any) => {
+      console.log(err);
+    })
+
   }
 
-  getMebersPrimaryData() {
+  getMembersPrimaryData() {
     this.crmservice.getExportMemberIsprimary().subscribe((res: any) => {
       this.mMemeberData = res.recordset;
       console.log(this.mMemeberData);
@@ -239,149 +247,76 @@ export class MembersComponent implements OnInit {
     })
   }
 
-  onViewCellClicked(event: any){
-    console.log(event.data);
+  onViewCellClicked(event: any) {
     this.refreshForm();
-    if (event.column.colId =="MemberNo" ){
-      this.memberForm.patchValue({
-        memberNo: event.data.MemberNo,
-        memberRefNo: event.data.REFMEMBNO,
-        title: event.data.TITLE,
-        //image: data.IMAGENAME,
-        firstname: event.data.NAME,
-        surname: event.data.SURNAME,
-        memberType: event.data.MEMBTYPE,
-        billingCode: event.data.ACCODE,
-        birthdate: event.data.BIRTHDT,
-        relation: event.data.RELATION,
-        marital: event.data.MARITAL,
-        add1: event.data.ADD1,
-        add2: event.data.ADD2,
-        add3: event.data.ADD3, 
-        nation: event.data.NATION,
-        telOff: event.data.TELOFF,
-        telRes: event.data.TELRES,
-        faxNbr: event.data.FAXNO,
-        employer: event.data.EMPLOYER,
-        position: event.data.POSITION,
-        email: event.data.Email,
-        insuranceNbr: event.data.InsuranceNo,
-        primaryMember: event.data.PRIMARYMEMBER,
-        cprNbr: event.data.CPRNo
-      });
-      this.fillOpbalName(event.data.ACCODE)
-      this.checkDependents(event.data.MEMBTYPE);
-      this.crmservice.getDependentMembers(event.data.MemberNo).subscribe((res: any) => {
-        if (event.data.MEMBTYPE === 'F') {
-          const famArr = res.recordset;
-          for(let i=0; i<famArr.length; i++) {
-            const famMember = new FormGroup({
-              dMemberNo: new FormControl(famArr[i].MemberNo, [Validators.required]),
-              dMemberRefNo: new FormControl(famArr[i].REFMEMBNO, [Validators.required]),
-              dTitle: new FormControl(famArr[i].TITLE, [Validators.required]),
-              dFirstname: new FormControl(famArr[i].NAME, [Validators.required]),
-              dSurname: new FormControl(famArr[i].SURNAME, [Validators.required]),
-              dMemberType: new FormControl(famArr[i].MEMBTYPE, [Validators.required]),
-              dRelation: new FormControl(famArr[i].RELATION, []),
-              dDob: new FormControl(famArr[i].BIRTHDT, []),
-              dCprNbr: new FormControl(famArr[i].CPRNo, [Validators.required])
-            });
-            this.familyMembers.push(famMember);
-          }
+    this.memberForm.patchValue({
+      memberNo: event.MemberNo,
+      memberRefNo: event.REFMEMBNO,
+      title: event.TITLE,
+      //image: data.IMAGENAME,
+      firstname: event.NAME,
+      surname: event.SURNAME,
+      memberType: event.MEMBTYPE,
+      billingCode: event.ACCODE,
+      birthdate: event.BIRTHDT,
+      relation: event.RELATION,
+      marital: event.MARITAL,
+      add1: event.ADD1,
+      add2: event.ADD2,
+      add3: event.ADD3,
+      nation: event.NATION,
+      telOff: event.TELOFF,
+      telRes: event.TELRES,
+      faxNbr: event.FAXNO,
+      employer: event.EMPLOYER,
+      position: event.POSITION,
+      email: event.Email,
+      insuranceNbr: event.InsuranceNo,
+      primaryMember: event.PRIMARYMEMBER,
+      cprNbr: event.CPRNo
+    });
+    this.fillOpbalName(event.ACCODE)
+    this.checkDependents(event.MEMBTYPE);
+    this.crmservice.getDependentMembers(event.MemberNo).subscribe((res: any) => {
+      if (event.MEMBTYPE === 'F') {
+        const famArr = res.recordset;
+        for (let i = 0; i < famArr.length; i++) {
+          const famMember = new FormGroup({
+            dMemberNo: new FormControl(famArr[i].MemberNo, [Validators.required]),
+            dMemberRefNo: new FormControl(famArr[i].REFMEMBNO, [Validators.required]),
+            dTitle: new FormControl(famArr[i].TITLE, [Validators.required]),
+            dFirstname: new FormControl(famArr[i].NAME, [Validators.required]),
+            dSurname: new FormControl(famArr[i].SURNAME, [Validators.required]),
+            dMemberType: new FormControl(famArr[i].MEMBTYPE, [Validators.required]),
+            dRelation: new FormControl(famArr[i].RELATION, []),
+            dDob: new FormControl(famArr[i].BIRTHDT, []),
+            dCprNbr: new FormControl(famArr[i].CPRNo, [Validators.required])
+          });
+          this.familyMembers.push(famMember);
         }
-        else if (event.data.MEMBTYPE === 'C') {
-          const copArr = res.recordset;        
-          for(let i=0; i<copArr.length; i++) {
-            const copMember = new FormGroup({
-              dMemberNo: new FormControl(copArr[i].MemberNo, [Validators.required]),
-              dMemberRefNo: new FormControl(copArr[i].REFMEMBNO, [Validators.required]),
-              dTitle: new FormControl(copArr[i].TITLE, [Validators.required]),
-              dFirstname: new FormControl(copArr[i].NAME, [Validators.required]),
-              dSurname: new FormControl(copArr[i].SURNAME, [Validators.required]),
-              dDob: new FormControl(copArr[i].BIRTHDT, []),
-              dCprNbr: new FormControl(copArr[i].CPRNo, [Validators.required]),
-              dMemberType: new FormControl(copArr[i].MEMBTYPE, [Validators.required]),
-              dRelation: new FormControl(copArr[i].RELATION, []),
-              dTelOff: new FormControl(copArr[i].TELOFF, []),
-              dPosition: new FormControl(copArr[i].POSITION, []),
-              dEmail: new FormControl(copArr[i].Email, [Validators.required])
-            });
-            this.corporateMembers.push(copMember);
-          }
+      }
+      else if (event.MEMBTYPE === 'C') {
+        const copArr = res.recordset;
+        for (let i = 0; i < copArr.length; i++) {
+          const copMember = new FormGroup({
+            dMemberNo: new FormControl(copArr[i].MemberNo, [Validators.required]),
+            dMemberRefNo: new FormControl(copArr[i].REFMEMBNO, [Validators.required]),
+            dTitle: new FormControl(copArr[i].TITLE, [Validators.required]),
+            dFirstname: new FormControl(copArr[i].NAME, [Validators.required]),
+            dSurname: new FormControl(copArr[i].SURNAME, [Validators.required]),
+            dDob: new FormControl(copArr[i].BIRTHDT, []),
+            dCprNbr: new FormControl(copArr[i].CPRNo, [Validators.required]),
+            dMemberType: new FormControl(copArr[i].MEMBTYPE, [Validators.required]),
+            dRelation: new FormControl(copArr[i].RELATION, []),
+            dTelOff: new FormControl(copArr[i].TELOFF, []),
+            dPosition: new FormControl(copArr[i].POSITION, []),
+            dEmail: new FormControl(copArr[i].Email, [Validators.required])
+          });
+          this.corporateMembers.push(copMember);
         }
-      })
-      let dialogRef = this.dialog.closeAll();
-    }else if (event.column.colId =="NAME" ){
-      this.memberForm.patchValue({
-        memberNo: event.data.MemberNo,
-        memberRefNo: event.data.REFMEMBNO,
-        title: event.data.TITLE,
-        //image: data.IMAGENAME,
-        firstname: event.data.NAME,
-        surname: event.data.SURNAME,
-        memberType: event.data.MEMBTYPE,
-        billingCode: event.data.ACCODE,
-        birthdate: event.data.BIRTHDT,
-        relation: event.data.RELATION,
-        marital: event.data.MARITAL,
-        add1: event.data.ADD1,
-        add2: event.data.ADD2,
-        add3: event.data.ADD3, 
-        nation: event.data.NATION,
-        telOff: event.data.TELOFF,
-        telRes: event.data.TELRES,
-        faxNbr: event.data.FAXNO,
-        employer: event.data.EMPLOYER,
-        position: event.data.POSITION,
-        email: event.data.Email,
-        insuranceNbr: event.data.InsuranceNo,
-        primaryMember: event.data.PRIMARYMEMBER,
-        cprNbr: event.data.CPRNo
-      });
-      this.fillOpbalName(event.data.ACCODE);
-      this.checkDependents(event.data.MEMBTYPE);
-      this.crmservice.getDependentMembers(event.data.MemberNo).subscribe((res: any) => {
-        console.log(res)
-        if (event.data.MEMBTYPE === 'F') {
-          const famArr = res.recordset;
-          for(let i=0; i<famArr.length; i++) {
-            const famMember = new FormGroup({
-              dMemberNo: new FormControl(famArr[i].MemberNo, [Validators.required]),
-              dMemberRefNo: new FormControl(famArr[i].REFMEMBNO, [Validators.required]),
-              dTitle: new FormControl(famArr[i].TITLE, [Validators.required]),
-              dFirstname: new FormControl(famArr[i].NAME, [Validators.required]),
-              dSurname: new FormControl(famArr[i].SURNAME, [Validators.required]),
-              dMemberType: new FormControl(famArr[i].MEMBTYPE, [Validators.required]),
-              dRelation: new FormControl(famArr[i].RELATION, []),
-              dDob: new FormControl(famArr[i].BIRTHDT, []),
-              dCprNbr: new FormControl(famArr[i].CPRNo, [Validators.required])
-            });
-            this.familyMembers.push(famMember);
-          }
-        }
-        else if (event.data.MEMBTYPE === 'C') {
-          const copArr = res.recordset;        
-          for(let i=0; i<copArr.length; i++) {
-            const copMember = new FormGroup({
-              dMemberNo: new FormControl(copArr[i].MemberNo, [Validators.required]),
-              dMemberRefNo: new FormControl(copArr[i].REFMEMBNO, [Validators.required]),
-              dTitle: new FormControl(copArr[i].TITLE, [Validators.required]),
-              dFirstname: new FormControl(copArr[i].NAME, [Validators.required]),
-              dSurname: new FormControl(copArr[i].SURNAME, [Validators.required]),
-              dDob: new FormControl(copArr[i].BIRTHDT, []),
-              dCprNbr: new FormControl(copArr[i].CPRNo, [Validators.required]),
-              dMemberType: new FormControl(copArr[i].MEMBTYPE, [Validators.required]),
-              dRelation: new FormControl(copArr[i].RELATION, []),
-              dTelOff: new FormControl(copArr[i].TELOFF, []),
-              dPosition: new FormControl(copArr[i].POSITION, []),
-              dEmail: new FormControl(copArr[i].Email, [Validators.required])
-            });
-            this.corporateMembers.push(copMember);
-          }
-        }
-      })
-      let dialogRef = this.dialog.closeAll();
-    }
+      }
+    })
+    let dialogRef = this.dialog.closeAll();
   }
 
   onGridMemberReady(params: any){ 

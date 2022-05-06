@@ -24,7 +24,7 @@ export class ContactsListComponent implements OnInit {
 
   constructor(private crmservices: CrmService, private router: Router) {
 
-    this.columns = ["PARTY_ID", "NAME", "ADD1", "ADD2", "ADD3", "PHONE1", "TELOFF", "EMAIL_ID", "Actions"];
+    this.columns = ["PARTY_ID", "NAME", "ADD1", "ADD2", "ADD3", "PHONE1", "Actions"];
 
   }
 

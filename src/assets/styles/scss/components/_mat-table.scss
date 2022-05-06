@@ -5,17 +5,23 @@
   padding: 0;
   width: 1px;
   font-weight: bold;
+  font-size :small;
   background-color: dodgerblue;
-  height: 80% ;
+  min-height: 30px;
 }
 
 .mat-table .mat-row {
   border-bottom: 2px solid #ddd;
   background-color: aliceblue;
   min-height: 1px !important;
-  height: 80% !important;
+  min-height: 30px;
 }
 
 .mat-row:hover > .mat-cell {
   cursor: pointer;
+}
+
+.mat-header-row, .mat-row {
+  min-height: 30px;
+  font-size: small;
 }

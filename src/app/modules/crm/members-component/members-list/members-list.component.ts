@@ -51,8 +51,28 @@ export class MembersListComponent implements OnInit {
       this.memberList = res.recordset;
 
       for (let i = 0; i < this.memberList.length; i++) {
+        if (this.memberList[i].MEMBTYPE === 'F') {
+          this.memberList[i].MEMBTYPE = 'Family';
+        }
+        else if (this.memberList[i].MEMBTYPE === 'C') {
+          this.memberList[i].MEMBTYPE = 'Corporate';
+        }
+        else if (this.memberList[i].MEMBTYPE === 'S') {
+          this.memberList[i].MEMBTYPE = 'Single';
+        }
         this.crmservice.getDependentMembers(this.memberList[i].MemberNo).subscribe((res: any) => {
           const famArr = res.recordset;
+          for (let i = 0; i < famArr.length; i++) {
+            if (famArr[i].MEMBTYPE === 'F') {
+              famArr[i].MEMBTYPE = 'Family';
+            }
+            else if (famArr[i].MEMBTYPE === 'C') {
+              famArr[i].MEMBTYPE = 'Corporate';
+            }
+            else if (famArr[i].MEMBTYPE === 'S') {
+              famArr[i].MEMBTYPE = 'Single';
+            }
+          }
           this.memberList[i].DepenedentMembers = famArr;
         });
       }

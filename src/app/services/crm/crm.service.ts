@@ -406,7 +406,7 @@ export class CrmService {
   }
 
   getReferenceCode(pcode:any){
-    return this.http.get(this.url + '/crm/refs'+ pcode)
+    return this.http.get(this.url + '/crm/refs/'+ pcode)
   }
 
   getPcode(pcode:any,year: any){

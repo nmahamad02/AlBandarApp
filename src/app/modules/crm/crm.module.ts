@@ -20,7 +20,7 @@ import { ActiveReportsModule } from '@grapecity/activereports-angular';
 import { CustomerprofileComponent } from './customerprofile/customerprofile.component';
 import { MembersComponent } from './members-component/members/members.component';
 import { MembershipComponent } from './membership/membership.component';
-import { ReferenceComponent } from './reference/reference.component';
+import { ReferenceComponent } from './reference-component/reference/reference.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ReceiptComponent } from './receipt/receipt.component';
@@ -31,6 +31,7 @@ import { AgreementComponent } from './agreement-component/agreement/agreement.co
 import { AgreementListComponent } from './agreement-component/agreement-list/agreement-list.component';
 import { ContactsListComponent } from './contacts-component/contacts-list/contacts-list.component';
 import { MembersListComponent } from './members-component/members-list/members-list.component';
+import { ReferenceListComponent } from './reference-component/reference-list/reference-list.component';
 import { SalesOrderListComponent } from './sales-order-component/sales-order-list/sales-order-list.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from "@angular/material/sort";
@@ -67,6 +68,10 @@ export const crmRoutes = [
   },
   {
     path: 'reference',
+    component: ReferenceListComponent
+  },
+  {
+    path: 'reference/details/:id',
     component: ReferenceComponent
   },
   {
@@ -116,7 +121,8 @@ export const crmRoutes = [
     AgreementListComponent,
     ContactsListComponent,
     MembersListComponent,
-    SalesOrderListComponent
+    SalesOrderListComponent,
+    ReferenceListComponent
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }

@@ -7,6 +7,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { GridOptions } from 'ag-grid-community';
 import { ClubserivceService } from 'src/app/services/clubservice/clubserivce.service';
 import { CrmService } from 'src/app/services/crm/crm.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-costcenter',
@@ -39,7 +40,7 @@ export class CostcenterComponent implements OnInit {
   opbalDisplayedColumns: string[] = ['pcode', 'name', 'glcode', 'opbal'];
   opbalDataSource = new MatTableDataSource(this.opbalArr);
 
-  constructor(private crmservices: CrmService,private dailog:MatDialog,private clubservices:ClubserivceService,private snackBar:MatSnackBar) { 
+  constructor(private crmservices: CrmService, private dailog: MatDialog, private clubservices: ClubserivceService, private snackBar: MatSnackBar, private route: ActivatedRoute) {
     this.costcentreForm = new FormGroup({
       expenseCode: new FormControl('', [Validators.required]),
       description: new FormControl('', []),
@@ -49,33 +50,34 @@ export class CostcenterComponent implements OnInit {
     })
 
     this.columnCostCenterDefs = [
-      { 
+      {
         headername: "Expense Code",
-        sortable: true ,
+        sortable: true,
         field: "EXP_CODE", rowGroup: true,
         width: 200
       },
-      { 
-        headerName: "Description", 
-        field: 'EXP_DESC', 
-        width:300, 
-        suppressMenu: false, 
+      {
+        headerName: "Description",
+        field: 'EXP_DESC',
+        width: 300,
+        suppressMenu: false,
         unSortIcon: true,
-        sortable: true, 
-        tooltipField: "EXP_DESC", 
-        headerTooltip: "EXP_DESC" 
+        sortable: true,
+        tooltipField: "EXP_DESC",
+        headerTooltip: "EXP_DESC"
       },
-      { 
-        headerName: "GL-Code", 
-        field: 'GL_CODE_AFFECTED', 
-        width:200, 
-        suppressMenu: false, 
+      {
+        headerName: "GL-Code",
+        field: 'GL_CODE_AFFECTED',
+        width: 200,
+        suppressMenu: false,
         unSortIcon: true,
-        sortable: true, 
-        tooltipField: "GL_CODE_AFFECTED", 
+        sortable: true,
+        tooltipField: "GL_CODE_AFFECTED",
         headerTooltip: "GL_CODE_AFFECTED"
       }
     ]
+ 
   }
 
   quickCostCenterSearch() {
@@ -230,6 +232,28 @@ formatDate(date: any) {
 }
 
   ngOnInit(): void {
+
+    this.getcostCenterDetails(this.route.snapshot.params.id);
+  }
+
+
+  getcostCenterDetails(value: any) {
+    this.crmservices.getnotofExpenseMaster(value).subscribe((res: any) => {
+      this.selectCostCenter(res.recordset[0])
+    }, (err: any) => {
+      console.log(err);
+    })
+
+  }
+
+  selectCostCenter(data: any) {
+    this.costcentreForm.patchValue({
+      expenseCode: data.EXP_CODE,
+      description: data.EXP_DESC,
+      glAccount: data.GL_CODE_AFFECTED,
+      glAccountCustname: data.CUST_NAME,
+      active: data.CASTACTIVE,
+    })
   }
 
 }

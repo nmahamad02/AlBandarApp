@@ -25,7 +25,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ReceiptComponent } from './receipt/receipt.component';
 import { DepartmentComponent } from './department/department.component';
-import { CostcenterComponent } from './costcenter/costcenter.component';
+import { CostcenterComponent } from './costcenter-component/costcenter/costcenter.component';
 import { SalesOrderComponent } from './sales-order-component/sales-order/sales-order.component';
 import { AgreementComponent } from './agreement-component/agreement/agreement.component';
 import { AgreementListComponent } from './agreement-component/agreement-list/agreement-list.component';
@@ -33,6 +33,7 @@ import { ContactsListComponent } from './contacts-component/contacts-list/contac
 import { MembersListComponent } from './members-component/members-list/members-list.component';
 import { ReferenceListComponent } from './reference-component/reference-list/reference-list.component';
 import { SalesOrderListComponent } from './sales-order-component/sales-order-list/sales-order-list.component';
+import { CostcenterListComponent } from './costcenter-component/costcenter-list/costcenter-list.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from "@angular/material/sort";
 import { MatTableExporterModule } from 'mat-table-exporter';
@@ -84,6 +85,10 @@ export const crmRoutes = [
   },
   {
     path: 'costcenter',
+    component: CostcenterListComponent
+  },
+  {
+    path: 'costcenter/details/:id',
     component: CostcenterComponent
   },
   {
@@ -122,7 +127,8 @@ export const crmRoutes = [
     ContactsListComponent,
     MembersListComponent,
     SalesOrderListComponent,
-    ReferenceListComponent
+    ReferenceListComponent,
+    CostcenterListComponent
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }

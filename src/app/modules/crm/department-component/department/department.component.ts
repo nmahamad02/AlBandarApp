@@ -6,6 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { GridOptions } from 'ag-grid-community';
 import { CrmService } from 'src/app/services/crm/crm.service';
 import { FinanceService } from 'src/app/services/finance/finance.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-department',
@@ -51,7 +52,7 @@ export class DepartmentComponent implements OnInit {
   deptDisplayedColumns: string[] = ['deptid','deptname','prefix'];
   deptDataSource = new MatTableDataSource(this.deptArr);
 
-  constructor(private financeservice: FinanceService, private dailog: MatDialog,private crmservice: CrmService,private snackBar:MatSnackBar) {
+  constructor(private financeservice: FinanceService, private dailog: MatDialog, private crmservices: CrmService, private snackBar: MatSnackBar, private route: ActivatedRoute) {
       this.DepartMentForm = new FormGroup({
         dptPrefix : new FormControl('' , []),
         dptName : new FormControl('' , []),
@@ -105,7 +106,7 @@ export class DepartmentComponent implements OnInit {
     this.selectedRowIndex = 0;
     let dialogRef = this.dailog.open(this.CostCenterLookUpDailouge);
     if (type === "cost") {
-      this.crmservice.searchExpenseMaster(value).subscribe((res: any)=> {
+      this.crmservices.searchExpenseMaster(value).subscribe((res: any)=> {
         this.costArr = res.recordset;
         this.CostCenterDataSource = new MatTableDataSource(this.costArr);
         this.CostIndex = index;      
@@ -117,7 +118,7 @@ export class DepartmentComponent implements OnInit {
 
   checkcostcenter(productCode: string, index: number) {
     this.CostIndex = index;      
-    this.crmservice.getExpenseMaster(productCode).subscribe((res: any) => {
+    this.crmservices.getExpenseMaster(productCode).subscribe((res: any) => {
       const rowData: any = {
         dptCostCenter: res.recordset[0].EXP_CODE,
         dptDescription: res.recordset[0].EXP_DESC,
@@ -145,7 +146,7 @@ export class DepartmentComponent implements OnInit {
   checkopbal(productCode: string, index: number) {
     console.log(productCode);
     this.opbalIndex = index;      
-    this.crmservice.getAllOpbal(productCode, this.myear).subscribe((res: any) => {
+    this.crmservices.getAllOpbal(productCode, this.myear).subscribe((res: any) => {
       const rowData: any = {
         dptAccode: res.recordset[0].PCODE,
         dptAccName: res.recordset[0].CUST_NAME
@@ -218,7 +219,7 @@ export class DepartmentComponent implements OnInit {
         this.financeservice.deleteDepartmentExpense(DPETID).subscribe((res:any) =>{
           console.log("deleted")
           for(let i=0; i<rcvDatadeptarr.length; i++) {
-            this.crmservice.getnotofExpenseMaster(rcvDatadeptarr[i].costcode).subscribe((res:any) => {
+            this.crmservices.getnotofExpenseMaster(rcvDatadeptarr[i].costcode).subscribe((res:any) => {
               const costcodeS = res.recordset[0].EXP_ID;
                 this.financeservice.postDeptExpenseMaster('01',DPETID,costcodeS,rcvDatadeptarr[i].accode,'DBA',this.mCurDate)
             })
@@ -255,7 +256,7 @@ export class DepartmentComponent implements OnInit {
           console.log(rcvDatadeptarr[i]);
           console.log(rcvDatadeptarr[i].accode);
           console.log(rcvDatadeptarr[i].costcode);
-          this.crmservice.getnotofExpenseMaster(rcvDatadeptarr[i].costcode).subscribe((res:any) => {
+          this.crmservices.getnotofExpenseMaster(rcvDatadeptarr[i].costcode).subscribe((res:any) => {
             const costcodeS = res.recordset[0].EXP_ID;
             this.financeservice.postDeptExpenseMaster('01',expid,costcodeS,rcvDatadeptarr[i].accode,'DBA',this.mCurDate)
 
@@ -292,7 +293,7 @@ export class DepartmentComponent implements OnInit {
     this.selectedRowIndex = 0;
     let dialogRef = this.dailog.open(this.opbalLookupDialog);
     if (type === "opbal") {
-      this.crmservice.getSearchOpbal(value, this.myear).subscribe((res: any)=> {
+      this.crmservices.getSearchOpbal(value, this.myear).subscribe((res: any)=> {
         this.opbalArr = res.recordset;
         this.opbalDataSource = new MatTableDataSource(this.opbalArr);
         this.opbalIndex = index;      
@@ -370,7 +371,7 @@ export class DepartmentComponent implements OnInit {
   onGridCostCenterReady(params: any){ 
     this.gridApi= params.api;
     this.gridColumnApi= params.columnApi;
-    this.crmservice.getAllDepartmentMaster().subscribe((res: any) =>  {
+    this.crmservices.getAllDepartmentMaster().subscribe((res: any) =>  {
       console.log(this.DepartmentList);
       this.DepartmentList=res.recordset;
       params.api.setRowData(this.DepartmentList);
@@ -447,6 +448,25 @@ export class DepartmentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.getDepartmentDetails(this.route.snapshot.params.id);
+  }
+
+  getDepartmentDetails(value: any) {
+    this.financeservice.getnotofDepartmentMaster(value).subscribe((res: any) => {
+      this.selectDepartment(res.recordset[0])
+    }, (err: any) => {
+      console.log(err);
+    })
+  }
+
+  selectDepartment(data: any) {
+    this.DepartMentForm.patchValue({
+      dptPrefix: data.PREFIX,
+      dptName: data.DEPT_NAME,
+      dptLastSerial: data.LASTNO,
+      dptActive: data.CASTACTIVE,
+      dptType: data.EXPENSE_TYPE
+    });
   }
 
 }

@@ -7,7 +7,7 @@
                     <div class="col-12">
                         <div class="row">
                             <div class="col-4">
-                                <mat-card-title> Department Master </mat-card-title>  
+                                <mat-card-title> Department Detail </mat-card-title>  
                             </div>
                             <div class="col-7">
                                 <mat-card-actions>
@@ -380,28 +380,7 @@
                             matDialogClose="close">Close</button>
                         </mat-dialog-actions>
                     </ng-template>
-                </div>
-                <mat-tab-group mat-align-tabs="center" >
-                    <mat-tab label="Home" style="color:wheat;">
-                        <div class="col-11">
-                            <b>Search</b>
-                            <mat-form-field class="full-width">
-                                <mat-icon matPrefix>search</mat-icon>
-                                <input matInput type="text" style="color: black;" placeholder="Please Enter Your Seach Keyword to filter" (keyup)=" quickCostCenterSearch()" [(ngModel)]="searchValue">
-                            </mat-form-field>
-                        </div>
-                        <!-- GET PARTY DETAILS FOR THIS CUSTOMER-->
-                        <ag-grid-angular style="width: 100%; height: 360px ;" 
-                        class="ag-theme-balham" [animateRows]="true"
-                        [pagination]="true" [paginationPageSize]="25" 
-                        [gridOptions]="gridOptions" 
-                        [rowStyle]="rowStyle"
-                        [suppressRowClickSelection]="true"
-                        (cellClicked)='onViewCellClicked($event)'
-                        [columnDefs]="columnDepartmentDefs"
-                        (gridReady)="onGridCostCenterReady($event)"></ag-grid-angular>     
-                    </mat-tab>
-                </mat-tab-group>
+                </div>         
             </mat-card>
         </div>
     </div>

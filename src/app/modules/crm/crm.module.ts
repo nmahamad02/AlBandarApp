@@ -14,7 +14,7 @@ import { MatCardModule} from '@angular/material/card'
 import { MatSelectModule } from '@angular/material/select';
 import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatTabsModule } from '@angular/material/tabs';
-import { InvoiceComponent } from './invoice/invoice.component';
+import { InvoiceComponent } from './invoice-component/invoice/invoice.component';
 import { InvoicereportComponent } from './invoicereport/invoicereport.component'; 
 import { ActiveReportsModule } from '@grapecity/activereports-angular';
 import { CustomerprofileComponent } from './customerprofile/customerprofile.component';
@@ -24,7 +24,7 @@ import { ReferenceComponent } from './reference-component/reference/reference.co
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ReceiptComponent } from './receipt/receipt.component';
-import { DepartmentComponent } from './department/department.component';
+import { DepartmentComponent } from './department-component/department/department.component';
 import { CostcenterComponent } from './costcenter-component/costcenter/costcenter.component';
 import { SalesOrderComponent } from './sales-order-component/sales-order/sales-order.component';
 import { AgreementComponent } from './agreement-component/agreement/agreement.component';
@@ -34,6 +34,8 @@ import { MembersListComponent } from './members-component/members-list/members-l
 import { ReferenceListComponent } from './reference-component/reference-list/reference-list.component';
 import { SalesOrderListComponent } from './sales-order-component/sales-order-list/sales-order-list.component';
 import { CostcenterListComponent } from './costcenter-component/costcenter-list/costcenter-list.component';
+import { DepartmentListComponent } from './department-component/department-list/department-list.component';
+import { InvoiceListComponent } from './invoice-component/invoice-list/invoice-list.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from "@angular/material/sort";
 import { MatTableExporterModule } from 'mat-table-exporter';
@@ -49,6 +51,10 @@ export const crmRoutes = [
   },
   {
     path: 'invoice',
+    component: InvoiceListComponent
+  },
+  {
+    path: 'invoice/details/:id',
     component: InvoiceComponent
   },
   {
@@ -80,7 +86,11 @@ export const crmRoutes = [
     component: ReceiptComponent
   },
   {
-    path: 'deparment',
+    path: 'department',
+    component: DepartmentListComponent
+  },
+  {
+    path: 'department/details/:id',
     component: DepartmentComponent
   },
   {
@@ -128,7 +138,9 @@ export const crmRoutes = [
     MembersListComponent,
     SalesOrderListComponent,
     ReferenceListComponent,
-    CostcenterListComponent
+    CostcenterListComponent,
+    DepartmentListComponent,
+    InvoiceListComponent
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }

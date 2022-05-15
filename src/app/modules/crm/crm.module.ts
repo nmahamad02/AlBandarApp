@@ -17,7 +17,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { InvoiceComponent } from './invoice-component/invoice/invoice.component';
 import { InvoicereportComponent } from './invoicereport/invoicereport.component'; 
 import { ActiveReportsModule } from '@grapecity/activereports-angular';
-import { CustomerprofileComponent } from './customerprofile/customerprofile.component';
+import { CustomerprofileComponent } from './customerprofile-component/customerprofile/customerprofile.component';
 import { MembersComponent } from './members-component/members/members.component';
 import { MembershipComponent } from './membership/membership.component';
 import { ReferenceComponent } from './reference-component/reference/reference.component';
@@ -36,6 +36,7 @@ import { SalesOrderListComponent } from './sales-order-component/sales-order-lis
 import { CostcenterListComponent } from './costcenter-component/costcenter-list/costcenter-list.component';
 import { DepartmentListComponent } from './department-component/department-list/department-list.component';
 import { InvoiceListComponent } from './invoice-component/invoice-list/invoice-list.component';
+import { CustomerprofileListComponent } from './customerprofile-component/customerprofile-list/customerprofile-list.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from "@angular/material/sort";
 import { MatTableExporterModule } from 'mat-table-exporter';
@@ -63,6 +64,10 @@ export const crmRoutes = [
   },
   {
     path: 'customers',
+    component: CustomerprofileListComponent
+  },
+  {
+    path: 'customer/details/:id',
     component: CustomerprofileComponent
   },
   {
@@ -140,7 +145,8 @@ export const crmRoutes = [
     ReferenceListComponent,
     CostcenterListComponent,
     DepartmentListComponent,
-    InvoiceListComponent
+    InvoiceListComponent,
+    CustomerprofileListComponent
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }

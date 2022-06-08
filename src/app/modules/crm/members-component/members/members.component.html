@@ -5,9 +5,9 @@
             <mat-card-header>
                 <div class="col-12">
                     <div class="row">
-                        <div class="col-3">
+                        <div class="col-2">
                             <mat-card-title i18n="@@CMMContactsTitle">
-                                Member Detail
+                                Member Details
                             </mat-card-title> 
                         </div>
                         <div class="col-9">
@@ -15,7 +15,7 @@
                                 <div class="row">
                                     <div class="col">
                                         <button mat-raised-button 
-                                        class="bg-primary text-white btn btn-block" 
+                                        class="bg-primary text-white btn btn-xs" 
                                         style="border-radius: 50%;" 
                                         (click)="newForm()">
                                             <mat-icon>add</mat-icon> New
@@ -23,7 +23,7 @@
                                     </div>
                                     <div class="col">
                                         <button mat-raised-button 
-                                        class="bg-success text-white btn btn-block" 
+                                        class="bg-success text-white btn btn-xs" 
                                         style="border-radius: 50%;" 
                                         (click)="submitForm()">
                                             <mat-icon>note_add</mat-icon> Submit
@@ -31,7 +31,7 @@
                                     </div>
                                     <div class="col">
                                         <button mat-raised-button 
-                                        class="bg-info text-white btn btn-block" 
+                                        class="bg-info text-white btn btn-xs" 
                                         style="border-radius: 50%;" 
                                         (click)="getDetails()">
                                             <mat-icon>feed</mat-icon> Details
@@ -39,14 +39,14 @@
                                     </div>
                                     <div class="col">
                                         <button mat-raised-button 
-                                        class="bg-warning text-white btn btn-block" 
+                                        class="bg-warning text-white btn btn-xs" 
                                         style="border-radius: 50%;">
                                             <mat-icon>delete</mat-icon> Delete
                                         </button>   
                                     </div>
                                     <div class="col">
                                         <button mat-raised-button 
-                                        class="bg-danger text-white btn btn-block" 
+                                        class="bg-danger text-white btn btn-xs" 
                                         style="border-radius: 50%;"
                                         (click)="refreshForm()">
                                             <mat-icon>cancel</mat-icon> Cancel
@@ -59,49 +59,7 @@
                 </div>
             </mat-card-header>
             <hr>
-            <mat-card-content>
-                <div class = "col-12">
-                    <div class = "row">
-                        <div class="col-12">
-                            <div class="row">
-                                <div class="col">
-                                    <button mat-raised-button color="primary"
-                                    class="btn btn-primary btn-block" 
-                                    style="border-radius: 10%;" 
-                                    (click)="exportAsXLSX()">
-                                        <mat-icon>print</mat-icon> ALL MEMBERS
-                                    </button>
-                                </div>                                
-                                <div class="col">
-                                    <button mat-raised-button color="primary" 
-                                    class="btn btn-primary btn-block" 
-                                    style="border-radius: 10%;" 
-                                    (click)="exportPrimaryAsXLSX()">
-                                        <mat-icon>print</mat-icon> ALL PRIMARY MEMBERS
-                                    </button>
-                                </div>                                
-                                <div class="col">
-                                    <button mat-raised-button color="primary" 
-                                    class="btn btn-primary btn-block" 
-                                    style="border-radius: 10%;" 
-                                    (click)="getPrimarySIngleMember()">
-                                        <mat-icon>print</mat-icon> PRIMARY MEMEBERS
-                                    </button>
-                                </div> 
-                                <div class="col">
-                                    <button mat-raised-button color="primary" 
-                                    class="btn btn-primary btn-block" 
-                                    style="border-radius: 10%;" 
-                                    (click)="getBoatmember()">
-                                        <mat-icon>print</mat-icon> BOAT
-                                    </button>
-                                </div>                      
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <hr>
+            <mat-card-content>                
                 <div class="col-12">
                     <form class="form-container"
                     [formGroup]="memberForm">

@@ -89,12 +89,12 @@ export const crmRoutes = [
     path:'sales-order/details',
     component: SalesOrderComponent
   },
-  {
+  /*{
     path: "agreements",
     component: AgreementListComponent
-  },
+  },*/
   {
-    path: 'agreements/details',
+    path: 'agreements',
     component: AgreementComponent
   }
 ]

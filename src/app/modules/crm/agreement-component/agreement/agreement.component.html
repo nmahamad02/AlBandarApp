@@ -63,7 +63,7 @@
                             <div class="row">
                                 <div class="col-9">
                                     <div class="row">
-                                        <div class="col-4">
+                                        <div class="col-3">
                                             <mat-form-field class="full-width">
                                                 <mat-label i18n="@@CMMContactsNameFormControl">Agreement Number</mat-label>
                                                 <input matInput 
@@ -72,9 +72,19 @@
                                                 (keydown.enter)="getSalesorder(sono.value)" >
                                             </mat-form-field>
                                         </div>
-                                        <div class="col-4">
+                                        <div class="col-3">
+                                            <mat-form-field class="full-width">
+                                                <mat-label i18n="@@CMMContactsNameFormControl">Sales Order Number</mat-label>
+                                                <input matInput formControlName="soNbr">
+                                            </mat-form-field>
                                         </div>
-                                        <div class="col-4">
+                                        <div class="col-3">
+                                            <mat-form-field class="full-width">
+                                                <mat-label i18n="@@CMMContactsNameFormControl">Invoice Number</mat-label>
+                                                <input matInput formControlName="invNbr">
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-3">
                                             <mat-form-field class="full-width"> 
                                                 <mat-label i18n="@@CMMContactsMobileFormControl">Agreement Date</mat-label>
                                                 <input type="text" formControlName="voucherDate" matInput>

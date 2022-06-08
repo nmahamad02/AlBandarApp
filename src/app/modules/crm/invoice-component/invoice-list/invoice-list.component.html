@@ -62,7 +62,7 @@
                                         </div>
                                         <div class="col-4" style="padding: 5px;">
                                             <mat-form-field class="full-width"> 
-                                                <mat-label i18n="@@CMMContactsMobileFormControl">Aggrement No</mat-label>
+                                                <mat-label i18n="@@CMMContactsMobileFormControl">Agreement No</mat-label>
                                                 <input type="text" formControlName="invArgNO" matInput>
                                                 <mat-error i18n="@@CMMContactsMobileFormControlError">Invoice Date <strong>required</strong></mat-error>
                                             </mat-form-field>
@@ -107,7 +107,7 @@
                                             <mat-form-field class="full-width"> 
                                                 <mat-label i18n="@@CMMContactsMobileFormControl">Customer Code:</mat-label>
                                                 <input type="text" formControlName="invContactNo" matInput>
-                                                <mat-error i18n="@@CMMContactsMobileFormControlError">Customer Code<strong>required</strong></mat-error>
+                                                <mat-error i18n="@@CMMContactsMobileFormControlError">Customer Code<strong> required</strong></mat-error>
                                             </mat-form-field>                             
                                         </div>
                                     </div>
@@ -116,7 +116,7 @@
                                             <mat-form-field class="full-width"> 
                                                 <mat-label i18n="@@CMMContactsMobileFormControl">Subject </mat-label>
                                                 <input type="text" formControlName="invSubject" matInput>
-                                                <mat-error i18n="@@CMMContactsMobileFormControlError">Subject <strong>required</strong></mat-error>
+                                                <mat-error i18n="@@CMMContactsMobileFormControlError">Subject <strong> required</strong></mat-error>
                                             </mat-form-field>
                                         </div> 
                                     </div>
@@ -139,26 +139,60 @@
                             </div>
                         </div>    
                         <mat-tab-group mat-align-tabs="center" >
-                            <mat-tab label="Home" style="color:wheat;">Home
-                                <div class="col-11">
-                                    <b>Search</b>
-                                    <mat-form-field class="full-width">
-                                        <mat-icon matPrefix>search</mat-icon>
-                                        <input matInput type="text" style="color: black;" placeholder="Please Enter Your Seach Keyword to filter" (keyup)="quickInvoiceSearch()" [(ngModel)]="searchValue">
-                                    </mat-form-field>
-                                </div>
-                                <!-- GET PARTY DETAILS FOR THIS CUSTOMER-->
-                                <ag-grid-angular style="width: 100%; height: 360px ;" 
-                                    class="ag-theme-balham" [animateRows]="true"
-                                    [pagination]="true" [paginationPageSize]="25" 
-                                    [gridOptions]="gridOptions" 
-                                    [rowStyle]="rowStyle"
-                                    [suppressRowClickSelection]="true"
-                                    [columnDefs]="columndef"
-                                    (gridReady)="onGridCustomerReady($event)">
-                                </ag-grid-angular>     
-                            </mat-tab>
-                            <mat-tab label="invoiceDetial" style="color:wheat;">Inovice Details
+                          <mat-tab label="Home" style="color:wheat;">
+                            Home
+                              <div>
+                              <br />
+                            </div>
+                            <div class="row">
+                              <b>Search</b>
+                              <mat-form-field>
+                                <mat-icon matPrefix>search</mat-icon>
+                                <input matInput type="text" style="color: black;" placeholder="Please Enter Your Seach Keyword to filter" (keyup)="quickPartyrSearch()" [(ngModel)]="searchValue" [ngModelOptions]="{standalone: true}">
+                              </mat-form-field>
+                            </div>
+                            <!-- GET PARTY DETAILS FOR THIS CUSTOMER-->
+                            <button mat-raised-button color="primary" (click)="exporter.exportTable('xlsx')">Export as Excel</button>
+                            <div>
+                              <br />
+                            </div>
+                            <mat-table [dataSource]="invoiceDataSource" matTableExporter #exporter="matTableExporter"
+                                       class="mat-table" matSort matSortDisableClear [multiTemplateDataRows]="true">
+                              <ng-container matColumnDef="PCODE">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Product ID </mat-header-cell>
+                                <mat-cell *matCellDef="let row"> {{ row.PCODE }} </mat-cell>
+                              </ng-container>
+
+                              <ng-container matColumnDef="CUST_NAME">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
+                                <mat-cell *matCellDef="let row"> {{ row.CUST_NAME }} </mat-cell>
+                              </ng-container>
+
+                              <ng-container matColumnDef="MOBILE">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Mobile </mat-header-cell>
+                                <mat-cell *matCellDef="let row"> {{ row.MOBILE }} </mat-cell>
+                              </ng-container>
+
+                              <!-- Button Column -->
+                              <ng-container matColumnDef="Actions">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Actions </mat-header-cell>
+                                <mat-cell *matCellDef="let row">
+                                  <button md-raised-button color="primary" class="btn-w-md ml-2 mat-button text-white" style="border-radius: 50%;" (click)="gotoInvoiceDetails('/crm/invoice/details', row.PCODE)">
+                                    View
+                                  </button>
+                                </mat-cell>
+                              </ng-container>
+
+                              <mat-header-row *matHeaderRowDef="columns"></mat-header-row>
+                              <mat-row matRipple *matRowDef="let row; columns: columns;"></mat-row>
+                            </mat-table>
+                            <mat-paginator #paginator
+                                           [pageSize]="50"
+                                           [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons>
+                            </mat-paginator>
+
+                          </mat-tab>
+                            <mat-tab label="Invoice Details" style="color:wheat;">Invoice Details
                                 <div class="col-12" style="height: 45vh; overflow-y: auto;">
                                     <table class="table table-sm table-borderless table-hover table-responsive-xxl" formArrayName="invitemArray" >
                                         <thead>
@@ -243,7 +277,7 @@
                                 </div>
                             </mat-tab>
                             <mat-tab label="Financial Distribution" style="color:wheat;">Financial Distribution</mat-tab>
-                            <mat-tab label="Log Detials" style="color:wheat;">Log Detials</mat-tab>
+                            <mat-tab label="Log Details" style="color:wheat;">Log Details</mat-tab>
                            <!-- 
         <mat-tab label="Reports" style="color:wheat;">Reports
                                 <div class="col-12">

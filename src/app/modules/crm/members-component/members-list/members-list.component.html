@@ -30,9 +30,9 @@
             <ng-container matColumnDef="actions">
               <mat-header-cell *matHeaderCellDef>  </mat-header-cell>
               <mat-cell mat-cell *matCellDef="let row">
-                <a mat-button href="javascript:void()" (click)="row.isExpanded = !row.isExpanded">
+                <button md-fab-button color="primary" class="btn-w-sm ml-2" style="border-radius: 50%;" (click)="row.isExpanded = !row.isExpanded">
                   +
-                </a>
+                </button>
               </mat-cell>
             </ng-container>
             <ng-container matColumnDef="MemberNo">
@@ -57,8 +57,8 @@
              Button Column 
             <ng-container matColumnDef="buttons">
               <mat-header-cell *matHeaderCellDef mat-sort-header> Actions </mat-header-cell>
-              <mat-cell *matCellDef="let row">
-                <button mat-raised-button class="bg-primary text-white btn btn-block" style="border-radius: 50%;" (click)="gotoMemebersDetails('/crm/member/details', row.MemberNo)">
+              <mat-cell *matCellDef="let row">            
+                <button md-raised-button color="primary" class="btn-w-md ml-2 mat-button text-white" style="border-radius: 50%;" (click)="gotoMemebersDetails('/crm/member/details', row.MemberNo)">
                   View
                 </button>
               </mat-cell>

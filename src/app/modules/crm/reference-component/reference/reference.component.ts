@@ -2,10 +2,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { GridOptions } from 'ag-grid-community';
-import { concat } from 'rxjs';
 import { CrmService } from 'src/app/services/crm/crm.service';
 import { FinanceService } from 'src/app/services/finance/finance.service';
 import { LookupService } from 'src/app/services/lookup/lookup.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -21,7 +22,6 @@ export class ReferenceComponent implements OnInit {
   gridApi: any;
   gridColumnApi:any;
   refList: any[] = [];
-  mRefDetails: any;
   rowStyle!: { background: string; };
   varPcode: string = ""
   varRefType: string = ""
@@ -31,7 +31,7 @@ export class ReferenceComponent implements OnInit {
   utc = new Date();
 
   mCurDate = this.formatDate(this.utc);
-  constructor(private crmservices:CrmService,private lookupservice:LookupService,private financeservice: FinanceService) { 
+  constructor(private crmservices: CrmService, public snackbar: MatSnackBar, private lookupservice: LookupService, private financeservice: FinanceService, private route: ActivatedRoute ) {
     this.referenceForm = new FormGroup({
       referenceType: new FormControl('', []),
       referenceCode: new FormControl('', [Validators.required]),
@@ -74,7 +74,8 @@ export class ReferenceComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getRefTypeData()
+    this.getRefTypeData();
+    this.getRefData(this.route.snapshot.params.id);
   }
 
   onGridRefDetails(params: any){ 
@@ -122,11 +123,19 @@ export class ReferenceComponent implements OnInit {
 
 
   getRefData(refNO:string) {
-    this.crmservices.getReferenceCode(refNO).subscribe((res: any) => {
-      this.mRefDetails = res.recordset[0];
-      console.log(this.mRefDetails);
+    this.lookupservice.getRefcode(refNO).subscribe((res: any) => {
+      this.selectReference(res.recordset[0])
     }, (err: any) => {
       console.log(err);
+    })
+  }
+
+  selectReference(data: any) {
+    this.referenceForm.patchValue({
+      referenceType: data.TYPE,
+      referenceCode: data.PCODE,
+      referenceName: data.NAME,
+      referenceDescription: data.DESCRIPTION
     })
   }
 
@@ -139,13 +148,23 @@ export class ReferenceComponent implements OnInit {
     console.log(data);
     this.lookupservice.getRefcode(data.referenceCode).subscribe((res:any) =>{
       console.log(res.recordset);
-      this.financeservice.updateReferenceData(data.referenceName,data.referenceDescription,data.referenceType,'01','1','DBA',this.mCurDate,data.referenceCode)
+      this.financeservice.updateReferenceData(data.referenceName, data.referenceDescription, data.referenceType, '01', '1', 'DBA', this.mCurDate, data.referenceCode);
+      this.snackbar.open("Updated Successfully", "close", {
+        duration: 10000,
+        verticalPosition: 'top',
+        panelClass: ['sbBg']
+      });
     },(err: any) =>{
       console.log(err);
       this.financeservice.getMaxOfRef().subscribe((res:any) => {
         const recid = res.recordset[0].RECID
         console.log(recid)
-        this.financeservice.postReferenceData(recid,data.referenceCode,data.referenceName,data.referenceDescription,data.referenceType,'01','1','DBA',this.mCurDate)
+        this.financeservice.postReferenceData(recid, data.referenceCode, data.referenceName, data.referenceDescription, data.referenceType, '01', '1', 'DBA', this.mCurDate);
+        this.snackbar.open("Inserted Successfully", "close", {
+          duration: 10000,
+          verticalPosition: 'top',
+          panelClass: ['sbBg']
+        });
       })
     })
   }

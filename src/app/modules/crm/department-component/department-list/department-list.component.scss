@@ -1,0 +1,45 @@
+.full-width {
+    width: 100%;
+    height: 40%;
+}
+
+/* Structure */
+table {
+  width: 100%;
+}
+
+.mat-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+  
+
+.highlight{
+  background: lightgray;
+}
+
+tr:focus{
+  outline: none;
+}
+
+::ng-deep  .sbBg {
+  color: darkblue; 
+  background:rgb(251, 252, 249);
+}
+
+.mat-column-DEPT_ID {
+  flex: 0 0 20%;
+}
+
+.mat-column-PREFIX {
+  flex: 0 0 30%;
+}
+
+.mat-column-DEPT_NAME {
+  flex: 0 0 30%;
+}
+
+.mat-column-Actions {
+  flex: 0 0 20%;
+}
+

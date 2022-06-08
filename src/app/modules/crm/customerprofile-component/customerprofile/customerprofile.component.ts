@@ -11,6 +11,7 @@ import * as FileSaver from 'file-saver';
 import { DataSharingService } from 'src/app/services/data-sharing/data-sharing.service';
 const EXCEL_EXTENSION = '.xlsx';
 const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-customerprofile',
@@ -90,7 +91,7 @@ export class CustomerprofileComponent implements OnInit {
     { backgroundColor: 'rgb(2, 46, 82)' }
   ];*/
 
-  constructor(private financeservice:FinanceService,private snackbar:MatSnackBar,private dataSharing: DataSharingService){ 
+  constructor(private financeservice: FinanceService, private snackbar: MatSnackBar, private dataSharing: DataSharingService, private route: ActivatedRoute ){
     this.custForm = new FormGroup({
       pcode: new FormControl('', [ Validators.required]),
       cname: new FormControl('', [ Validators.required]),
@@ -784,9 +785,35 @@ export class CustomerprofileComponent implements OnInit {
     this.getAccountsTypeData();
     this.getBranchData();
     this.getCustomerExcel();
+    this.getCustomerDetails(this.route.snapshot.params.id);
   }
   
   flipChartGrid() {
     this.opbalChartBool = !this.opbalChartBool;
+  }
+
+  getCustomerDetails(value: any) {
+    this.financeservice.getCustomerBypcode(value).subscribe((res: any) => {
+      this.selectCustomerDetail(res.recordset[0])
+    }, (err: any) => {
+      console.log(err);
+    })
+  }
+  selectCustomerDetail(data: any) {
+    this.custForm.patchValue({
+      pcode: data.PCODE,
+      cname: data.CUST_NAME,
+      cStatus: data.STATUS,
+      cAccountCategory: data.ACCOUNT_CATEGORY_CD,
+      cAccountGroup: data.GLCODE,
+      CAccountGroupName: data.GLNAME,
+      cType: data.ACCOUNT_TYPE_CD,
+      cBranch: data.BRANCH_ID,
+      cExternalCode: data.AFFECTING_TYPE_CODE,
+      cCreditPeriod: data.CREDITPERIOD,
+      cLimit: data.CR_LIMIT,
+      cCR: data.CR_CPR,
+      cTaxNo: data.TAX_1_NO
+    });
   }
 }

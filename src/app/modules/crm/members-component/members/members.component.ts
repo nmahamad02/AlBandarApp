@@ -438,6 +438,15 @@ export class MembersComponent implements OnInit {
     });
     this.fillOpbalName(data.ACCODE)
     this.checkDependents(data.MEMBTYPE);
+    console.log(data.IMAGENAME);
+    var imgVal: string = data.IMAGENAME;
+    if (imgVal === "") {
+      this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/imgNaN.png";
+    } else {
+      var imgName: string = imgVal.slice(12);
+      this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgName;
+    }
+    console.log(this.imageSrc);
     this.crmservice.getDependentMembers(data.MemberNo).subscribe((res: any) => {
       if (data.MEMBTYPE === 'F') {
         const famArr = res.recordset;
@@ -527,9 +536,9 @@ export class MembersComponent implements OnInit {
         if (imgVal === "") {
           this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/imgNaN.png";
         } else {
-          var imgName: string = imgVal.slice(12);
-          this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgName;
+          this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgVal;
         }
+        console.log(this.imageSrc);
         this.fillOpbalName(data.ACCODE)
         this.checkDependents(data.MEMBTYPE);
         this.crmservice.getDependentMembers(data.MemberNo).subscribe((res: any) => {
@@ -693,8 +702,7 @@ export class MembersComponent implements OnInit {
         if (imgVal === "") {
           this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/imgNaN.png";
         } else {
-          var imgName: string = imgVal.slice(12);
-          this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgName;
+          this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgVal;
         }
         this.fillOpbalName(data.ACCODE)
         this.checkDependents(data.MEMBTYPE);
@@ -937,7 +945,6 @@ export class MembersComponent implements OnInit {
   }
 
   onFileChange(event: any) {
-
     var filesList: FileList = event.target.files;
     const reader = new FileReader();
 
@@ -945,6 +952,7 @@ export class MembersComponent implements OnInit {
       const fileToUpload: any = filesList.item(0);
       console.log(fileToUpload.name);
       const imgNm: string = fileToUpload.name;
+      console.log(imgNm);
       reader.readAsDataURL(fileToUpload);
       reader.onload = () => {
           this.imageSrc = reader.result as string;

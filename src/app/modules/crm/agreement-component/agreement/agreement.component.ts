@@ -1,7 +1,10 @@
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Console } from 'console';
 import { CrmService } from 'src/app/services/crm/crm.service';
 import { DataSharingService } from 'src/app/services/data-sharing/data-sharing.service';
 import { FinanceService } from 'src/app/services/finance/finance.service';
@@ -36,7 +39,8 @@ export class AgreementComponent implements OnInit {
 
   docArgNo: any;
   docArg: any;
-  docInv: any;
+  docSONo: any;
+  docSO: any;
   taxArr: any;
   discount: number;
   grossvalue: number;
@@ -84,10 +88,12 @@ export class AgreementComponent implements OnInit {
   referenceDisplayedColumns: string[] = ['refid', 'name', 'desc', 'type'];
   referenceDataSouuce = new MatTableDataSource(this.refArr);
 
-  constructor(private crmservice: CrmService,private dialog: MatDialog,private financeService: FinanceService,private lookupservice:LookupService,private dataSharing: DataSharingService ) {
+  constructor(private crmservice: CrmService,private dialog: MatDialog,private financeService: FinanceService,private lookupservice:LookupService,private dataSharing: DataSharingService, private route: ActivatedRoute, private router: Router) {
     this.salesOrderForm = new FormGroup({
       voucherNo: new FormControl('', [ Validators.required]),
+      soNbr: new FormControl('', [ Validators.required]),
       voucherDate: new FormControl('', [ Validators.required]),
+      quotationNo: new FormControl('', [ Validators.required]),
       purchaseOrderNo: new FormControl('', [ Validators.required]),
       party: new FormControl('', [ Validators.required]),
       customerCode: new FormControl('', [ Validators.required]),
@@ -112,8 +118,6 @@ export class AgreementComponent implements OnInit {
 
    refreshForm() {
     this.agrArr = [];
-    this.docArgNo = '';
-    this.docArg = '';
     this.mPartyName = "";
     this.mPartyPhone = "";
     this.mPartyId = "";
@@ -122,13 +126,15 @@ export class AgreementComponent implements OnInit {
     this.mPartyAdd3 = "";
     this.mPartyEmail = "";
     this.mPartyTelephone = "";
-    this.mAgrTotal = 0;
-    this.mAgrVAT = 0;
     this.mAgrDisc = 0;
     this.mAgrGTotal = 0;
+    this.mAgrTotal = 0;
+    this.mAgrVAT = 0;
     this.salesOrderForm = new FormGroup({
       voucherNo: new FormControl('', [ Validators.required]),
+      soNbr: new FormControl('', [ Validators.required]),
       voucherDate: new FormControl('', [ Validators.required]),
+      quotationNo: new FormControl('', [ Validators.required]),
       purchaseOrderNo: new FormControl('', [ Validators.required]),
       party: new FormControl('', [ Validators.required]),
       customerCode: new FormControl('', [ Validators.required]),
@@ -147,7 +153,7 @@ export class AgreementComponent implements OnInit {
     });
   }
 
-   newForm() {
+  newForm() {
     this.mAgrTotal = 0;
     this.mAgrVAT = 0;
     this.mAgrDisc = 0;
@@ -157,10 +163,11 @@ export class AgreementComponent implements OnInit {
       const yearStr = String(res.recordset[0].CYEAR).substring(2);
       this.docArgNo = res.recordset[0].FIELD_VALUE_NM + 1;
       this.docArg = 'AGR' + yearStr + '-' + this.docArgNo.toString();
-      //this.docInv = 'INV' + yearStr + '-' + this.docArgNo.toString();
       this.salesOrderForm = new FormGroup({
         voucherNo: new FormControl(this.docArg, [ Validators.required]),
+        soNbr: new FormControl('', [ Validators.required]),
         voucherDate: new FormControl(this.mCurDate, [ Validators.required]),
+        quotationNo: new FormControl(this.docArg, [ Validators.required]),
         purchaseOrderNo: new FormControl('', [ Validators.required]),
         party: new FormControl('', [ Validators.required]),
         customerCode: new FormControl('', [ Validators.required]),
@@ -174,6 +181,7 @@ export class AgreementComponent implements OnInit {
         subject: new FormControl('', [ Validators.required]),
         srvItemArr: new FormArray([])
       });
+
       const salesorderGrid = new FormGroup({
         srvCode: new FormControl('', [ Validators.required]),
         srvDesc: new FormControl('', [ Validators.required]),
@@ -191,18 +199,17 @@ export class AgreementComponent implements OnInit {
         srvNetValue: new FormControl('', [ Validators.required]),
       });
       this.srvItem.push(salesorderGrid);
-
+  
       this.agreementForm = new FormGroup({
         serviceArr: new FormArray([])
       });
-
+  
       const agreementGrid = new FormGroup({
         serviceNo: new FormControl('', [ Validators.required]),
         serviceDesc: new FormControl('', [Validators.required]),
         Price: new FormControl('', [ Validators.required]),
       });
       this.agrItem.push(agreementGrid);
-    }, (err: any) => {
     })
   }
 
@@ -220,7 +227,7 @@ export class AgreementComponent implements OnInit {
       this.crmservice.getagreementmaster(argno).subscribe((res: any) => {
         this.selectSalesOrder(res.recordset[0]);
       }, (err: any) => {
-      })
+    })
   }
 
   lookupAgreementAndMember(index: any) {
@@ -308,19 +315,19 @@ export class AgreementComponent implements OnInit {
     this.selectedRowIndex = 0;
     this.serviceIndex = index;
     let dialogRef = this.dialog.open(this.RefLookupDialog);
-      this.lookupservice.searchReference().subscribe((res: any) => {
-        this.refArr = res.recordset;
-        this.referenceDataSouuce = new MatTableDataSource(this.refArr);
-      }, (err: any) => {
-      })
+    this.lookupservice.searchReference().subscribe((res: any) => {
+      this.refArr = res.recordset;
+      this.referenceDataSouuce = new MatTableDataSource(this.refArr);
+    }, (err: any) => {
+    })
   }
 
   selectSiv(){
     this.getsrvData(this.srvArr[this.selectedRowIndex].PCODE, this.srvIndex);
     const rowData: any = {
       serviceNo: this.srvArr[this.selectedRowIndex].ServiceID,
-        serviceDesc: this.srvArr[this.selectedRowIndex].ServiceName,
-        Price: this.srvArr[this.selectedRowIndex].MemberPrice,
+      serviceDesc: this.srvArr[this.selectedRowIndex].ServiceName,
+      Price: this.srvArr[this.selectedRowIndex].MemberPrice,
     }
     this.agrItem.at(this.srvIndex).patchValue(rowData);
     let dialogRef = this.dialog.closeAll();
@@ -465,7 +472,9 @@ export class AgreementComponent implements OnInit {
     const date = this.formatDate(obj.AGR_DATE);
     this.salesOrderForm.patchValue({
       voucherNo: obj.AGR_NO,
+      soNbr: obj.SONO,
       voucherDate: date,
+      quotationNo: obj.QUTONO,
       purchaseOrderNo: obj.REFNO,
       party: obj.PARTY_ID,
       customerCode: obj.PCODE,
@@ -512,7 +521,7 @@ export class AgreementComponent implements OnInit {
   }
 
   getCustomerMember(pcode:string) {
-    this.financeService.getCustomerMemner(pcode).subscribe((res: any) => {
+    this.financeService.getCustomerMemner(pcode,String(this.mCYear)).subscribe((res: any) => {
       this.memberList = res.recordset;
     }, (err: any) => {
     })
@@ -520,7 +529,15 @@ export class AgreementComponent implements OnInit {
 
   ngOnInit(): void {
     this.getTaxData();
-    const data = this.salesOrderForm.value
+    this.getAgreementDetails(this.route.snapshot.params.id);
+  }
+
+  getAgreementDetails(value: any) {
+    if(value === 'new') {
+      this.newForm();
+    } else {
+      this.getSalesorder(value); 
+    }
   }
   
   setReportData(apiUrl: string, reportType: string){
@@ -627,29 +644,72 @@ export class AgreementComponent implements OnInit {
         })
       })
     }, (err: any) => {
-      this.financeService.postAgreementMaster('01',agrData.voucherNo,this.mCurDate,this.docArg,agrData.customerCode,agrData.customerCode,agrData.name,String(this.mAgrTotal),String(this.mAgrDisc),String(this.mAgrGTotal),String(this.mAgrVAT),agrData.add1,agrData.phoneNo,agrData.telephone,agrData.subject,this.mCurDate,'DBA').subscribe((resp: any) => {
+      this.financeService.postAgreementMaster('01',agrData.voucherNo,this.mCurDate,agrData.soNbr,agrData.quotationNo,agrData.customerCode,agrData.customerCode,agrData.name,String(this.mAgrTotal),String(this.mAgrDisc),String(this.mAgrGTotal),String(this.mAgrVAT),agrData.add1,agrData.phoneNo,agrData.telephone,agrData.subject,this.mCurDate,'DBA').subscribe((resp: any) => {
         for(let i=0; i<agrData.srvItemArr.length; i++) {
           this.financeService.postAgreementDetails(agrData.voucherNo,'01',agrData.srvItemArr[i].srvCode,agrData.srvItemArr[i].srvDesc,agrData.srvItemArr[i].srvMember,agrData.srvItemArr[i].srvMemberName,this.formatDate(agrData.srvItemArr[i].srvFrom),this.formatDate(agrData.srvItemArr[i].srvTo),agrData.srvItemArr[i].srvValue,agrData.srvItemArr[i].srvGross,agrData.srvItemArr[i].srvDisc,agrData.srvItemArr[i].srvDiscount,agrData.srvItemArr[i].srvVatCat,agrData.srvItemArr[i].srvVat,agrData.srvItemArr[i].srvNetValue,this.mCurDate,'DBA').subscribe((response: any) => {
           });
         }
       });
-      this.financeService.updatedocAgreement(this.docArgNo, String(this.mCYear));
+      this.financeService.updatedocAgreement(this.docArgNo, String(this.mCYear)).subscribe((res: any) => {
+        console.log(res);
+      
+      }, (err: any) => {
+        console.log(err);
+      });
     });
     this.refreshForm();
   }
 
+  convertToSalesOrder() {
+    const agrData = this.salesOrderForm.value;
+    this.financeService.getSalesOrderMaster(agrData.soNbr).subscribe((res: any) => {
+      this.financeService.updateSOMaster(agrData.voucherNo, agrData.voucherDate, agrData.soNbr, agrData.party, agrData.customerCode, agrData.name, String(this.mAgrTotal), String(this.mAgrDisc), String(this.mAgrGTotal), String(this.mAgrVAT), agrData.add1, agrData.add2, agrData.phoneNo, agrData.subject, this.mCurDate, 'DBA').subscribe((resp: any) => {
+        this.financeService.deleteSalesOrderDetails(agrData.soNbr).subscribe((response: any) => {
+          for(let i=0; i<agrData.srvItemArr.length; i++) {
+            this.financeService.postSalesOrderDetails(agrData.soNbr, agrData.srvItemArr[i].srvCode, agrData.srvItemArr[i].srvDesc, agrData.srvItemArr[i].srvValue,agrData.srvItemArr[i].srvGross,agrData.srvItemArr[i].srvDisc,agrData.srvItemArr[i].srvDiscount,agrData.srvItemArr[i].srvVatCat,agrData.srvItemArr[i].srvVat,agrData.srvItemArr[i].srvNetValue,this.mCurDate,'DBA').subscribe((respo: any) => {
+            });
+          }
+        }, (error: any) => {
+        })
+      })
+    }, (err: any) => {
+      const year = String(this.mCYear);
+      this.financeService.getDocForSO(year).subscribe((resp: any) => {
+        const yearStr = String(resp.recordset[0].CYEAR).substring(2);
+        this.docSONo = resp.recordset[0].FIELD_VALUE_NM + 1;
+        this.docSO = 'SO' + yearStr + '-' + this.docSONo.toString();
+        this.financeService.postSalesOrderMaster(agrData.voucherNo,this.mCurDate,this.docSO,agrData.party,agrData.customerCode,agrData.name,String(this.mAgrTotal),String(this.mAgrDisc),String(this.mAgrGTotal),String(this.mAgrVAT),agrData.add1,agrData.phoneNo,agrData.telephone,agrData.subject,this.mCurDate,'DBA').subscribe((resp: any) => {
+          for(let i=0; i<agrData.srvItemArr.length; i++) {
+            this.financeService.postSalesOrderDetails(this.docSO, agrData.srvItemArr[i].srvCode, agrData.srvItemArr[i].srvDesc, agrData.srvItemArr[i].srvValue,agrData.srvItemArr[i].srvGross,agrData.srvItemArr[i].srvDisc,agrData.srvItemArr[i].srvDiscount,agrData.srvItemArr[i].srvVatCat,agrData.srvItemArr[i].srvVat,agrData.srvItemArr[i].srvNetValue,this.mCurDate,'DBA').subscribe((response: any) => {
+            });
+          }
+        });
+        this.financeService.updatedocso(this.docSONo, String(this.mCYear)).subscribe((res: any) => {
+          this.financeService.setSalesOrder(agrData.voucherNo, this.docSO).subscribe((respos: any) => {
+            this.getSalesorder(agrData.voucherNo)
+          })
+        }, (err: any) => {
+          console.log(err);
+        });
+      }, (error: any) => {
+        console.log(error);
+      })
+    });
+  }
+
   caliberateTotal() {
-    this.mAgrTotal = 0;
-    this.mAgrDisc = 0;
-    this.mAgrVAT = 0;
-    this.mAgrGTotal = 0;
+    this.mAgrTotal = 0.0;
+    this.mAgrDisc = 0.0;
+    this.mAgrVAT = 0.0;
+    this.mAgrGTotal = 0.0;
     for(let i=0; i<this.srvItem.length; i++) {
-      this.mAgrTotal = this.mAgrTotal + this.srvItem.value[i].srvValue;
-      this.mAgrDisc = this.mAgrDisc + this.srvItem.value[i].srvDiscount;
-      this.mAgrVAT = this.mAgrVAT + this.srvItem.value[i].srvVat;
-      this.mAgrGTotal = this.mAgrTotal - this.mAgrDisc + this.mAgrVAT;
+      this.mAgrTotal += this.srvItem.value[i].srvValue;
+      this.mAgrDisc += this.srvItem.value[i].srvDiscount;
+      this.mAgrVAT += this.srvItem.value[i].srvVat ;
+      this.mAgrGTotal += this.srvItem.value[i].srvNetValue;
     }
   }
+
   formatDate(date: any) {
     var d = new Date(date), day = '' + d.getDate(), month = '' + (d.getMonth() + 1), year = d.getFullYear();
 
@@ -668,5 +728,13 @@ export class AgreementComponent implements OnInit {
 
   get agrItem(): FormArray {
     return this.agreementForm.get('serviceArr') as FormArray
+  }
+
+  public goToSalesOrder() {
+    const soData = this.salesOrderForm.value;
+    var id = soData.soNbr;
+    var myurl = `/crm/sales-order/details/${id}`;
+    this.router.navigateByUrl(myurl).then(e => {
+    });
   }
 }

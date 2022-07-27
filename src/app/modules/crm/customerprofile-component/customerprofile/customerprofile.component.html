@@ -1,42 +1,32 @@
 <div class="container-fluid">
-    <br>
     <div class="col-12">
         <mat-card style="color: darkblue; background-color:rgb(251, 252, 249);">
             <mat-card-header>
                 <div class="col-12">
                     <div class="row">
-                        <div class="col-4">
+                        <div class="col-3">
                             <mat-card-title>Customer Profile </mat-card-title>
                         </div>
-                        <div class="col-7">
+                        <div class="col-8">
                             <mat-card-actions>
-                                <div class="row">
-                                    <div class="col">
-                                        <button mat-raised-button class="bg-primary text-white btn btn-block" style="border-radius: 50%;" (click)="newForm()" >
-                                            <mat-icon>add</mat-icon> New
-                                        </button>
-                                    </div>
-                                    <div class="col">
-                                        <button type="submit" mat-raised-button class="bg-secondary text-white btn btn-block" style="border-radius: 50%;" (click)="exportTOexcel()"  >
-                                            <mat-icon>print</mat-icon> Print
-                                        </button>
-                                    </div>
-                                    <div class="col">
-                                        <button mat-raised-button class="bg-success  text-white btn btn-block" style="border-radius: 50%;" (click)="submitForm()" >
-                                            <mat-icon>note_add</mat-icon> Submit 
-                                        </button>
-                                    </div>
-                                    <div class="col">
-                                        <button mat-raised-button class="bg-info text-white btn btn-block" style="border-radius: 50%;" >
-                                            <mat-icon>delete</mat-icon> Delete
-                                        </button>   
-                                    </div>
-                                    <div class="col">
-                                        <button mat-raised-button class="bg-danger text-white btn btn-block" style="border-radius: 50%;" (click)="refreshForm()" >
-                                            <mat-icon>cancel</mat-icon> Cancel
-                                        </button>
-                                    </div>  
-                                </div>
+                                <button mat-raised-button class="bg-primary text-white btn btn-block" style="border-radius: 50%;" (click)="newForm()" style="float: right;">
+                                    <mat-icon>add</mat-icon> New
+                                </button>
+                                <button type="submit" mat-raised-button class="bg-secondary text-white btn btn-block" style="border-radius: 50%;" (click)="exportTOexcel()"  style="float: right;">
+                                    <mat-icon>print</mat-icon> Print
+                                </button>
+                                <button mat-raised-button class="bg-success  text-white btn btn-block" style="border-radius: 50%;" (click)="submitForm()" style="float: right;">
+                                    <mat-icon>note_add</mat-icon> Submit 
+                                </button>
+                                <button mat-raised-button class="bg-info text-white btn btn-block" style="border-radius: 50%;" style="float: right;">
+                                    <mat-icon>delete</mat-icon> Delete
+                                </button>   
+                                <button mat-raised-button class="bg-danger text-white btn btn-block" style="border-radius: 50%;" (click)="refreshForm()" style="float: right;">
+                                    <mat-icon>cancel</mat-icon> Cancel
+                                </button>
+                                <button mat-raised-button class="bg-warning text-white btn btn-block" style="border-radius: 50%;" [routerLink]="['/crm/customers']" style="float: right;">
+                                    <mat-icon>arrow_back</mat-icon> Return
+                                </button>
                             </mat-card-actions>
                         </div>
                     </div>
@@ -55,7 +45,7 @@
                         <div class="col-3">
                             <mat-form-field class="full-width">
                                 <mat-label >Name</mat-label>
-                                <input formControlName="cname" matInput required  value="{{varName}}">
+                                <input formControlName="cname" matInput required>
                             </mat-form-field>
                         </div>
                         <div class="col-3">
@@ -66,16 +56,6 @@
                                 </mat-select>
                             </mat-form-field> 
                         </div>
-                        <!-- <div class="col-2">
-                            <mat-form-field class="full-width">
-                                <mat-label>Branch</mat-label>
-                                  <mat-select formControlName="cBranch">
-                                    <mat-option *ngFor="let brh of BranchArr" [value]="brh.BRANCH_ID">{{ brh.BRANCH_NAME }}</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        </div> -->
-
-
                         <div class="col-3">
                             <mat-form-field class="full-width">
                                 <mat-label>Type</mat-label>
@@ -85,37 +65,6 @@
                            </mat-form-field> 
                         </div>
                     </div>
-                   
-                   <!-- <div class="row">
-                        <div class="col-3">
-                            <mat-form-field class="full-width">
-                                <mat-label >Account Group</mat-label>
-                                <mat-select formControlName="CAccountGroupName" matInput required value="{{varAccountGroupName}}">
-                                    <mat-option value="TRADE">TRADE DEBTORS</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-                        <div class="col-3">
-                            <mat-form-field class="full-width">
-                                <mat-label>External Code</mat-label>
-                                <input formControlName="cExternalCode" matInput required>
-                              </mat-form-field> 
-                        </div>
-                        <div class="col-3">
-                            <mat-form-field class="full-width">
-                                <mat-label>Credit Period</mat-label>
-                                <input formControlName="cCreditPeriod" matInput required value="{{varcreditPeriod}}">
-                            </mat-form-field>
-                        </div>
-
-                        <div class="col-3">
-                            <mat-form-field class="full-width">
-                                <mat-label>Limit</mat-label>
-                                <input formControlName="cLimit" matInput required value="{{varLimit}}">
-                              </mat-form-field> 
-                        </div> 
-
-                    </div> -->
                     <div class="row">
                         <div class="col-3">
                             <mat-form-field class="full-width">
@@ -126,21 +75,120 @@
                                 </mat-select>
                             </mat-form-field>
                         </div>
-                        
                         <div class="col-3">
                             <mat-form-field class="full-width">
                                 <mat-label>CR/CPR</mat-label>
-                                <input formControlName="cCR" matInput required value="{{varCrCpr}}">
+                                <input formControlName="cCR" matInput required>
                             </mat-form-field>
                         </div>
                         <div class="col-6">
                             <mat-form-field class="full-width">
                                 <mat-label>TAX NO</mat-label>
-                                <input formControlName="cTaxNo" matInput required value="{{varTaxNo}}">
+                                <input formControlName="cTaxNo" matInput required>
                             </mat-form-field>
                         </div>
                     </div>
                 </form>
+                <mat-tab-group mat-align-tabs="center" >
+                    <mat-tab label="Contact Details">
+                        <mat-table [dataSource]="contactListDataSource" matTableExporter #exporter="matTableExporter" class="mat-table" matSort matSortDisableClear [multiTemplateDataRows]="true">
+               
+                            <ng-container matColumnDef="PARTY_ID">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Number </mat-header-cell>
+                                <mat-cell *matCellDef="let row"> {{ row.PARTY_ID }} </mat-cell>
+                            </ng-container>
+               
+                            <ng-container matColumnDef="NAME">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
+                                <mat-cell *matCellDef="let row" > {{ row.NAME }} </mat-cell>
+                            </ng-container>
+                    
+                            <ng-container matColumnDef="ADD1">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> ADD1 </mat-header-cell>
+                                <mat-cell *matCellDef="let row"> {{ row.ADD1 }} </mat-cell>
+                            </ng-container>
+                        
+                            <ng-container matColumnDef="ADD2">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> ADD2 </mat-header-cell>
+                                <mat-cell *matCellDef="let row"> {{ row.ADD2 }} </mat-cell>
+                            </ng-container>
+                        
+                            <ng-container matColumnDef="ADD3">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> ADD3 </mat-header-cell>
+                                <mat-cell *matCellDef="let row"> {{ row.ADD3 }} </mat-cell>
+                            </ng-container>
+                        
+                            <ng-container matColumnDef="PHONE1">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Phone</mat-header-cell>
+                                <mat-cell *matCellDef="let row"> {{ row.PHONE1 }} </mat-cell>
+                            </ng-container>
+                        
+                            <ng-container matColumnDef="Actions">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Actions </mat-header-cell>
+                                <mat-cell *matCellDef="let row">
+                                    <button md-raised-button color="primary" class="btn-w-md ml-2 mat-button text-white"  style="border-radius: 50%;"  (click)="gotoContactDetails('/crm/contacts/details', row.PARTY_ID)">
+                                        View
+                                    </button>
+                                </mat-cell>
+                            </ng-container>
+                        
+                            <mat-header-row *matHeaderRowDef="contactsColumns"></mat-header-row>
+                            <mat-row matRipple *matRowDef="let row; columns: contactsColumns;"></mat-row>
+                        </mat-table>
+                        <mat-paginator #paginator [pageSize]="50" [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>
+                    </mat-tab>
+     
+                    <mat-tab label="Member Details">
+                        
+                        <mat-table [dataSource]="memberListDataSource" matTableExporter #exporter="matTableExporter" class="mat-table" matSort matSortDisableClear [multiTemplateDataRows]="true">
+                    
+                            <ng-container matColumnDef="MemberNo">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Member Nbr </mat-header-cell>
+                                <mat-cell *matCellDef="let row"> {{ row.MemberNo }} </mat-cell>
+                            </ng-container>
+                        
+                            <ng-container matColumnDef="NAME">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
+                                <mat-cell *matCellDef="let row"> {{ row.NAME }} </mat-cell>
+                            </ng-container>
+                        
+                            <ng-container matColumnDef="DEPT_NAME">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Surname </mat-header-cell>
+                                <mat-cell *matCellDef="let row"> {{ row.DEPT_NAME }} </mat-cell>
+                            </ng-container>
+                        
+                            <ng-container matColumnDef="MEMBTYPE">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Type</mat-header-cell>
+                                <mat-cell *matCellDef="let row"> {{ row.MEMBTYPE }} </mat-cell>
+                            </ng-container>
+                        
+                            <ng-container matColumnDef="Actions">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header> Actions </mat-header-cell>
+                                <mat-cell *matCellDef="let row">
+                                    <button md-raised-button color="primary" class="btn-w-md ml-2 mat-button text-white"  style="border-radius: 50%;"  (click)="gotoMembersDetails('/crm/member/details', row.MemberNo)">
+                                        View
+                                    </button>
+                                </mat-cell>
+                            </ng-container>
+                        
+                            <mat-header-row *matHeaderRowDef="memberColumns"></mat-header-row>
+                            <mat-row matRipple *matRowDef="let row; columns: memberColumns;"></mat-row>
+                        </mat-table>
+                        <mat-paginator #paginator [pageSize]="50" [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>
+                    </mat-tab>
+     
+                    <mat-tab label="Opening Balance"> 
+                     
+                    </mat-tab>
+                    
+                    <mat-tab label="Invoice">
+  
+                    </mat-tab>
+                    
+                    <mat-tab label="Payments">
+
+                    </mat-tab>             
+                </mat-tab-group>
             </mat-card-content>
         </mat-card>
     </div>

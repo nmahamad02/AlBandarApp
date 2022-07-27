@@ -22,7 +22,7 @@ tr:focus{
 outline: none;
 }
 
-::ng-deep  .sbBg {
-color: darkblue; 
-background:rgb(251, 252, 249);
-}
+.container {
+  color: darkblue; 
+  background:rgb(251, 252, 249);
+  }

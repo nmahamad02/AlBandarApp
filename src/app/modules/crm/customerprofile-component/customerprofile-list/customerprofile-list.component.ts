@@ -121,9 +121,10 @@ export class CustomerprofileListComponent implements OnInit {
       cTaxNo: new FormControl('', [ Validators.required])
     });
 
-    this.columns = ["Customer Code", "Customer Name", "Account Type", "Account Category", "Branch Name", "GL Code", "GL Name", "CPR Number", "Limit", "TAX No"];
-    this.columnCustomer = ["PCODE", "CUST_NAME", "ACCOUNT_TYPE_CD", "ADD1", "ADD2", "TAX_1_NO", "PHONE1", "Actions"];
+    //this.columns = ["Customer Code", "Customer Name", "Account Type", "Account Category", "Branch Name", "GL Code", "GL Name", "CPR Number", "Limit", "TAX No"];
+    this.columnCustomer = ["PCODE", "CUST_NAME", "ADD1", "ADD2", "TAX_1_NO", "PHONE1", "Actions"];
 
+    /*
     this.columnCustomerDefs = [
       { 
         headername: "Customer ID",
@@ -415,6 +416,7 @@ export class CustomerprofileListComponent implements OnInit {
         width:150
       },
     ];
+    */
   }
 
   onGridCustomerReady(params: any){ 
@@ -466,17 +468,6 @@ export class CustomerprofileListComponent implements OnInit {
     });
   }
 
-  onGridCustomerParty(params: any){ 
-    this.gridApiCust= params.api;
-    this.gridColumnApiCust= params.columnApi;
-    this.financeservice.getCustomerParty(this.varpcode).subscribe((res: any) => {
-      this.CustPartyList = res.recordset;
-      params.api.setRowData(this.CustPartyList);
-    }, (err: any) => {
-      console.log(err);
-    })
-  }
-
   getCustmerDetails(pcode: any){
     this.financeservice.getCustomerBypcode(pcode).subscribe((res:any) => {
       this.selectCustomer(res.recordset[0])
@@ -505,49 +496,7 @@ export class CustomerprofileListComponent implements OnInit {
     this.getCustmerParty(this.varpcode);
     this.getCustmerInvoices(this.varpcode,this.varsfyear,this.varefyear);
     this.getCustomerMember(this.varpcode)
-    this.getAggrementDetails(this.varpcode)
-    this.onGridCustomerMember(this.CustMemberList)
   }
-
-  onGridCustomerMember(params: any){ 
-    this.gridApiCust= params.api;
-    this.gridColumnApiCust= params.columnApi;
-    this.financeservice.getCustomerMemner(this.varpcode).subscribe((res: any) =>  {
-      this.CustMemberList=res.recordset;
-      params.api.setRowData(this.CustMemberList);
-    }, (error: any) => {
-      console.log(error);
-    });
-  }
-
-  onGridCustomerAgreement(params: any){ 
-    this.gridApiCust= params.api;
-    this.gridColumnApiCust= params.columnApi;
-    this.financeservice.getCustomerMemner(this.varpcode).subscribe((res: any) =>  {
-      this.CustAgreementList=res.recordset;
-      params.api.setRowData(this.CustAgreementList);
-    }, (error: any) => {
-      console.log(error);
-    });
-  }
-
-  onGridCustomerOpeningDetail(params: any){ 
-    this.gridApiCust= params.api;
-    this.gridColumnApiCust= params.columnApi;
-    this.financeservice.getCustomerInvoices(this.varpcode, this.varsfyear, this.varefyear).subscribe((res: any) => {
-      this.CustInvoiceList = res.recordset;
-      params.api.setRowData(this.CustInvoiceList);
-      /*for(let i=0; i<this.CustInvoiceList.length; i++) {
-        var tempChartLbl: string = this.CustInvoiceList[i].INV_NO;
-        var tempChartVal: number = this.CustInvoiceList[i].INV_AMOUNT;
-        this.varInvChartLabels.push(tempChartLbl);
-        this.varInvChartValues.push(tempChartVal);
-      }*/
-    }, (err: any) => {
-      console.log(err);
-    })
-  }
-
 
   onViewCellClicked(event: any){
     if (event.column.colId =="CUST_NAME" ){
@@ -571,7 +520,6 @@ export class CustomerprofileListComponent implements OnInit {
       this.getCustmerParty(this.varpcode);
       this.getCustmerInvoices(this.varpcode,this.varsfyear,this.varefyear);
       this.getCustomerMember(this.varpcode)
-      this.getAggrementDetails(this.varpcode)
     }
   }
 
@@ -610,7 +558,7 @@ export class CustomerprofileListComponent implements OnInit {
   }
 
   getCustmerParty(pcode:string) {
-    this.financeservice.getCustomerParty(pcode).subscribe((res: any) => {
+    this.financeservice.getCustomerParty(pcode,String(this.currentYear)).subscribe((res: any) => {
       this.CustPartyList = res.recordset;
     }, (err: any) => {
       console.log(err);
@@ -618,7 +566,7 @@ export class CustomerprofileListComponent implements OnInit {
   }
 
   getCustomerMember(pcode:string) {
-    this.financeservice.getCustomerMemner(pcode).subscribe((res: any) => {
+    this.financeservice.getCustomerMemner(pcode,String(this.currentYear)).subscribe((res: any) => {
       this.CustMemberList = res.recordset;
     }, (err: any) => {
       console.log(err);
@@ -660,15 +608,6 @@ export class CustomerprofileListComponent implements OnInit {
         this.varInvChartLabels.push(tempChartLbl);
         this.varInvChartValues.push(tempChartVal);
       }*/
-    }, (err: any) => {
-      console.log(err);
-    })
-  }
-
- 
-  getAggrementDetails(pcode: string) {
-    this.financeservice.getAggrementDetails(pcode).subscribe((res: any) => {
-      this.CustAgreementList = res.recordset;
     }, (err: any) => {
       console.log(err);
     })
@@ -825,7 +764,6 @@ export class CustomerprofileListComponent implements OnInit {
   }
 
   quickPartyrSearch() {
-
     this.customerlistDataSource.filter = this.searchValue.trim().toLowerCase();
   }
 

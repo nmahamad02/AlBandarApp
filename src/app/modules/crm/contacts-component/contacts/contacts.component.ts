@@ -214,12 +214,15 @@ export class ContactsComponent implements OnInit {
   
   
   getPartyDetails(value : any){
-    this.crmservices.getPartyDetails(value).subscribe((res: any) => {
-      this.selectParty(res.recordset[0])
-    }, (err: any) => {
-      console.log(err);
-    })
-
+    if(value === 'new') {
+      this.newForm();
+    } else {
+      this.crmservices.getPartyDetails(value).subscribe((res: any) => {
+        this.selectParty(res.recordset[0])
+      }, (err: any) => {
+        console.log(err);
+      })  
+    }
   }
 
   selectParty(data: any){
@@ -314,8 +317,6 @@ export class ContactsComponent implements OnInit {
     })
    let dialogRef = this.dialog.closeAll();
  }
-
-
 
   submitForm() {
     const data = this.contactsForm.value;

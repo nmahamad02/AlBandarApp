@@ -182,14 +182,7 @@ export class MembersComponent implements OnInit {
     this.getRelations();
     this.getTitles();
     this.getPositions();
-
-    this.crmservice.getMembers(this.route.snapshot.params.id).subscribe((res: any) => {
-      const data = res.recordset[0];
-      this.onViewCellClicked(data);
-    }, (err: any) => {
-      console.log(err);
-    })
-
+    this.getDetails(this.route.snapshot.params.id);
   }
 
   getMembersPrimaryData() {
@@ -1078,10 +1071,21 @@ export class MembersComponent implements OnInit {
 
   }
 
-  getDetails() {
-    const data = this.memberForm.value;
+  getDetails(value: any) {
+    /*const data = this.memberForm.value;
     this.dataService.setData(data);
-    this.router.navigate(['/crm/member/details']);
+    this.router.navigate(['/crm/member/details']);*/
+
+    if(value === 'new') {
+      this.newForm();
+    } else {
+      this.crmservice.getMembers(value).subscribe((res: any) => {
+        const data = res.recordset[0];
+        this.onViewCellClicked(data);
+      }, (err: any) => {
+        console.log(err);
+      })
+    }
   }
 
   highlight(type: string, index: number){

@@ -23,13 +23,10 @@ export class ContactsListComponent implements OnInit {
   @ViewChild('TABLE') table: ElementRef;
 
   constructor(private crmservices: CrmService, private router: Router) {
-
     this.columns = ["PARTY_ID", "NAME", "ADD1", "ADD2", "ADD3", "PHONE1", "Actions"];
-
   }
 
   ngOnInit(): void {
-
     this.crmservices.getParty().subscribe((res: any) => {
       this.contactList = res.recordset;
       this.contactListDataSource = new MatTableDataSource(this.contactList);
@@ -38,7 +35,6 @@ export class ContactsListComponent implements OnInit {
     }, (error: any) => {
       console.log(error);
     });
-
   }
 
   exportAsExcel() {
@@ -48,7 +44,6 @@ export class ContactsListComponent implements OnInit {
 
     /* save to file */
     XLSX.writeFile(wb, 'SheetJS.xlsx');
-
   }
 
   quickPartyrSearch() {

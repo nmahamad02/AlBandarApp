@@ -39,7 +39,6 @@ export class AuthenticationService {
     localStorage.setItem('firstname', "");
     localStorage.setItem('lastname', "");
     localStorage.setItem('userclass', "");
-
   }
 
   recoverPassword(email: any) {

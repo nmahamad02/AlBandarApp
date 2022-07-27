@@ -13,4 +13,8 @@ export class ReportsService {
     return this.http.get(this.url + '/receivables/ageing/' + date)
   }
 
+  getOutstanding() {
+    
+  }
+
 }

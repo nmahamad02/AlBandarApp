@@ -1,15 +1,22 @@
 <div class="container-fluid">
-  <br>
   <div class="col-12">
     <mat-card style="color: darkblue; background-color:rgb(251, 252, 249);">
       <mat-card-header>
         <div class="col-12">
           <div class="row">
             <div class="col-3">
-              <mat-card-title i18n="@@CMMContactsTitle">
-                Member Management
-              </mat-card-title>
-            </div>         
+              <mat-card-title i18n="@@CMMContactsTitle">Member Master</mat-card-title>
+            </div> 
+            <div class="col-6"></div>  
+            <div class="col-3">     
+              <button mat-raised-button href="javascript:void(0)" (click)="toggleTableRows()" color="primary" >
+                <mat-icon>settings_accessibility</mat-icon>
+              </button>
+              &nbsp;
+              <button mat-raised-button class="bg-primary text-white btn btn-block" (click)="gotoMemebersDetails('/crm/member/details', 'new')">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
           </div>
         </div>
       </mat-card-header>
@@ -21,12 +28,7 @@
               <input matInput type="text" style="color: black;" placeholder="Please Enter Your Seach Keyword to filter" (keyup)=" quickMemberSearch()" [(ngModel)]="searchValue">
             </mat-form-field>
           </div>
-    
-          <div style="text-align: end;padding: 10px 10px;">
-            <a mat-raised-button href="javascript:void(0)" (click)="toggleTableRows()" color="primary">Toggle Rows</a>
-          </div>
-          <mat-table [dataSource]="memberListDataSource" matTableExporter #exporter="matTableExporter"
-                     class="mat-table" matSort matSortDisableClear [multiTemplateDataRows]="true">
+          <mat-table [dataSource]="memberListDataSource" matTableExporter #exporter="matTableExporter" class="mat-table" matSort matSortDisableClear [multiTemplateDataRows]="true">
             <ng-container matColumnDef="actions">
               <mat-header-cell *matHeaderCellDef>  </mat-header-cell>
               <mat-cell mat-cell *matCellDef="let row">

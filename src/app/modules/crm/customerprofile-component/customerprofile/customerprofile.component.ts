@@ -1,17 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { GridOptions } from 'ag-grid-community';
-//import { ChartOptions, ChartType, ChartDataset } from 'chart.js';
-//import { Color, Label } from 'ng2-charts';
-import * as moment from 'moment';
+import {ElementRef, ViewChild } from '@angular/core';
 import { FinanceService } from 'src/app/services/finance/finance.service';
 import * as ExcelJS from  'exceljs/dist/exceljs.min.js';
 import * as FileSaver from 'file-saver';
 import { DataSharingService } from 'src/app/services/data-sharing/data-sharing.service';
 const EXCEL_EXTENSION = '.xlsx';
 const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from "@angular/material/sort";
+import { MatTableDataSource } from '@angular/material/table';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-customerprofile',
@@ -23,395 +24,45 @@ export class CustomerprofileComponent implements OnInit {
   public balForm: FormGroup;
   currentYear = new Date().getFullYear()
   searchValue: any;
-  gridOptions!: Partial<GridOptions>;
   customerlist: any[] = [];
-  CustPartyList: any[] = [];
-  CustMemberList: any[] = [];
-  CustInvoiceList: any[] = [];
-  CustAgreementList: any[] = [];
+  custPartyList: any[] = [];
+  custMemberList: any[] = [];
+  custInvoiceList: any[] = [];
+  custAgreementList: any[] = [];
   AccountsCategoryList: any[] = [];
   AccountsTypeList: any[] = [];
-  BranchArr: any[] = [];
   custExcelArr: any[] = [];
-  gridApi: any;
-  gridColumnApi:any;
-  gridApiCust: any;
-  gridColumnApiCust:any;
-  columnCustomerDefs:any;
-  columnContactDefs:any;
-  columnCustomeropeningDefs:any;
-  columnCustomerMemberDefs: any;
-  columnCustomerAgreementDefs: any;
 
   rowStyle!: { background: string; };
   sortingOrder:any;
-  mAccountDetails: any = {
-    Cust_name: "",
-    mOpbal: 0,
-    mDebit: 0,
-    mCredit: 0
-  }
   
-  varName: string = "";
-  varAccountCategory: any ;
-  varAccountType: string = "";
-  varBranch: string = "";
-  varAccountGroup: string = "";
-  varAccountGroupName: string="";
-  varexcode:string ="";
-  varcreditPeriod: string ="";
-  varActive:string = "";
-  varLimit:string = "";
-  varCrCpr:string = "";
-  varTaxNo: string = "";
-  varselected: string = "";
+  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: false }) sort: MatSort;
+  @ViewChild('TABLE') table: ElementRef;
+
   varpcode:string = "";
   varsfyear:string ="2022-01-01";
   varefyear:string ="2022-01-01";
   opbalChartBool: boolean = false;
   
+  contactListDataSource = new MatTableDataSource(this.custPartyList);
+  memberListDataSource = new MatTableDataSource(this.custMemberList);
+
   columns: any[];
+  contactsColumns = ["PARTY_ID", "NAME", "ADD1", "ADD2", "ADD3", "PHONE1", "Actions"];
+  memberColumns = ["MemberNo", "NAME", "DEPT_NAME", "MEMBTYPE", "Actions"];
+  //contactsColumns = ["PARTY_ID", "NAME", "ADD1", "ADD2", "ADD3", "PHONE1", "Actions"];
+  //contactsColumns = ["PARTY_ID", "NAME", "ADD1", "ADD2", "ADD3", "PHONE1", "Actions"];
 
-  
-
-  /*varInvChartLabels: any[] = [];
-  varInvChartValues: any[] = [];
-
-  public barChartOptions: ChartOptions = {
-    responsive: true,
-  };
-  public barChartLabels: Label[] = this.varInvChartLabels;
-  public barChartType: ChartType = 'bar';
-  public barChartLegend = true;
-  public barChartPlugins = [];
-  public barChartData: ChartDataSets[] = [
-    { data: this.varInvChartValues, label: 'Ageing' },
-  ];
-  public barChartColors: Color[] = [
-    { backgroundColor: 'rgb(2, 46, 82)' }
-  ];*/
-
-  constructor(private financeservice: FinanceService, private snackbar: MatSnackBar, private dataSharing: DataSharingService, private route: ActivatedRoute ){
+  constructor(private financeservice: FinanceService, private snackbar: MatSnackBar, private dataSharing: DataSharingService, private route: ActivatedRoute, private router: Router){
     this.custForm = new FormGroup({
       pcode: new FormControl('', [ Validators.required]),
       cname: new FormControl('', [ Validators.required]),
       cStatus: new FormControl('', [ Validators.required]),
       cAccountCategory: new FormControl('', [ Validators.required]),
-      cAccountGroup: new FormControl('', [ Validators.required]),
-      CAccountGroupName: new FormControl('', [ Validators.required]),
       cType: new FormControl('', [ Validators.required]),
-      cBranch: new FormControl('', [ Validators.required]),
-      cExternalCode: new FormControl('', [ Validators.required]),
-      cCreditPeriod: new FormControl('', [ Validators.required]),
-      cLimit: new FormControl('', [ Validators.required]),
       cCR: new FormControl('', [ Validators.required]),
-      cActive: new FormControl('', [ Validators.required]),
       cTaxNo: new FormControl('', [ Validators.required])
-    });
-
-    this.columns = ["Customer Code","Customer Name","Account Type","Account Category","Branch Name","GL Code","GL Name","CPR Number","Limit","TAX No"];
-
-    this.columnCustomerDefs = [
-      { 
-        headername: "Customer ID",
-        sortable: true,
-        field: "PCODE",
-        width: 85
-      },
-      { 
-        headerName: "NAME", 
-        field: 'CUST_NAME', 
-        width:250, 
-        suppressMenu: false, 
-        unSortIcon: true,
-        sortable: true,
-        tooltipField: "NAME", 
-        headerTooltip: "NAME" 
-      },
-      { 
-        headername: "TYPE",
-        field: "ACCOUNT_TYPE_CD",
-        filter: true,
-        rowGroup:true,
-        enableRowGroup: true,
-        width:75
-      },
-      { 
-        headername: "ADDRESS I",
-        filter: true,
-        sortable: true,
-        field: "ADD1",
-        width:150,
-        rowGroup:true
-      },
-      { 
-        headername: "ADDRESS II",
-        filter: true,
-        sortable: true,
-        field: "ADD2",
-        width:150
-      },
-      { 
-        headername: "MOBILE",
-        filter: true,
-        field: "MOBILE",
-        width:100
-      },
-      { 
-        headername: "EMAIL",
-        filter: true,
-        field: "EMAIL_ID",
-        width:200
-      },
-      { 
-        headername: "TAX",
-        filter: true,
-        field: "TAX_1_NO",
-        width:200
-      },
-      { 
-        headername: "PHONE",
-        filter: true,
-        field: "PHONE1",
-        width:200
-      }
-    ];
-
-    this.columnCustomeropeningDefs = [
-      { 
-        headername: "INVOICE",
-        sortable: true ,
-        field: "INV_NO", rowGroup: true,
-        width: 150
-      },
-      { 
-        headerName: "DESCRIPTION", 
-        field: 'DESCRIPTION', 
-        width:450, 
-        suppressMenu: false, 
-        unSortIcon: true,
-        sortable: true, 
-        tooltipField: "DESCRIPTION", 
-        headerTooltip: "DESCRIPTION" 
-      },
-      { 
-      //  headername: "INVOICE AMOUNT",
-       // field: "INV_AMOUNT",
-       /// filter: true,
-        //rowGroup:true,
-        //enableRowGroup: true,
-        //width:100
-        
-          headername: "INVOICE AMOUNT",
-          filter: true,
-          field: "INV_AMOUNT",
-          cellRenderer: (params:any) => {
-            var usdFormate = new Intl.NumberFormat('en-US', {
-              style: 'currency',
-              currency: 'BHD',
-              minimumFractionDigits: 3
-            });
-            return usdFormate.format(params.value);
-          },
-          width:200
-             
-      },
-      { 
-        headername: "INV_DATE",
-        cellRenderer: (data: any) => {
-          return moment(data.createdAt).format('DD/MM/YYYY')
-        },
-        filter: true,sortable: true,
-        field: "INV_DATE",
-        width:100
-      },
-      { 
-        headername: "REFNO",
-        filter: true,
-        sortable: true,
-        field: "REFNO",
-        width:150
-      },
-      { 
-        headername: "REFDATE",
-        filter: true,
-        field: "REFDT",
-        cellRenderer: (data: any) => {
-          return moment(data.createdAt).format('DD/MM/YYYY')
-        },
-        width:100
-      },
-      { 
-        headername: "REF_AMOUNT",
-        filter: true,
-        field: "REFAMOUNT",
-        cellRenderer: (params:any) => {
-          var usdFormate = new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'BHD',
-            minimumFractionDigits: 3
-          });
-          return usdFormate.format(params.value);
-        },
-        width:200
-      }
-    ];
-    
-    this.columnContactDefs = [
-      { 
-        headername: "Party ID",
-        sortable: true ,
-        field: "PARTY_ID",
-        width: 85
-      },
-      { 
-        headerName: "NAME", 
-        field: 'NAME', 
-        width:250, 
-        suppressMenu: false, 
-        unSortIcon: true,
-        sortable: true,
-        tooltipField: "NAME", 
-        headerTooltip: "NAME" 
-      },
-      { 
-        headername: "TYPE",
-        field: "TYPE",
-        filter: true,
-        rowGroup:true,
-        enableRowGroup: true,
-        width:75
-      },
-      { 
-        headername: "ADDRESS I",
-        filter: true,
-        sortable: true,
-        field: "ADD1",
-        width:150
-      },
-      { 
-        headername: "ADDRESS II",
-        filter: true,
-        sortable: true,
-        field: "ADD2",
-        width:150
-      },
-      { 
-        headername: "MOBILE",
-        filter: true,
-        field: "MOBILE",
-        width:100
-      },
-      { 
-        headername: "EMAIL",
-        filter: true,
-        field: "EMAIL_ID",
-        width:200
-      }
-    ];
-    
-    this.columnCustomerAgreementDefs = [
-      { 
-        headername: "Agreement Number",
-        sortable: true ,
-        field: "AGR_NO",
-        width: 85
-      },
-      { 
-        headerName: "NAME", 
-        field: 'AGR_CUST_NAME', 
-        width:250, 
-        suppressMenu: false, 
-        unSortIcon: true,
-        sortable: true,
-        tooltipField: "AGR_CUST_NAME", 
-        headerTooltip: "AGR_CUST_NAME" 
-      },
-      { 
-        headername: "Department Name",
-        field: "DEPT_NAME",
-        filter: true,
-        rowGroup:true,
-        enableRowGroup: true,
-        width:75
-      },
-      { 
-        headername: "ADDRESS I",
-        filter: true,
-        sortable: true,
-        field: "AGR_ADD1",
-        width:150
-      },
-      { 
-        headername: "ADDRESS II",
-        filter: true,
-        sortable: true,
-        field: "AGR_ADD2",
-        width:150
-      },
-      { 
-        headername: "MOBILE",
-        filter: true,
-        field: "AGR_PHONE1",
-        width:100
-      },
-      { 
-        headername: "Total",
-        filter: true,
-        field: "TOTAL",
-        width:200
-      }
-    ];
-    this.columnCustomerMemberDefs = [
-      { 
-        headername: "MEMBER NUMBER",
-        sortable: true ,
-        field: "MemberNo",
-        width: 85
-      },
-      { 
-        headerName: "NAME", 
-        field: 'NAME', 
-        width:250, 
-        suppressMenu: false, 
-        unSortIcon: true,
-        sortable: true,
-        tooltipField: "NAME", 
-        headerTooltip: "NAME" 
-      },
-      { 
-        headername: "APPROVDT",
-        field: "APPROVDT",
-        filter: true,
-        rowGroup:true,
-        enableRowGroup: true,
-        width:150
-      },
-      { 
-        headername: "EMPLOYEER",
-        filter: true,
-        sortable: true,
-        field: "EMPLOYER",
-        width:200
-      },
-      { 
-        headername: "CPR NO",
-        filter: true,
-        sortable: true,
-        field: "CPRNo",
-        width:150
-      },
-    ];
-  }
-
-  onGridCustomerReady(params: any){ 
-    this.gridApi= params.api;
-    this.gridColumnApi= params.columnApi;
-    this.financeservice.getCustomerList(String(this.currentYear)).subscribe((res: any) =>  {
-      this.customerlist=res.recordset;
-      params.api.setRowData(this.customerlist);
-    }, (error: any) => {
-      console.log(error);
     });
   }
 
@@ -421,15 +72,8 @@ export class CustomerprofileComponent implements OnInit {
       cname: new FormControl('', [ Validators.required]),
       cStatus: new FormControl('', [ Validators.required]),
       cAccountCategory: new FormControl('', [ Validators.required]),
-      cAccountGroup: new FormControl('', [ Validators.required]),
-      CAccountGroupName: new FormControl('', [ Validators.required]),
       cType: new FormControl('', [ Validators.required]),
-      cBranch: new FormControl('', [ Validators.required]),
-      cExternalCode: new FormControl('', [ Validators.required]),
-      cCreditPeriod: new FormControl('', [ Validators.required]),
-      cLimit: new FormControl('', [ Validators.required]),
       cCR: new FormControl('', [ Validators.required]),
-      cActive: new FormControl('', [ Validators.required]),
       cTaxNo: new FormControl('', [ Validators.required])
     });
   }
@@ -440,28 +84,10 @@ export class CustomerprofileComponent implements OnInit {
       cname: new FormControl('', [ Validators.required]),
       cStatus: new FormControl('', [ Validators.required]),
       cAccountCategory: new FormControl('', [ Validators.required]),
-      cAccountGroup: new FormControl('', [ Validators.required]),
-      CAccountGroupName: new FormControl('', [ Validators.required]),
       cType: new FormControl('', [ Validators.required]),
-      cBranch: new FormControl('', [ Validators.required]),
-      cExternalCode: new FormControl('', [ Validators.required]),
-      cCreditPeriod: new FormControl('', [ Validators.required]),
-      cLimit: new FormControl('', [ Validators.required]),
       cCR: new FormControl('', [ Validators.required]),
-      cActive: new FormControl('', [ Validators.required]),
       cTaxNo: new FormControl('', [ Validators.required])
     });
-  }
-
-  onGridCustomerParty(params: any){ 
-    this.gridApiCust= params.api;
-    this.gridColumnApiCust= params.columnApi;
-    this.financeservice.getCustomerParty(this.varpcode).subscribe((res: any) => {
-      this.CustPartyList = res.recordset;
-      params.api.setRowData(this.CustPartyList);
-    }, (err: any) => {
-      console.log(err);
-    })
   }
 
   getCustmerDetails(pcode: any){
@@ -478,88 +104,15 @@ export class CustomerprofileComponent implements OnInit {
       cname: data.CUST_NAME,
       cStatus: data.STATUS,
       cAccountCategory: data.ACCOUNT_CATEGORY_CD,
-      cAccountGroup: data.GLCODE,
-      CAccountGroupName: data.GLNAME,
       cType: data.ACCOUNT_TYPE_CD,
-      cBranch: data.BRANCH_ID,
-      cExternalCode: data.AFFECTING_TYPE_CODE,
-      cCreditPeriod: data.CREDITPERIOD,
-      cLimit: data.CR_LIMIT,
       cCR: data.CR_CPR,
       cTaxNo: data.TAX_1_NO  
     });
     this.varpcode = data.PCODE;
     this.getCustmerParty(this.varpcode);
     this.getCustmerInvoices(this.varpcode,this.varsfyear,this.varefyear);
-    this.getCustomerMember(this.varpcode)
-    this.getAggrementDetails(this.varpcode)
-    this.onGridCustomerMember(this.CustMemberList)
-  }
-
-  onGridCustomerMember(params: any){ 
-    this.gridApiCust= params.api;
-    this.gridColumnApiCust= params.columnApi;
-    this.financeservice.getCustomerMemner(this.varpcode).subscribe((res: any) =>  {
-      this.CustMemberList=res.recordset;
-      params.api.setRowData(this.CustMemberList);
-    }, (error: any) => {
-      console.log(error);
-    });
-  }
-
-  onGridCustomerAgreement(params: any){ 
-    this.gridApiCust= params.api;
-    this.gridColumnApiCust= params.columnApi;
-    this.financeservice.getCustomerMemner(this.varpcode).subscribe((res: any) =>  {
-      this.CustAgreementList=res.recordset;
-      params.api.setRowData(this.CustAgreementList);
-    }, (error: any) => {
-      console.log(error);
-    });
-  }
-
-  onGridCustomerOpeningDetail(params: any){ 
-    this.gridApiCust= params.api;
-    this.gridColumnApiCust= params.columnApi;
-    this.financeservice.getCustomerInvoices(this.varpcode, this.varsfyear, this.varefyear).subscribe((res: any) => {
-      this.CustInvoiceList = res.recordset;
-      params.api.setRowData(this.CustInvoiceList);
-      /*for(let i=0; i<this.CustInvoiceList.length; i++) {
-        var tempChartLbl: string = this.CustInvoiceList[i].INV_NO;
-        var tempChartVal: number = this.CustInvoiceList[i].INV_AMOUNT;
-        this.varInvChartLabels.push(tempChartLbl);
-        this.varInvChartValues.push(tempChartVal);
-      }*/
-    }, (err: any) => {
-      console.log(err);
-    })
-  }
-
-
-  onViewCellClicked(event: any){
-    if (event.column.colId =="CUST_NAME" ){
-      this.custForm.patchValue({
-        pcode: event.data.PCODE,
-        cname: event.data.CUST_NAME,
-        cStatus: event.data.STATUS,
-        cAccountCategory: event.data.ACCOUNT_CATEGORY_CD,
-        cAccountGroup: event.data.GLCODE,
-        CAccountGroupName: event.data.GLNAME,
-        cType: event.data.ACCOUNT_TYPE_CD,
-        cBranch: event.data.BRANCH_ID,
-        cExternalCode: event.data.AFFECTING_TYPE_CODE,
-        cCreditPeriod: event.data.CREDITPERIOD,
-        cLimit: event.data.CR_LIMIT,
-        cCR: event.data.CR_CPR,
-        cTaxNo: event.data.TAX_1_NO
-        
-      });
-      this.varpcode = event.data.PCODE;
-      this.getCustmerParty(this.varpcode);
-      this.getCustmerInvoices(this.varpcode,this.varsfyear,this.varefyear);
-      this.getCustomerMember(this.varpcode)
-      this.getAggrementDetails(this.varpcode)
-    }
+    this.getCustomerMember(this.varpcode);
+    this.getAggrementDetails(this.varpcode);
   }
 
   submitForm(){
@@ -587,26 +140,45 @@ export class CustomerprofileComponent implements OnInit {
           panelClass: ['sbBg']
         });
       })
-      
     }
-    
-  }
-
-  quickCustomerSearch() {
-    this.gridApi.setQuickFilter(this.searchValue);
   }
 
   getCustmerParty(pcode:string) {
-    this.financeservice.getCustomerParty(pcode).subscribe((res: any) => {
-      this.CustPartyList = res.recordset;
+    this.financeservice.getCustomerParty(pcode, String(this.currentYear)).subscribe((res: any) => {
+      this.custPartyList = res.recordset;
+      console.log(this.custPartyList);
+      this.contactListDataSource = new MatTableDataSource(this.custPartyList);
+      this.contactListDataSource.sort = this.sort;
+      this.contactListDataSource.paginator = this.paginator;
     }, (err: any) => {
       console.log(err);
     })
   }
 
   getCustomerMember(pcode:string) {
-    this.financeservice.getCustomerMemner(pcode).subscribe((res: any) => {
-      this.CustMemberList = res.recordset;
+    this.financeservice.getCustomerMemner(pcode, String(this.currentYear)).subscribe((res: any) => {
+      this.custMemberList = res.recordset;
+      console.log(this.custMemberList);
+      for (let i = 0; i < this.custMemberList.length; i++) {
+        if (this.custMemberList[i].MEMBTYPE === 'F') {
+          this.custMemberList[i].MEMBTYPE = 'Family';
+          this.memberListDataSource = new MatTableDataSource(this.custMemberList);
+          this.memberListDataSource.sort = this.sort;
+          this.memberListDataSource.paginator = this.paginator;
+        }
+        else if (this.custMemberList[i].MEMBTYPE === 'C') {
+          this.custMemberList[i].MEMBTYPE = 'Corporate';
+          this.memberListDataSource = new MatTableDataSource(this.custMemberList);
+          this.memberListDataSource.sort = this.sort;
+          this.memberListDataSource.paginator = this.paginator;
+        }
+        else if (this.custMemberList[i].MEMBTYPE === 'S') {
+          this.custMemberList[i].MEMBTYPE = 'Single';
+          this.memberListDataSource = new MatTableDataSource(this.custMemberList);
+          this.memberListDataSource.sort = this.sort;
+          this.memberListDataSource.paginator = this.paginator;
+        }
+      }
     }, (err: any) => {
       console.log(err);
     })
@@ -627,35 +199,18 @@ export class CustomerprofileComponent implements OnInit {
       console.log(error);
     }); 
   }
-
-  getBranchData() {
-    this.financeservice.getBranch().subscribe((res: any) =>  {
-      this.BranchArr=res.recordset;
-    }, (error: any) => {
-      console.log(error);
-    }); 
-  }
   
   getCustmerInvoices(pcode: string,sfyear: string,efyear: string) {
     this.financeservice.getCustomerInvoices(pcode, sfyear,efyear).subscribe((res: any) => {
-      this.CustInvoiceList = res.recordset;
-      /*this.varInvChartLabels = [];
-      this.varInvChartValues = [];
-      for(let i=0; i<this.CustInvoiceList.length; i++) {
-        var tempChartLbl: string = this.CustInvoiceList[i].INV_NO;
-        var tempChartVal: number = this.CustInvoiceList[i].INV_AMOUNT;
-        this.varInvChartLabels.push(tempChartLbl);
-        this.varInvChartValues.push(tempChartVal);
-      }*/
+      this.custInvoiceList = res.recordset;
     }, (err: any) => {
       console.log(err);
     })
   }
 
- 
   getAggrementDetails(pcode: string) {
     this.financeservice.getAggrementDetails(pcode).subscribe((res: any) => {
-      this.CustAgreementList = res.recordset;
+      this.custAgreementList = res.recordset;
     }, (err: any) => {
       console.log(err);
     })
@@ -759,7 +314,6 @@ export class CustomerprofileComponent implements OnInit {
       })
   }
 
-
   numToAlpha(num: number) {
     let alpha = '';
     for (; num >=0; num = parseInt((num / 26).toString(),10)-1){
@@ -783,7 +337,6 @@ export class CustomerprofileComponent implements OnInit {
   ngOnInit(): void {
     this.getAccountsCategoryData();
     this.getAccountsTypeData();
-    this.getBranchData();
     this.getCustomerExcel();
     this.getCustomerDetails(this.route.snapshot.params.id);
   }
@@ -793,27 +346,40 @@ export class CustomerprofileComponent implements OnInit {
   }
 
   getCustomerDetails(value: any) {
-    this.financeservice.getCustomerBypcode(value).subscribe((res: any) => {
-      this.selectCustomerDetail(res.recordset[0])
+    this.varpcode = value
+    this.financeservice.getCustomerBypcode(this.varpcode).subscribe((res: any) => {
+      this.selectCustomerDetail(res.recordset[0]);
     }, (err: any) => {
       console.log(err);
     })
   }
+
   selectCustomerDetail(data: any) {
     this.custForm.patchValue({
       pcode: data.PCODE,
       cname: data.CUST_NAME,
       cStatus: data.STATUS,
       cAccountCategory: data.ACCOUNT_CATEGORY_CD,
-      cAccountGroup: data.GLCODE,
-      CAccountGroupName: data.GLNAME,
       cType: data.ACCOUNT_TYPE_CD,
-      cBranch: data.BRANCH_ID,
-      cExternalCode: data.AFFECTING_TYPE_CODE,
-      cCreditPeriod: data.CREDITPERIOD,
-      cLimit: data.CR_LIMIT,
       cCR: data.CR_CPR,
       cTaxNo: data.TAX_1_NO
+    });
+    this.varpcode = data.PCODE;
+    this.getCustmerParty(this.varpcode);
+    this.getCustmerInvoices(this.varpcode,this.varsfyear,this.varefyear);
+    this.getCustomerMember(this.varpcode);
+    this.getAggrementDetails(this.varpcode);
+  }
+
+  public gotoContactDetails(url, id) {
+    var myurl = `${url}/${id}`;
+    this.router.navigateByUrl(myurl).then(e => {
+    });
+  }
+
+  public gotoMembersDetails(url, id) {
+    var myurl = `${url}/${id}`;
+    this.router.navigateByUrl(myurl).then(e => {
     });
   }
 }

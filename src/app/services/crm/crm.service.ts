@@ -103,12 +103,10 @@ export class CrmService {
     return this.http.get(this.url + '/coa/getbanknamefromid/'+ bankid)
   }
 
-
   deleteTran(trnno: string,year: string) {
     return this.http.get(this.url + '/coa/deleteTran/' + trnno + '/' + year)
   }  
 
- 
   getnotofExpenseMaster(expno: string) {
     return this.http.get(this.url + '/coa/getnotExpenseMaster/' + expno)
   } 
@@ -116,7 +114,6 @@ export class CrmService {
   getAllDepartmentMaster() {
     return this.http.get(this.url + '/coa/getAllDepartmentMaster')
   } 
-  
   
   searchExpenseMaster(expno: string) {
     return this.http.get(this.url + '/coa/searchExpenseMaster/' + expno)
@@ -149,14 +146,6 @@ export class CrmService {
   searchSoMaster(sono: any){
     return this.http.get(this.url + '/crm/searchSOMaster/' + sono)
   }
-
-  /*getSoDetails(sono: any){
-    return this.http.get(this.url + '/crm/getSoDetails/' + sono)
-  }
-
-  getSOmaster(sono: any){
-    return this.http.get(this.url + '/crm/getSOMaster/' + sono)
-  }*/
 
   getagreementmaster(argno: any){
     return this.http.get(this.url + '/coa/getAgreementsMaster/' + argno)

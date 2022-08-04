@@ -77,7 +77,6 @@ export class MembersListComponent implements OnInit {
         });
       }
 
-
       this.memberListDataSource = new MatTableDataSource(this.memberList);
       this.memberListDataSource.sort = this.sort;
       this.memberListDataSource.paginator = this.paginator;
@@ -99,14 +98,11 @@ export class MembersListComponent implements OnInit {
   }
 
   quickMemberSearch() {
-
     this.memberListDataSource.filter = this.searchValue.trim().toLowerCase();
   }
 
   toggleTableRows() {
-
     this.isTableExpanded = !this.isTableExpanded;
-
     this.memberListDataSource.data.forEach((row: any) => {
       row.isExpanded = this.isTableExpanded;
     })

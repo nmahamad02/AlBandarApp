@@ -425,10 +425,11 @@ export class AgreementComponent implements OnInit {
   } 
 
   selectMember(obj: any) {
-    this.getRefData(this.membArr[this.selectedRowIndex].PCODE, this.refIndex);
+    console.log(obj);
+    this.getRefData(obj.PCODE, this.refIndex);
     const rowData: any = {
-      srvMember: this.membArr[this.selectedRowIndex].MemberNo,
-      srvMemberName: this.membArr[this.selectedRowIndex].NAME
+      srvMember: obj.MemberNo,
+      srvMemberName: obj.NAME
     }
     this.srvItem.at(this.memberIndex).patchValue(rowData);
     let dialogRef = this.dialog.closeAll();

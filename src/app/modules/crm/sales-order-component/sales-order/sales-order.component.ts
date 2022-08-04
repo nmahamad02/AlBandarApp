@@ -21,6 +21,8 @@ export class SalesOrderComponent implements OnInit {
   
   SOArr: any[] = [];
   agrArr: any[] = [];
+  invArr: any[] = [];
+
   selectedRowIndex: any = 0;
   membArr: any[] = [];
   partyArr: any[] = [];
@@ -39,6 +41,8 @@ export class SalesOrderComponent implements OnInit {
   docArg: any;
   docSONo: any;
   docSO: any;
+  docInvNo: any;
+  docInv: any;
   taxArr: any;
   discount: number;
   grossvalue: number;
@@ -50,8 +54,6 @@ export class SalesOrderComponent implements OnInit {
   mPartyAdd1: string = "";
   mPartyAdd2: string = "";
   mPartyAdd3: string = "";
-  mPartyEmail: string = "";
-  mPartyTelephone: string = "";
   mAgrTotal = 0;
   mAgrVAT = 0;
   mAgrDisc = 0;
@@ -66,6 +68,7 @@ export class SalesOrderComponent implements OnInit {
 
   @ViewChild('SOLookUpDialouge') SOLookUpDialouge!: TemplateRef<any>;
   @ViewChild('AgreementLookUpDialouge') AgreementLookUpDialouge!: TemplateRef<any>;
+  @ViewChild('InvoiceLookUpDialouge') InvoiceLookUpDialouge!: TemplateRef<any>;
 
   SalesOrderDisplayedColumns: string[] = ['sono', 'pcode', 'custname','total'];
   SalesOrderDataSource = new MatTableDataSource(this.SOArr);
@@ -73,10 +76,14 @@ export class SalesOrderComponent implements OnInit {
   AgreementDisplayedColumns: string[] = ['agrno', 'sono', 'pcode', 'custname','total'];
   AgreementDataSource = new MatTableDataSource(this.agrArr);
 
+  InvoiceDisplayedColumns: string[] = ['invno', 'sono', 'date', 'custname','total'];
+  InvoiceDataSource = new MatTableDataSource(this.invArr);
+
   constructor(private crmservice: CrmService,private dialog: MatDialog,private financeService: FinanceService,private lookupservice:LookupService,private dataSharing: DataSharingService, private route: ActivatedRoute, private router: Router) {
     this.salesOrderForm = new FormGroup({
       agrNbr: new FormControl('', [ Validators.required]),
       soNbr: new FormControl('', [ Validators.required]),
+      invNbr: new FormControl('', [ Validators.required]),
       sodate: new FormControl('', [ Validators.required]),
       party: new FormControl('', [ Validators.required]),
       customerCode: new FormControl('', [ Validators.required]),
@@ -108,8 +115,6 @@ export class SalesOrderComponent implements OnInit {
     this.mPartyAdd1 = "";
     this.mPartyAdd2 = "";
     this.mPartyAdd3 = "";
-    this.mPartyEmail = "";
-    this.mPartyTelephone = "";
     this.salesOrderForm = new FormGroup({
       agrNbr: new FormControl('', [ Validators.required]),
       soNbr: new FormControl('', [ Validators.required]),
@@ -159,6 +164,7 @@ export class SalesOrderComponent implements OnInit {
       this.salesOrderForm.patchValue({
         agrNbr: salesOrder.AGR_NO,
         soNbr: salesOrder.SONO,
+        invNbr: salesOrder.REFNO,
         sodate: date,
         party: salesOrder.PARTY_ID,
         customerCode: salesOrder.PCODE,
@@ -201,6 +207,62 @@ export class SalesOrderComponent implements OnInit {
     })
   }
 
+  lookupInvoice(value: string) {
+    this.selectedRowIndex = 0;
+    let dialogRef = this.dialog.open(this.InvoiceLookUpDialouge);    
+    this.financeService.searchSales(value).subscribe((res: any) => {
+      this.invArr = res.recordset;
+      this.InvoiceDataSource = new MatTableDataSource(this.invArr);
+    }, (err: any) => {
+    })
+  }
+
+  getInvoice(invno: any) {
+      this.financeService.getSales(invno).subscribe((res: any) => {
+        this.selectSalesOrder(res.recordset[0]);
+      }, (err: any) => {
+        
+    })
+  }
+
+  selectInvoice(inv: any){
+    this.getSalesorder(inv.SONO);
+  }
+
+  convertToInvoice() {
+    const soData = this.salesOrderForm.value;
+    const year = String(this.mCYear);
+    this.financeService.getSales(soData.invNo).subscribe((res: any) => {
+      this.financeService.updateSales(year,soData.invNbr,soData.sodate,soData.party,soData.customerCode, soData.name, String(this.mAgrGTotal), String(this.mAgrDisc), String(this.mAgrVAT), String(this.mAgrTotal), soData.soNbr, soData.subject, soData.remarks, 'DBA', this.mCurDate).subscribe((resp: any) => {
+        console.log(resp);
+        this.financeService.updateOutstanding(year, soData.invNbr, soData.sodate, soData.customerCode, 'INV', String(this.mAgrGTotal), soData.subject, soData.remarks).subscribe((respo: any) => {
+          console.log(respo)
+        })
+      })
+    }, (err: any) => {
+      this.financeService.getDocForInv(year).subscribe((resp: any) => {
+        const yearStr = String(resp.recordset[0].CYEAR).substring(2);
+        this.docInvNo = resp.recordset[0].FIELD_VALUE_NM + 1;
+        this.docInv = 'INV' + yearStr + '-' + this.docInvNo.toString();
+        this.financeService.postSales(year,this.docInv,this.mCurDate,soData.party,soData.customerCode, soData.name, String(this.mAgrGTotal), String(this.mAgrDisc), String(this.mAgrVAT), String(this.mAgrTotal), soData.soNbr, soData.subject, soData.remarks, 'DBA', this.mCurDate).subscribe((resp: any) => {
+          this.financeService.postOutstanding(year, this.docInv, this.mCurDate, soData.customerCode, 'INV', String(this.mAgrGTotal), soData.subject, soData.remarks).subscribe((respo: any) => {
+            console.log(respo);
+            this.refreshForm();
+            this.financeService.updateDocForInv(this.docInvNo, String(this.mCYear)).subscribe((res: any) => {
+              this.financeService.setInvoice(soData.agrNbr, soData.soNbr, this.docInv).subscribe((respos: any) => {
+                this.getSalesorder(soData.soNbr);
+              })
+            }, (err: any) => {
+              console.log(err);
+            });
+          })
+        });
+      }, (error: any) => {
+        console.log(error);
+      })
+    });
+  }
+
   lookupAgreement(value: string) {
     this.selectedRowIndex = 0;
     let dialogRef = this.dialog.open(this.AgreementLookUpDialouge);    
@@ -230,6 +292,7 @@ export class SalesOrderComponent implements OnInit {
     this.salesOrderForm.patchValue({
       agrNbr: salesOrder.QUOTNO,
       soNbr: salesOrder.SONO,
+      invNbr: salesOrder.REFNO,
       sodate: date,
       party: salesOrder.PARTY_ID,
       customerCode: salesOrder.PCODE,
@@ -365,6 +428,10 @@ export class SalesOrderComponent implements OnInit {
       if(index >= 0 && index <= this.agrArr.length - 1){
         this.selectedRowIndex = index;
       } 
+    } else if (type === "invoice") {
+      if(index >= 0 && index <= this.invArr.length - 1){
+        this.selectedRowIndex = index;
+      } 
     }
   }
 
@@ -401,6 +468,14 @@ export class SalesOrderComponent implements OnInit {
     const soData = this.salesOrderForm.value;
     var id = soData.agrNbr;
     var myurl = `/crm/agreements/details/${id}`;
+    this.router.navigateByUrl(myurl).then(e => {
+    });
+  }
+
+  public goToInvoice() {
+    const soData = this.salesOrderForm.value;
+    var id = soData.invNbr;
+    var myurl = `/crm/invoice/details/${id}`;
     this.router.navigateByUrl(myurl).then(e => {
     });
   }

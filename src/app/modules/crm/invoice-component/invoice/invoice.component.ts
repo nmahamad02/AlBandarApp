@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
@@ -6,32 +6,32 @@ import { GridOptions } from 'ag-grid-community';
 import { CrmService } from 'src/app/services/crm/crm.service';
 import { DataSharingService } from 'src/app/services/data-sharing/data-sharing.service';
 import { LookupService } from 'src/app/services/lookup/lookup.service';
+import {animate, state, style, transition, trigger} from '@angular/animations';
+import { FinanceService } from 'src/app/services/finance/finance.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { Console } from 'console';
 
 @Component({
   selector: 'app-invoice',
   templateUrl: './invoice.component.html',
-  styleUrls: ['./invoice.component.scss']
+  styleUrls: ['./invoice.component.scss'],
 })
+
 export class InvoiceComponent implements OnInit {
-
-  inoviceForm: FormGroup;
-  invoiceDetail: FormArray = new FormArray([]);
-  gridOptions!: Partial<GridOptions>;  
-  invoiceFooter: FormGroup;
-  columndef : any;
-  gridapi : any;
-  gridColumnApi: any;
-  currentYear = new Date().getFullYear()
-  invoiceList: any;
   searchValue: any;
-  rowStyle!: { background: string; };
-  selectedRowIndex: any = 0;
-  partyArr: any[] = [];
+  isTableExpanded = false;
+  invoiceForm: FormGroup;
   
-  invIndex: number = 0;
+  agrDetArr: any[] = [];
+  SOArr: any[] = [];
+  invArr: any[] = [];
 
-  invReportApiUrl: string = "";
-  invReportName: string = "";
+  selectedRowIndex: any = 0;
+
+  docInvNo: any;
+  docInv: any;
 
   mPartyName: string = "";
   mPartyId: string = "";
@@ -39,160 +39,278 @@ export class InvoiceComponent implements OnInit {
   mPartyAdd1: string = "";
   mPartyAdd2: string = "";
   mPartyAdd3: string = "";
-  mPartyEmail: string = "";
-  mPartyTelephone: string = "";
-  refArr: any[] = [];
+  mAgrNo: string = "";
+  mInvTotal = 0;
+  mInvVAT = 0;
+  mInvDisc = 0;
+  mInvGTotal = 0;
+
+  utc = new Date();
+  mCurDate = this.formatDate(this.utc);
+  mCYear = new Date().getFullYear();
+
+  invReportApiUrl: string = "";
+  invReportName: string = "";
+
+  @ViewChild('SOLookUpDialouge') SOLookUpDialouge!: TemplateRef<any>;
+  @ViewChild('InvoiceLookUpDialouge') InvoiceLookUpDialouge!: TemplateRef<any>;
   
-  @ViewChild('partyLookupDialog') partyLookupDialog!: TemplateRef<any>;
-  @ViewChild('RefLookupDialog') RefLookupDialog!: TemplateRef<any>;
+  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: false }) sort: MatSort;
+  @ViewChild('TABLE') table: ElementRef;
 
-  partyDisplayedColumns: string[] = [ 'pcode', 'cust_name', 'party_id', 'name', 'add1', 'add2', 'add3', 'phone1', 'mobile', 'email_id'];
-  partyDataSource = new MatTableDataSource(this.partyArr);
+  SalesOrderDisplayedColumns: string[] = ['sono', 'pcode', 'custname','refno', 'agrno', 'total'];
+  SalesOrderDataSource = new MatTableDataSource(this.SOArr);
 
-  referenceDisplayedColumns: string[] = ['refid', 'name', 'desc', 'type'];
-  referenceDataSouuce = new MatTableDataSource(this.refArr);
+  InvoiceDisplayedColumns: string[] = ['invno', 'sono', 'date', 'custname','total'];
+  InvoiceDataSource = new MatTableDataSource(this.invArr);
 
-  constructor(private crmservice: CrmService, private dataSharing: DataSharingService,private dialog: MatDialog,private lookupservice: LookupService){ 
-    this.inoviceForm = new FormGroup({
-      invNO: new FormControl('', [ Validators.required]),
+  BlaDisplayedColumns: string[] = [ "desc", "name", "fromdate", "todate", "amount"];
+  BlaListDataSource = new MatTableDataSource(this.agrDetArr);
+
+  constructor(private crmservice: CrmService,private dialog: MatDialog,private financeService: FinanceService,private lookupservice:LookupService,private dataSharing: DataSharingService, private route: ActivatedRoute, private router: Router) {
+    this.invoiceForm = new FormGroup({
+      invNo: new FormControl('', [ Validators.required]),
+      soNo: new FormControl('', [ Validators.required]),
+      agrNo: new FormControl('', [ Validators.required]),
       invDate: new FormControl('', [ Validators.required]),
-      invBillTo: new FormControl('', [ Validators.required]),
-      invCustType: new FormControl('', [ Validators.required]),
-      invArgNO: new FormControl('', [ Validators.required]),
-      invName: new FormControl('', [ Validators.required]),
-      InvContactName: new FormControl('', [ Validators.required]),
-      invContactNo: new FormControl('', [ Validators.required]),
-      invArgMasterNo: new FormControl('', [ Validators.required]),
-      invEmailAdd: new FormControl('', [ Validators.required]),
-      invSubject: new FormControl('', [ Validators.required]),
-      invitemArray: new FormArray([])
+      subject: new FormControl('', [ Validators.required]),
+      total: new FormControl('', [ Validators.required]),
+      gtotal: new FormControl('', [ Validators.required]),
+      discount: new FormControl('', [ Validators.required]),
+      vat: new FormControl('', [ Validators.required]),
+      custname: new FormControl('', [ Validators.required]),
+      pCode: new FormControl('', [ Validators.required]),
+      add1: new FormControl('', [ Validators.required]),
+      add2: new FormControl('', [ Validators.required]),
+      add3: new FormControl('', [ Validators.required]),
+      phoneNo: new FormControl('', [ Validators.required]),
+      remarks: new FormControl('', [ Validators.required]),
     });
-    const invoicegrid = new FormGroup({
-      invCode: new FormControl('', [ Validators.required]),
-      invDesc: new FormControl('', [ Validators.required]),
-      invQty: new FormControl('', [ Validators.required]),
-      invUOM: new FormControl('', [ Validators.required]),
-      invAmt: new FormControl('', [ Validators.required]),
-      invDisc: new FormControl('', [ Validators.required]),
-      //srvArgItemArr: new FormArray([]),
-      invDiscAmt: new FormControl('', [ Validators.required]),
-      invNetAmt: new FormControl('', [ Validators.required]),
-      invVatType: new FormControl('', [ Validators.required]),
-      invVatAmt: new FormControl('', [ Validators.required]),
-      invVatAmtincl: new FormControl('', [ Validators.required]),
-      invDept: new FormControl('', [ Validators.required]),
-      invArg: new FormControl('', [ Validators.required]),
-      invCostCenter: new FormControl('', [ Validators.required]),
-    });
-    this.invItem.push(invoicegrid);
+  } 
 
-    this.invoiceFooter = new FormGroup({
-      siIssueRecievedBy: new FormControl('', [ Validators.required]),
-      siIssueIssuedBy: new FormControl('', [ Validators.required]),
-      siIssueApprovedBy: new FormControl('', [ Validators.required]),
+  refreshForm() {
+    this.invArr = [];
+    this.mInvTotal = 0;
+    this.mInvVAT = 0;
+    this.mInvDisc = 0;
+    this.mInvGTotal = 0;
+    this.mAgrNo = "";
+    this.mPartyName = "";
+    this.mPartyPhone = "";
+    this.mPartyId = "";
+    this.mPartyAdd1 = "";
+    this.mPartyAdd2 = "";
+    this.mPartyAdd3 = "";
+    this.invoiceForm = new FormGroup({
+      invNo: new FormControl('', [ Validators.required]),
+      soNo: new FormControl('', [ Validators.required]),
+      agrNo: new FormControl('', [ Validators.required]),
+      invDate: new FormControl('', [ Validators.required]),
+      total: new FormControl('', [ Validators.required]),
+      gtotal: new FormControl('', [ Validators.required]),
+      vat: new FormControl('', [ Validators.required]),
+      custname: new FormControl('', [ Validators.required]),
+      discount: new FormControl('', [ Validators.required]),
+      pCode: new FormControl('', [ Validators.required]),
+      add1: new FormControl('', [ Validators.required]),
+      add2: new FormControl('', [ Validators.required]),
+      add3: new FormControl('', [ Validators.required]),
+      phoneNo: new FormControl('', [ Validators.required]),
+      remarks: new FormControl('', [ Validators.required]),
+      subject: new FormControl('', [ Validators.required]),
     });
-    this.columndef = [
-      { 
-        headername: "Proudct ID",
-        sortable: true,
-        field: "PCODE",
-        width: 85
-      },
-      { 
-        headerName: "NAME", 
-        field: 'CUST_NAME', 
-        width:250, 
-        suppressMenu: false, 
-        unSortIcon: true,
-        sortable: true,
-        tooltipField: "NAME", 
-        headerTooltip: "NAME" 
-      },
-      { 
-        headername: "Mobile",
-        field: "MOBILE",
-        filter: true,
-        rowGroup:true,
-        enableRowGroup: true,
-        width:75
-      },
-    ];
-  }
-  onGridCustomerReady(params: any){ 
-    this.gridapi= params.api;
-    this.gridColumnApi= params.columnApi;
-    this.crmservice.getCustomerAcc(String(this.currentYear)).subscribe((res: any) =>  {
-      console.log(this.invoiceList);
-      this.invoiceList=res.recordset;
-      params.api.setRowData(this.invoiceList);
-      console.log(this.invoiceList);
-    }, (error: any) => {
-      console.log(error);
-    });
-  }
-  quickInvoiceSearch() {
-    this.gridapi.setQuickFilter(this.searchValue);
   }
 
-  ngOnInit(): void {
-    this.invReportApiUrl = "crm/getCustomerAcc/" + this.currentYear;
-    this.invReportName = "invoicereport.rdlx-json";
-  }
-
-  lookUpParty(value: string) {
+  lookupSalesorder(value: string) {
     this.selectedRowIndex = 0;
-    this.crmservice.getPartyFromName(value).subscribe((res: any) => {
-      console.log(res);
-      this.partyArr = res.recordset;
-      this.partyDataSource = new MatTableDataSource(this.partyArr);
-      console.log(this.partyArr[0]);
-      let dialogRef = this.dialog.open(this.partyLookupDialog);
+    let dialogRef = this.dialog.open(this.SOLookUpDialouge);    
+    this.financeService.searchSalesOrderMaster(value).subscribe((res: any) => {
+      console.log(this.SOArr);
+      this.SOArr = res.recordset;
+      this.SalesOrderDataSource = new MatTableDataSource(this.SOArr);
     }, (err: any) => {
-      console.log(err);
     })
-    //this.selectParty(this.partyArr[0]);
   }
 
-  highlight(type: string, index: number){
-    console.log(index)
-    if(type === "party"){
-      if(index >= 0 && index <= this.partyArr.length - 1){
-        this.selectedRowIndex = index;
-      }
-    }else if (type == "ref"){
-      if(index >= 0 && index <= this.partyArr.length - 1){
-        this.selectedRowIndex = index;
-      }
-    }
-  }
-
-  selectRef(obj: any){
-    console.log(obj.PCODE);
-    // this.getRefData(obj.PCODE, index);
-    const rowData: any = {
-      invCode: obj.PCODE,
-      invDesc: obj.NAME
-    }
-    this.invItem.at(this.invIndex).patchValue(rowData);
-    let dialogRef = this.dialog.closeAll();
-  }
-
-  selectParty(obj: any){
-    console.log(obj);
-    this.inoviceForm.patchValue({
-      invContactNo : obj.pcode,
-      InvContactName: obj.name
+  getSalesorder(sono: any) {
+      this.financeService.getSalesOrderMaster(sono).subscribe((res: any) => {
+        console.log(res.recordset[0])
+        this.getInvoiceFromSalesOrder(res.recordset[0]);
+      }, (err: any) => {
+        
     })
-    this.mPartyName = obj.cust_name;
-    this.mPartyAdd1 = obj.add1;
-    this.mPartyAdd2 = obj.add2;
-    this.mPartyAdd3 = obj.add3;
-    this.mPartyPhone = obj.phone1;
-    this.mPartyEmail = obj.email_id;
-    this.mPartyTelephone = obj.mobile;
-    let dialogRef = this.dialog.closeAll();
   }
 
+  getInvoiceFromSalesOrder(salesOrder: any) {
+    let dialogRef = this.dialog.closeAll();
+    this.financeService.getSales(salesOrder.REFNO).subscribe((res: any) => {
+      this.selectInvoice(res.recordset[0]);
+    }, (err: any) => {
+      const date = this.formatDate(salesOrder.SODATE);
+      this.mAgrNo = salesOrder.QUOTNO;
+      this.mPartyName = salesOrder.CUST_NAME;
+      this.mPartyId = salesOrder.PCODE;
+      this.mPartyPhone = salesOrder.CUST_PHONE1;
+      this.mPartyAdd1 = salesOrder.CUST_ADD1;
+      this.mPartyAdd2 = salesOrder.CUST_ADD2;
+      this.mPartyAdd3 = salesOrder.CUST_ADD3;
+      this.mInvTotal = salesOrder.TOTAL;
+      this.mInvVAT = salesOrder.VATAMT;
+      this.mInvDisc = salesOrder.DISCOUNT;
+      this.mInvGTotal = salesOrder.GTOTAL;
+      this.invoiceForm.patchValue({
+        soNo: salesOrder.SONO,
+        agrNo: salesOrder.QUOTNO,
+        invDate: date,
+        total: salesOrder.AMOUNT,
+        gtotal: salesOrder.GROSSAMOUNT,
+        discount: salesOrder.DISCOUNT,
+        vat: salesOrder.TAX_1_AMT,
+        custname: salesOrder.CUST_NAME,
+        pCode: salesOrder.PCODE,
+        add1: salesOrder.CUST_ADD1,
+        add2: salesOrder.CUST_ADD2,
+        add3: salesOrder.CUST_ADD3,
+        phoneNo: salesOrder.CUST_PHONE1,
+        remarks: salesOrder.REMARKS,
+        subject: salesOrder.SUBJECT
+      });
+      this.crmservice.getagreementDetails(this.mAgrNo).subscribe((res: any) => {
+        this.agrDetArr = res.recordset;
+        console.log(this.agrDetArr);
+        for(let i=0; i<res.recordset.length; i++) {
+          this.agrDetArr[i].FROMDT = this.formatDate(this.agrDetArr[i].FROMDT);
+          this.agrDetArr[i].TODT = this.formatDate(this.agrDetArr[i].TODT);          
+          this.crmservice.getAgreementBLA(this.mAgrNo, res.recordset[i].MEMBERCODE).subscribe((resp: any) => {
+            const blA = resp.recordset;
+            this.agrDetArr[i].blAArr = blA;
+          })
+        }
+        this.BlaListDataSource = new MatTableDataSource(this.agrDetArr);
+        this.BlaListDataSource.sort = this.sort;
+        this.BlaListDataSource.paginator = this.paginator;
+        console.log(this.agrDetArr);
+        this.toggleTableRows();
+      })
+    })
+  }
+
+  getInvoice(invno: any) {
+    this.financeService.getSales(invno).subscribe((res: any) => {
+      console.log(res.recordset[0])
+      this.selectInvoice(res.recordset[0]);
+    }, (err: any) => {
+      
+  })
+  }
+
+  lookupInvoice(value: string) {
+    this.selectedRowIndex = 0;
+    let dialogRef = this.dialog.open(this.InvoiceLookUpDialouge);    
+    this.financeService.searchSales(value).subscribe((res: any) => {
+      console.log(this.invArr)
+      this.invArr = res.recordset;
+      this.InvoiceDataSource = new MatTableDataSource(this.invArr);
+    }, (err: any) => {
+    })
+  }
+
+  selectInvoice(invoice: any) {
+    let dialogRef = this.dialog.closeAll();
+    const date = this.formatDate(invoice.TRN_DATE);
+    this.financeService.getSalesOrderMaster(invoice.REF_NO).subscribe((res: any) => {
+      console.log(res.recordset[0]);
+      this.mAgrNo = res.recordset[0].QUOTNO;
+      this.mPartyName = invoice.CUST_NAME;
+      this.mPartyId = res.recordset[0].PCODE;
+      this.mPartyPhone = res.recordset[0].CUST_PHONE1;
+      this.mPartyAdd1 = res.recordset[0].CUST_ADD1;
+      this.mPartyAdd2 = res.recordset[0].CUST_ADD2;
+      this.mPartyAdd3 = res.recordset[0].CUST_ADD3;
+      this.mInvTotal = invoice.AMOUNT;
+      this.mInvVAT = invoice.TAX_1_AMT;
+      this.mInvDisc = invoice.DISCOUNT;
+      this.mInvGTotal = invoice.GROSSAMOUNT;
+      this.invoiceForm.patchValue({
+        invNo: invoice.TRN_NO,
+        soNo: invoice.REF_NO,
+        agrNo: res.recordset[0].QUOTNO,
+        invDate: date,
+        total: invoice.AMOUNT,
+        gtotal: invoice.GROSSAMOUNT,
+        discount: invoice.DISCOUNT,
+        vat: invoice.TAX_1_AMT,
+        custname: invoice.CUST_NAME,
+        pCode: res.recordset[0].PCODE,
+        add1: res.recordset[0].CUST_ADD1,
+        add2: res.recordset[0].CUST_ADD2,
+        add3: res.recordset[0].CUST_ADD3,
+        phoneNo: res.recordset[0].CUST_PHONE1,
+        remarks: invoice.REMARKS,
+        subject: invoice.SUBJECT
+      })
+      this.crmservice.getagreementDetails(this.mAgrNo).subscribe((res: any) => {
+        this.agrDetArr = res.recordset;
+        console.log(this.agrDetArr)
+        for(let i=0; i<res.recordset.length; i++) {
+          this.agrDetArr[i].FROMDT = this.formatDate(this.agrDetArr[i].FROMDT);
+          this.agrDetArr[i].TODT = this.formatDate(this.agrDetArr[i].TODT);          
+          this.crmservice.getAgreementBLA(this.mAgrNo, res.recordset[i].MEMBERCODE).subscribe((resp: any) => {
+            const blA = resp.recordset;
+            this.agrDetArr[i].blAArr = blA;
+          })
+        }
+        this.BlaListDataSource = new MatTableDataSource(this.agrDetArr);
+        this.BlaListDataSource.sort = this.sort;
+        this.BlaListDataSource.paginator = this.paginator;
+        console.log(this.agrDetArr);
+        this.toggleTableRows();
+      })
+    }, (err: any) => {
+      
+    })
+  }
+  
+  ngOnInit(): void {
+    this.getInvoice(this.route.snapshot.params.id);
+  }
+
+  onFormSubmit() {
+    const invData = this.invoiceForm.value;
+    const year = String(this.mCYear);
+    console.log(invData);
+    this.financeService.getSales(invData.invNo).subscribe((res: any) => {
+      this.financeService.updateSales(year,invData.invNbr,invData.sodate,invData.pCode,invData.pCode, invData.custname, String(this.mInvGTotal), String(this.mInvDisc), String(this.mInvVAT), String(this.mInvTotal), invData.soNo, invData.subject, invData.remarks, 'DBA', this.mCurDate).subscribe((resp: any) => {
+        console.log(resp);
+        this.financeService.updateOutstanding(year, invData.invNbr, invData.sodate, invData.pCode,'INV', String(this.mInvGTotal), invData.subject, invData.remarks).subscribe((respo: any) => {
+          console.log(respo)
+        })
+      })
+    }, (err: any) => {
+      this.financeService.getDocForInv(year).subscribe((resp: any) => {
+        const yearStr = String(resp.recordset[0].CYEAR).substring(2);
+        this.docInvNo = resp.recordset[0].FIELD_VALUE_NM + 1;
+        this.docInv = 'INV' + yearStr + '-' + this.docInvNo.toString();
+        this.financeService.postSales(year,this.docInv,this.mCurDate,invData.pCode,invData.pCode, invData.custname, String(this.mInvGTotal), String(this.mInvDisc), String(this.mInvVAT), String(this.mInvTotal), invData.soNo, invData.subject, invData.remarks, 'DBA', this.mCurDate).subscribe((resp: any) => {
+          this.financeService.postOutstanding(year, this.docInv, this.mCurDate, invData.pCode, 'INV', String(this.mInvGTotal), invData.subject, invData.remarks).subscribe((respo: any) => {
+            console.log(respo);
+            this.refreshForm();
+            this.financeService.updateDocForInv(this.docInvNo, String(this.mCYear)).subscribe((res: any) => {
+              this.financeService.setInvoice(invData.agrNo, invData.soNo, this.docInv).subscribe((respos: any) => {
+                this.getSalesorder(invData.soNo);
+              })
+            }, (err: any) => {
+              console.log(err);
+            });
+          })
+        });
+      }, (error: any) => {
+        console.log(error);
+      })
+    });
+  }
+  
   arrowDownEvent(type: string, index: number){
     this.highlight(type, ++index);
   }
@@ -200,53 +318,7 @@ export class InvoiceComponent implements OnInit {
   arrowUpEvent(type: string, index: number){
     this.highlight(type, --index);
   }
-
-  lookUpReference(index: number) {
-    this.selectedRowIndex = 0;
-    this.invIndex = index;
-    let dialogRef = this.dialog.open(this.RefLookupDialog);
-      this.lookupservice.searchReference().subscribe((res: any) => {
-        this.refArr = res.recordset;
-        this.referenceDataSouuce = new MatTableDataSource(this.refArr);
-      }, (err: any) => {
-        console.log(err);
-      })
-  }
-
-  getRefData(pcode: any,index: any){
-    console.log(pcode);    
-    this.lookupservice.getRefcode(pcode).subscribe((res: any) => {
-      const rowData: any = {
-        invCode: res.recordset[0].PCODE,
-        invDesc: res.recordset[0].NAME
-      }
-      this.invItem.at(index).patchValue(rowData);
-      console.log(res);
-    }, (err: any) => {
-      console.log(err);
-    })
-  }
-
-  addUnit() {
-    const InoviceIssue = new FormGroup({
-      siItemCode: new FormControl('', [ Validators.required]),
-      siDesc: new FormControl('', [ Validators.required]),
-      siQty: new FormControl('', [ Validators.required]),
-      siUoM: new FormControl('', [ Validators.required]),
-      siCP: new FormControl('', [ Validators.required]),
-      siSP: new FormControl('', [ Validators.required]),
-      siDept: new FormControl('', [ Validators.required]),
-      siJob: new FormControl('', [ Validators.required]),
-      siCostCtr: new FormControl('', [ Validators.required]),
-    });
-    this.invoiceDetail.push(InoviceIssue);
-    console.log(this.invoiceDetail);
-  }
-
-  deleteUnit(index: number) {
-    this.invoiceDetail.removeAt(index);
-  }
-
+  
   setReportData(apiUrl: string, reportType: string){
     const reportData = {
       apiUrl: apiUrl,
@@ -254,10 +326,44 @@ export class InvoiceComponent implements OnInit {
     };
     this.dataSharing.setData(reportData);
   }
-
-  get invItem(): FormArray {
-    return this.inoviceForm.get('invitemArray') as FormArray
+  
+  highlight(type: string, index: number){
+    if (type === "salesorder") {
+      if(index >= 0 && index <= this.SOArr.length - 1){
+        this.selectedRowIndex = index;
+      } 
+    } else if (type === "invoice") {
+      if(index >= 0 && index <= this.invArr.length - 1){
+        this.selectedRowIndex = index;
+      } 
+    }
   }
 
+  formatDate(date: any) {
+    var d = new Date(date), day = '' + d.getDate(), month = '' + (d.getMonth() + 1), year = d.getFullYear();
+
+    if (day.length < 2) {
+      day = '0' + day;
+    } 
+    if (month.length < 2) {
+      month = '0' + month;
+    }
+    return [day, month, year].join('-');
+  }
+
+  public goToSalesOrder() {
+    const soData = this.invoiceForm.value;
+    var id = soData.agrNbr;
+    var myurl = `/crm/sales-order/details/${id}`;
+    this.router.navigateByUrl(myurl).then(e => {
+    });
+  }
+
+  toggleTableRows() {
+    this.isTableExpanded = !this.isTableExpanded;
+    this.BlaListDataSource.data.forEach((row: any) => {
+      row.isExpanded = this.isTableExpanded;
+    })
+  }
 
 }

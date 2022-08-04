@@ -9,6 +9,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from "@angular/material/sort";
 import * as XLSX from 'xlsx';
 import { Router } from "@angular/router";
+import { XlsxExport } from '@grapecity/activereports';
 
 
 @Component({
@@ -57,17 +58,27 @@ export class ReferenceListComponent implements OnInit {
   }
 
   exportAsExcel() {
-    const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(this.table.nativeElement);//converts a DOM TABLE element to a worksheet
+    const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(this.table.nativeElement);
+    //converts a DOM TABLE element to a worksheet
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet2');
 
     /* save to file */
     XLSX.writeFile(wb, 'SheetJS.xlsx');
-
-  }
+/*
+     var Excel = require('exceljs');
+     var workbook = new Excel.Workbook();
+     let url = "/assets/resources/templates.xlsx";
+     workbook.xlsx.readFile(url).then(function() {
+       var worksheet = workbook.getWorksheet(1);
+       var row = worksheet.getRow(5);
+       row.getCell(1).value = 5; // A5's value set to 5
+       row.commit();
+       return workbook.xlsx.writeFile(url);
+      })*/
+    }
 
   quickPartyrSearch() {
-
     this.referenceListDataSource.filter = this.searchValue.trim().toLowerCase();
   }
 

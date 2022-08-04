@@ -525,31 +525,6 @@ export class CustomerprofileListComponent implements OnInit {
 
   submitForm(){
     const data = this.custForm.value
-    if (data.pcode == ''){
-      this.snackbar.open("Please Enter Pcode", "close", {
-        duration: 10000,
-        verticalPosition: 'top',
-        panelClass: ['sbBg']
-      });
-    }
-    else{
-      this.financeservice.getCustomerBypcode(data.pcode).subscribe((res: any) => {
-        this.financeservice.updateOPbalDeatils(data.cname,data.cAccountCategory,data.cStatus,data.cType,data.cCR,data.cTaxNo,data.pcode)
-        this.snackbar.open(data.pcode + " Updated Successfully", "close", {
-          duration: 10000,
-          verticalPosition: 'top',
-          panelClass: ['sbBg']
-        });
-      },(err:any) =>{
-        this.financeservice.postOpbalDetails('01',data.pcode,data.cname,data.cAccountCategory,data.cType,data.cCR,data.cTaxNo,data.cStatus,'2022')
-        this.snackbar.open( data.pcode + " inserted Successfully", "close", {
-          duration: 10000,
-          verticalPosition: 'top',
-          panelClass: ['sbBg']
-        });
-      })
-      
-    }
     
   }
 

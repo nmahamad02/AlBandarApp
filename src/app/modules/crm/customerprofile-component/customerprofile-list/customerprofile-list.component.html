@@ -1,28 +1,26 @@
-<div class="container-fluid">
+<div class="container">
+  <br>
   <div class="col-12">
-    <mat-card style="color: darkblue; background-color:rgb(251, 252, 249);">
-      <mat-card-header>
-        <div class="row">
-          <div class="col-3">
-            <mat-card-title>Customer Profile</mat-card-title>          
-          </div>
-          <div class="col-6"></div>
-          <div class="col-3">
-            <button mat-raised-button color="primary" (click)="exporter.exportTable('xlsx')">                  
-              <mat-icon>file_download</mat-icon>
-            </button>
-          </div>
-        </div>
-      </mat-card-header>        
-      <!-- GET PARTY DETAILS FOR THIS CUSTOMER-->
-      <br>
-      <div class="row">
-        <b>Search</b>
-        <mat-form-field>
-          <mat-icon matPrefix>search</mat-icon>
-          <input matInput type="text" style="color: black;" placeholder="Please Enter Your Seach Keyword to filter" (keyup)="quickPartyrSearch()" [(ngModel)]="searchValue">
-        </mat-form-field>
+    <div class="row">
+      <div class="col-4">
+        <mat-card-title>Customer Profile</mat-card-title>          
       </div>
+      <div class="col-6"></div>
+      <div class="col-2">
+        <button mat-raised-button color="primary" (click)="exporter.exportTable('xlsx')" title="Download Customer List">                  
+          <mat-icon>file_download</mat-icon>
+        </button>
+      </div>
+    </div>
+    <div class="row">
+      <b>Search</b>
+      <mat-form-field>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput type="text" style="color: black;" placeholder="Please Enter Your Seach Keyword to filter" (keyup)="quickPartyrSearch()" [(ngModel)]="searchValue">
+      </mat-form-field>
+    </div>
+    <hr>
+    <div class="col-12">
       <mat-table [dataSource]="customerlistDataSource" matTableExporter #exporter="matTableExporter" class="mat-table" matSort matSortDisableClear [multiTemplateDataRows]="true">
         <ng-container matColumnDef="PCODE">
           <mat-header-cell *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
@@ -78,6 +76,6 @@
         <mat-row matRipple *matRowDef="let row; columns: columnCustomer;"></mat-row>
       </mat-table>
       <mat-paginator #paginator [pageSize]="50" [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>
-    </mat-card>
+    </div>
   </div>
 </div>

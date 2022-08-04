@@ -39,10 +39,10 @@
   <div *ngIf="loginBool">
     <div *ngIf="signinBool">
       <div class="row no-gutters">
-        <div class="col-md-8 col-lg-8 col-sm-12"> 
+        <div class="col-md-6 col-lg-8 col-sm-12"> 
           <img src="../assets/Pics/69413394_z.jpg" style="height: 100%; width: 100%;">
         </div>
-        <div class="col-md-4 col-lg-4 col-sm-12">
+        <div class="col-md-6 col-lg-4 col-sm-12">
           <div class="container-fluid">
             <div class="row">
               <div class="col-1"></div>
@@ -62,7 +62,7 @@
                   </div>
                   <div class="form-group" style="padding-bottom: 10px;">
                     <label for="password" style="padding-bottom: 10px;">Password</label>
-                    <input type="password" class="form-control" id="password" formControlName="password" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" >
+                    <input type="password" class="form-control" id="password" formControlName="password" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" (key.enter)="onSignin()">
                     <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
                       <div *ngIf="f.password.errors.required">Password is required</div>
                     </div>
@@ -86,10 +86,10 @@
     </div>
     <div *ngIf="signupBool">
       <div class="row no-gutters">
-        <div class="col-md-8 col-lg-8 col-sm-12">
+        <div class="col-md-6 col-lg-8 col-sm-12">
           <img src="../assets/Pics/169538_16062719030044150446.jpg" style="height: 100%; width: 100%;">
         </div>
-        <div class="col-md-4 col-lg-4 col-sm-12">
+        <div class="col-md-6 col-lg-4 col-sm-12">
           <div class="container-fluid">
             <div class="row">
               <div class="col-1"></div>
@@ -158,9 +158,10 @@
                     </label>
                   </div>
                   <div class="form-call-to-actions">
-                    <button class="btn btn-primary" type="button" style="float: right;" (click)="onSignup()">Create account</button>
+                    <button class="btn btn-primary btn-block" type="button" style="float: right;" (click)="onSignup()">Create account</button>
                   </div>
                   <br>
+                  <hr>
                   <div style="text-align: center;">
                     <span style="font-size:16px;">
                       Already have an account? <button class="btn btn-link" (click)="showSignIn()">Log in.</button>
@@ -177,10 +178,10 @@
     </div>
     <div *ngIf="forgotPasswordBool">
       <div class="row no-gutters">
-        <div class="col-md-8 col-lg-8 col-sm-12">
+        <div class="col-md-6 col-lg-8 col-sm-12">
           <img src="../assets/Pics/Al-Bander-Resort-7.jpg" style="height: 100%; width: 100%;">
         </div>
-        <div class="col-md-4 col-lg-4 col-sm-12">
+        <div class="col-md-6 col-lg-4 col-sm-12">
           <div class="container-fluid">
             <div class="row">
               <div class="col-1"></div>
@@ -192,7 +193,7 @@
                   We are here to help you recovering your password. Please enter your username along with your new password.
                 </span>
                 <hr>
-                <form class="recover-password-form" [formGroup]="recoverPasswordForm" (ngSubmit)="onRecoverPassword()">
+                <form class="recover-password-form" [formGroup]="recoverPasswordForm">
                   <div class="form-row">
                     <div class="form-group" style="padding-bottom: 10px;">
                       <label for="username" style="padding-bottom: 10px;">Username</label>
@@ -206,24 +207,30 @@
                     <div class="form-group" style="padding-bottom: 10px;">
                       <label for="password" style="padding-bottom: 10px;">Password</label>
                       <input type="password" class="form-control" id="password" formControlName="password" >
-                      <div *ngIf="submitted && g.password.errors" class="invalid-feedback">
-                        <div *ngIf="g.password.errors.required">Password is required</div>
+                      <div *ngIf="submitted && h.password.errors" class="invalid-feedback">
+                        <div *ngIf="h.password.errors.required">Password is required</div>
                         <div *ngIf="notmatched">Passwords do not match</div>
                       </div>
                     </div>
                     <div class="form-group" style="padding-bottom: 10px;">
                       <label for="confirmPassword" style="padding-bottom: 10px;">Confirm Password</label>
                       <input type="password" class="form-control" id="confirmPassword" formControlName="confirmPassword" >
-                      <div *ngIf="submitted && g.confirmPassword.errors" class="invalid-feedback">
-                        <div *ngIf="g.confirmPassword.errors.required">Password is required</div>
+                      <div *ngIf="submitted && h.confirmPassword.errors" class="invalid-feedback">
+                        <div *ngIf="h.confirmPassword.errors.required">Password is required</div>
                         <div *ngIf="notmatched">Passwords do not match</div>
                       </div>
                     </div>
                   </div>
                   <br>
                   <div class="form-call-to-actions">
-                    <button class="btn btn-link" (click)="showSignIn()">Go back to Login page</button>
-                    <button class="btn btn-primary" style="float: right;" type="submit">Recover Password</button>
+                    <div class="row">
+                      <div class="col-8">
+                        <button class="btn btn-link" (click)="showSignIn()">Go back to Login page</button>
+                      </div>
+                      <div class="col-4">
+                        <button class="btn btn-primary" style="float: right;" (click)="onChangePassword()">Change Password</button>
+                      </div>
+                    </div>
                   </div>
                 </form>
                 <br>
@@ -434,6 +441,7 @@
 <footer style="background-color: rgb(2, 46, 82); color: white;">
   <div class="container-fluid">
     <br><br>
+    <!--
     <div class="row">
       <div class="col-1"></div>
       <div class="col">
@@ -448,15 +456,14 @@
           </div>
         </div>
         <br>
-        <br>
-       <!--<hr style="border: 1px solid white;">--> 
-        <div class="col-12">
-        </div>
-        <hr style="border: 1px solid white;">
-        <br>
+       <div class="col-12">
       </div>
-      <div class="col-1"></div>
+      <hr style="border: 1px solid white;">
+      <br>
     </div>
+    <div class="col-1"></div>
+  </div>
+    -->
   </div>
 </footer>
 

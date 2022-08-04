@@ -23,12 +23,12 @@
                         </button>
                     </div>
                     <div class="col">
-                        <button class="btn-warning btn text-white btn-block" (click)="goToAgreement()" title="View Invoice">
+                        <button class="btn-warning btn text-white btn-block" (click)="goToInvoice()" title="View Invoice">
                             <mat-icon>note_add</mat-icon> 
                         </button>
                     </div>
                     <div class="col">
-                        <button class="btn-success btn btn-block" (click)="goToAgreement()" title="Convert to Invoice">
+                        <button class="btn-success btn btn-block" (click)="convertToInvoice()" title="Convert to Invoice">
                             <mat-icon>arrow_circle_right</mat-icon>  
                         </button>
                     </div>
@@ -57,19 +57,25 @@
                     <div class="row">
                         <div class="col-9">
                             <div class="row">
-                                <div class="col-4">
+                                <div class="col-3">
                                     <mat-form-field class="full-width">
                                         <mat-label i18n="@@CMMContactsNameFormControl">Sales Order Number</mat-label>
                                         <input matInput #sono formControlName="soNbr" (keydown.f2)="lookupSalesorder(sono.value)" (keydown.enter)="getSalesorder(sono.value)" >
                                     </mat-form-field>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-3">
                                     <mat-form-field class="full-width">
                                         <mat-label i18n="@@CMMContactsNameFormControl">Agreement Number</mat-label>
                                         <input matInput #agrNo formControlName="agrNbr" (keydown.f2)="lookupAgreement(agrNo.value)" (keydown.enter)="getAgreement(agrNo.value)">
                                     </mat-form-field>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-3">
+                                    <mat-form-field class="full-width">
+                                        <mat-label i18n="@@CMMContactsNameFormControl">Invoice Number</mat-label>
+                                        <input matInput #invNo formControlName="invNbr" (keydown.f2)="lookupInvoice(invNo.value)" (keydown.enter)="getInvoice(invNo.value)">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-3">
                                     <mat-form-field class="full-width"> 
                                         <mat-label i18n="@@CMMContactsMobileFormControl">Sales Order Date</mat-label>
                                         <input type="text" formControlName="sodate" matInput>
@@ -111,7 +117,7 @@
                                     </mat-form-field>
                                 </div>
                                 <div class="col-12">
-                                    <p><strong>{{ mPartyName }}</strong> <br> {{ mPartyAdd1 }}, {{ mPartyAdd2 }}, {{ mPartyAdd3 }} <br> {{ mPartyPhone }} / {{ mPartyTelephone}} <br> {{ mPartyEmail }}</p>
+                                    <p><strong>{{ mPartyName }}</strong> <br> {{ mPartyAdd1 }}, {{ mPartyAdd2 }}, {{ mPartyAdd3 }} <br> {{ mPartyPhone }}</p>
                                 </div>
                             </div>
                         </div>
@@ -319,6 +325,64 @@
                         <tr mat-row *matRowDef="let row; columns: AgreementDisplayedColumns;  let i= index" [ngClass]="{'highlight': selectedRowIndex == i}" (click)="highlight('agreement',i)" tabindex="999" (keydown.arrowdown)="arrowDownEvent('agreement',selectedRowIndex)"
                         (keydown.arrowup)="arrowUpEvent('agreement',selectedRowIndex)" 
                         (keydown.enter)="selectAgreement(agrArr[selectedRowIndex])"></tr>
+                    </table>
+                </div>
+                <mat-dialog-actions align="end">
+                    <button mat-button matDialogClose="close">Close</button>
+                </mat-dialog-actions>
+            </ng-template>
+        </div>
+
+        <div class="col-12">
+            <ng-template #InvoiceLookUpDialouge style="width: 60%;">
+                <h3 matDialogTitle>
+                    <b>Look up for Invoice: {{ invArr.length }}</b>
+                </h3>
+                <hr>
+                <div mat-dialog-content>
+                    <table mat-table 
+                    [dataSource]="InvoiceDataSource" 
+                    class="mat-elevation-z8" 
+                    style="width: 65vw; height: 50vh;">
+
+                    <ng-container matColumnDef="invno">
+                        <th mat-header-cell 
+                        *matHeaderCellDef> Invoice  </th>
+                        <td mat-cell 
+                        *matCellDef="let inv"> {{ inv.TRN_NO }} </td>
+                    </ng-container>
+                        
+                    <ng-container matColumnDef="sono">
+                        <th mat-header-cell 
+                        *matHeaderCellDef> SO Number </th>
+                        <td mat-cell 
+                        *matCellDef="let inv"> {{ inv.SONO }} </td>
+                    </ng-container>
+                      
+                        <ng-container matColumnDef="date">
+                            <th mat-header-cell 
+                            *matHeaderCellDef> Date </th>
+                            <td mat-cell 
+                            *matCellDef="let inv"> {{ inv.TRN_DATE }} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="custname">
+                            <th mat-header-cell 
+                            *matHeaderCellDef> Customer Name</th>
+                            <td mat-cell 
+                            *matCellDef="let inv"> {{ inv.CUST_NAME }} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="total">
+                            <th mat-header-cell 
+                            *matHeaderCellDef> Total Amount</th>
+                            <td mat-cell 
+                            *matCellDef="let inv"> {{ inv.GROSSAMOUNT }} </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="InvoiceDisplayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: InvoiceDisplayedColumns;  let i= index" [ngClass]="{'highlight': selectedRowIndex == i}" (click)="highlight('invoice',i)" tabindex="999" (keydown.arrowdown)="arrowDownEvent('invoice',selectedRowIndex)"
+                        (keydown.arrowup)="arrowUpEvent('invoice',selectedRowIndex)" 
+                        (keydown.enter)="selectInvoice(invArr[selectedRowIndex])"></tr>
                     </table>
                 </div>
                 <mat-dialog-actions align="end">

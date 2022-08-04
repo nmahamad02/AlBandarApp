@@ -1,3 +1,4 @@
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -137,8 +138,11 @@ export class AppComponent {
   
       console.log(data);
       console.log(this.usrPwd);
+
+      const utc = new Date;
+      const userid = this.formatDate(utc);
   
-      this.authenticationService.signup(data.firstname, data.lastname, data.username, this.usrPwd, data.contactno);
+      this.authenticationService.signup(data.firstname, data.lastname, data.username, this.usrPwd, data.contactno, Number(userid));
       /*this.snackBar.open(data.username + " successfully added", "close", {
         duration: 5000,
         verticalPosition: 'top',
@@ -165,11 +169,21 @@ export class AppComponent {
     this.contentBool = false;
   }
   
-  onRecoverPassword(){
-    this.recoverPasswordForm = new FormGroup({
-      username: new FormControl('', [ Validators.required ]),
-      password: new FormControl('', [ Validators.required ]),
-      confirmPassword: new FormControl('', [ Validators.required ]),
+  onChangePassword(){
+    const data = this.recoverPasswordForm.value;
+    this.encrypt(data.password);
+    this.authenticationService.recoverPassword(data.username, this.usrPwd).subscribe((res: any) => {
+      this.showSignIn();
+  
+      this.signupForm = new FormGroup({
+        username: new FormControl('', [ Validators.required ]),
+        password: new FormControl('', [ Validators.required ]),
+        confirmPassword: new FormControl('', [ Validators.required ]),
+        firstname: new FormControl('', [ Validators.required ]),
+        lastname: new FormControl('', [ Validators.required ]),
+        contactno: new FormControl('', [ Validators.required ]),
+        terms: new FormControl(false)
+      });
     });
   }
 
@@ -211,4 +225,15 @@ export class AppComponent {
 
   get h() { return this.recoverPasswordForm.controls; }
 
+  formatDate(date: any) {
+    var d = new Date(date), day = '' + d.getDate(), month = '' + (d.getMonth() + 1), year = d.getFullYear(), hour = d.getHours(), min = d.getMinutes();
+
+    if (day.length < 2) {
+      day = '0' + day;
+    } 
+    if (month.length < 2) {
+      month = '0' + month;
+    }
+    return [day + hour + min];
+  }
 }

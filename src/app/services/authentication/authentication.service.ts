@@ -41,20 +41,28 @@ export class AuthenticationService {
     localStorage.setItem('userclass', "");
   }
 
-  recoverPassword(email: any) {
-    // your recover password login should go here
-    //return of(true);
-  }
-
-  signup(fName: string, lName: string, usrCode: string, pwd: string, cntctNbr: string) {
+  recoverPassword(usrCode: string, pwd: String) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
     
+    const newUsr = {
+      usercode: usrCode,
+      password: pwd
+    }
+
+    return this.http.post(this.url + '/changePassword', JSON.stringify(newUsr), { headers: headers })
+  }
+
+  signup(fName: string, lName: string, usrCode: string, pwd: string, cntctNbr: string, userid: number) {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+    
+
     const newUsr = {
       usercode: usrCode,
       password: pwd,
       firstname: fName,
       lastname: lName,
-      contactno: cntctNbr
+      contactno: cntctNbr,
+      userid: userid
     }
 
     this.http.post(this.url + 's/new', JSON.stringify(newUsr), { headers: headers }).subscribe(response => {

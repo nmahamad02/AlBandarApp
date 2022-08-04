@@ -137,6 +137,10 @@ export class FinanceService {
     return this.http.get(this.url + '/coa/getAllSalesOrder')
   }
 
+  getAllinvoices() {
+    return this.http.get(this.url + '/coa/getAllinvoices')
+  }
+
   getSalesOrderMaster(sono: any) {
     return this.http.get(this.url + '/coa/getSalesOrderMaster/' + sono)
   }
@@ -165,9 +169,12 @@ export class FinanceService {
     return this.http.get(this.url + '/coa/getDocForSO/' + year)
   }
 
+  getDocForInv(year: string) {
+    return this.http.get(this.url + '/coa/getDocForInv/' + year)
+  }
+
   checkAgreement(agrno: string) {
     return this.http.get(this.url + '/coa/checkAgreement/'+ agrno)
-
   }
 
   searchServicesDetails(serviceid:string) {
@@ -255,7 +262,7 @@ export class FinanceService {
       compcode: compcode
     }
 
-    return this.http.post(this.url + '/coa/postAgreement', JSON.stringify(newTran), { headers: headers })
+    return this.http.post(this.url + '/coa/postAgreementBLA', JSON.stringify(newTran), { headers: headers })
   }
 
   postAgreementMaster(compcode: string, agrno: string, agrdate: string, sono:string, quotno: string, partyid: string, pcode: string, custname: string, total: string, discount: string, gtotal: string, vatamt: string, custadd1: string, custadd2: string, custphone: string,remarks: string, createdate: string, createuser: string) {
@@ -316,6 +323,19 @@ export class FinanceService {
     return this.http.post(this.url + '/coa/setSalesOrder', JSON.stringify(newTran), { headers: headers })
   }
 
+  
+  setInvoice(agrno: string, sono:string, invno:string) {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+
+    const newTran = {
+      agrno : agrno,
+      invno: invno,
+      sono: sono,
+    }
+
+    return this.http.post(this.url + '/coa/setInvoice', JSON.stringify(newTran), { headers: headers })
+  }
+
   updateAgreementDetails(itcode: string, desc: string, membercode: string, membername: string, frmdate:string, todate: string, value: string, price: string, disper: string, disamt: string, vatcategory: string,vat: string, amount: string, editdt: string,edituser: string, agrno: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
@@ -369,6 +389,17 @@ export class FinanceService {
     }
 
     return this.http.post(this.url + '/coa/updatedocso', JSON.stringify(newTran), { headers: headers })
+  }
+
+  updateDocForInv(fieldvalue: string, year: string) {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+
+    const newTran = {
+      fieldvalue : fieldvalue,
+      cyear: year
+    }
+
+    return this.http.post(this.url + '/coa/updateDocForInv', JSON.stringify(newTran), { headers: headers })
   }
 
   postSalesOrderMaster(quotno: string, sodate: string, sono:string, partyid: string, pcode: string, custname: string, total: string, discount: string, gtotal: string, vatamt: string, custadd1: string, custadd2: string, custphone: string,remarks: string, createdate: string, createuser: string) {
@@ -476,11 +507,10 @@ export class FinanceService {
     return this.http.get(this.url + '/coa/deleteSalesOrderDetails/'+ sono)
   }
 
-  postOpbalDetails(compcode: string, pcode: string, custname: string, accountcategory: string, acounttype: string,cprno: string, tax1no: string,status: string,fyear: string) {
+  postOpbalDetails(pcode: string, custname: string, accountcategory: string, acounttype: string,cprno: string, tax1no: string,status: string,fyear: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     const newTran = {
-      compcode : compcode,
       pcode : pcode,
       custname : custname,
       accountcategory : accountcategory,
@@ -646,6 +676,104 @@ export class FinanceService {
     this.http.post(this.url + '/coa/UpdateAddeptarmentExpenseMaster', JSON.stringify(newTran), { headers: headers }).subscribe((res: any) => {
       console.log(res);
     })
+  }
+
+  getAllSales() {
+    return this.http.get(this.url + '/coa/getAllSales')
+  }
+
+  getSales(invno:string) {
+    return this.http.get(this.url + '/coa/getSales/'+ invno)
+  }
+
+  getSalesFromSono(sono:string) {
+    return this.http.get(this.url + '/coa/getSalesFromSono/'+ sono)
+  }
+
+  getSalesFromPcode(pCode:string) {
+    return this.http.get(this.url + '/coa/getSalesFromPcode/'+ pCode)
+  }
+
+  searchSales(invno:string) {
+    return this.http.get(this.url + '/coa/searchSales/'+ invno)
+  }
+
+  postSales(year: string, invno: string, invdate: string, partyId: string, custCode: string, custName: string, gtotal: string, discount: string, vatAmt: string, amount: string, sono: string, subject: string, remarks: string, createuser: string, createdate: string) {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+
+      const newTran = {
+        year: year,
+        invno: invno, 
+        invdate: invdate,
+        partyId:partyId,
+        custCode: custCode,
+        custName: custName,
+        gtotal: gtotal,
+        discount: discount,
+        vatAmt: vatAmt,
+        amount: amount,
+        sono: sono,
+        subject: subject,
+        remarks: remarks,
+        createuser: createuser,
+        createdate: createdate
+      }
+    return this.http.post(this.url + '/coa/postSales', JSON.stringify(newTran), { headers: headers })
+  }
+
+  updateSales(year: string, invno: string, invdate: string, partyId: string, custCode: string, custName: string, gtotal: string, discount: string, vatAmt: string, amount: string, sono: string, subject: string, remarks: string, edituser: string, editdt: string) {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+
+      const newTran = {
+        year: year,
+        invno: invno, 
+        invdate: invdate,
+        partyId:partyId,
+        custCode: custCode,
+        custName: custName,
+        gtotal: gtotal,
+        discount: discount,
+        vatAmt: vatAmt,
+        amount: amount,
+        sono: sono,
+        subject: subject,
+        remarks: remarks,
+        edituser: edituser,
+        editdt: editdt
+      }
+      return this.http.post(this.url + '/coa/updateSales', JSON.stringify(newTran), { headers: headers })
+  }
+
+  postOutstanding(year: string, invno: string, invdate: string, custCode: string, dbcd: string, amount: string, subject: string, remarks: string) {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+
+      const newTran = {
+        year: year,
+        invno: invno, 
+        invdate: invdate,
+        custCode: custCode,
+        dbcd: dbcd,
+        subject: subject,
+        remarks: remarks,
+        amount: amount
+      }
+      return this.http.post(this.url + '/coa/postOutstanding', JSON.stringify(newTran), { headers: headers })
+  }
+
+  updateOutstanding(year: string, invno: string, invdate: string, custCode: string, dbcd: string, amount: string, subject: string, remarks: string) {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+
+      const newTran = {
+        year: year,
+        invno: invno, 
+        invdate: invdate,
+        custCode: custCode,
+        dbcd: dbcd,
+        subject: subject,
+        remarks: remarks,
+        amount: amount
+      }
+      return this.http.post(this.url + '/coa/updateOutstanding', JSON.stringify(newTran), { headers: headers })
   }
 
 }

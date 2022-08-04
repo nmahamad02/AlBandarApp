@@ -32,6 +32,8 @@ export class CustomerprofileComponent implements OnInit {
   AccountsCategoryList: any[] = [];
   AccountsTypeList: any[] = [];
   custExcelArr: any[] = [];
+  sfyear: string = '01-01-' + this.currentYear.toString();
+  efyear: string = '31-12-' + this.currentYear.toString();
 
   rowStyle!: { background: string; };
   sortingOrder:any;
@@ -40,19 +42,17 @@ export class CustomerprofileComponent implements OnInit {
   @ViewChild(MatSort, { static: false }) sort: MatSort;
   @ViewChild('TABLE') table: ElementRef;
 
-  varpcode:string = "";
-  varsfyear:string ="2022-01-01";
-  varefyear:string ="2022-01-01";
+  varpcode:string = ""
   opbalChartBool: boolean = false;
   
   contactListDataSource = new MatTableDataSource(this.custPartyList);
   memberListDataSource = new MatTableDataSource(this.custMemberList);
+  invoiceListDataSource = new MatTableDataSource(this.custInvoiceList);
 
   columns: any[];
   contactsColumns = ["PARTY_ID", "NAME", "ADD1", "ADD2", "ADD3", "PHONE1", "Actions"];
   memberColumns = ["MemberNo", "NAME", "DEPT_NAME", "MEMBTYPE", "Actions"];
-  //contactsColumns = ["PARTY_ID", "NAME", "ADD1", "ADD2", "ADD3", "PHONE1", "Actions"];
-  //contactsColumns = ["PARTY_ID", "NAME", "ADD1", "ADD2", "ADD3", "PHONE1", "Actions"];
+  invoiceColumns = ["invNo", "invDate", "invDetails", "invAmt", "Actions"];
 
   constructor(private financeservice: FinanceService, private snackbar: MatSnackBar, private dataSharing: DataSharingService, private route: ActivatedRoute, private router: Router){
     this.custForm = new FormGroup({
@@ -67,8 +67,14 @@ export class CustomerprofileComponent implements OnInit {
   }
 
   newForm() {
+    const utc = new Date;
+    const pcode = this.formatPcode(utc);
+    this.customerlist = [];
+    this.custPartyList = [];
+    this.custMemberList = [];
+    this.custInvoiceList = [];
     this.custForm = new FormGroup({
-      pcode: new FormControl('', [ Validators.required]),
+      pcode: new FormControl(pcode, [ Validators.required]),
       cname: new FormControl('', [ Validators.required]),
       cStatus: new FormControl('', [ Validators.required]),
       cAccountCategory: new FormControl('', [ Validators.required]),
@@ -78,7 +84,24 @@ export class CustomerprofileComponent implements OnInit {
     });
   }
 
+  
+  formatPcode(date: any) {
+    var d = new Date(date), day = '' + d.getDate(), month = '' + (d.getMonth() + 1), year = d.getFullYear(), hour = d.getHours(), min = d.getMinutes(), sec = d.getSeconds();
+
+    if (day.length < 2) {
+      day = '0' + day;
+    } 
+    if (month.length < 2) {
+      month = '0' + month;
+    }
+    return [day + min + sec];
+  }
+
   refreshForm(){
+    this.customerlist = [];
+    this.custPartyList = [];
+    this.custMemberList = [];
+    this.custInvoiceList = [];
     this.custForm = new FormGroup({
       pcode: new FormControl('', [ Validators.required]),
       cname: new FormControl('', [ Validators.required]),
@@ -110,37 +133,29 @@ export class CustomerprofileComponent implements OnInit {
     });
     this.varpcode = data.PCODE;
     this.getCustmerParty(this.varpcode);
-    this.getCustmerInvoices(this.varpcode,this.varsfyear,this.varefyear);
+    this.getCustmerInvoices(this.varpcode,this.sfyear,this.efyear);
     this.getCustomerMember(this.varpcode);
     this.getAggrementDetails(this.varpcode);
   }
 
   submitForm(){
     const data = this.custForm.value
-    if (data.pcode == ''){
-      this.snackbar.open("Please Enter Pcode", "close", {
+
+    this.financeservice.getCustomerBypcode(data.pcode).subscribe((res: any) => {
+      this.financeservice.updateOPbalDeatils(data.cname,data.cAccountCategory,data.cStatus,data.cType,data.cCR,data.cTaxNo,data.pcode)
+      this.snackbar.open(data.pcode + " Updated Successfully", "close", {
         duration: 10000,
         verticalPosition: 'top',
         panelClass: ['sbBg']
       });
-    }
-    else{
-      this.financeservice.getCustomerBypcode(data.pcode).subscribe((res: any) => {
-        this.financeservice.updateOPbalDeatils(data.cname,data.cAccountCategory,data.cStatus,data.cType,data.cCR,data.cTaxNo,data.pcode)
-        this.snackbar.open(data.pcode + " Updated Successfully", "close", {
-          duration: 10000,
-          verticalPosition: 'top',
-          panelClass: ['sbBg']
-        });
-      },(err:any) =>{
-        this.financeservice.postOpbalDetails('01',data.pcode,data.cname,data.cAccountCategory,data.cType,data.cCR,data.cTaxNo,data.cStatus,'2022')
-        this.snackbar.open( data.pcode + " inserted Successfully", "close", {
-          duration: 10000,
-          verticalPosition: 'top',
-          panelClass: ['sbBg']
-        });
-      })
-    }
+    },(err:any) =>{
+      this.financeservice.postOpbalDetails(data.pcode,data.cname,data.cAccountCategory,data.cType,data.cCR,data.cTaxNo,data.cStatus,'2022')
+      this.snackbar.open( data.pcode + " inserted Successfully", "close", {
+        duration: 10000,
+        verticalPosition: 'top',
+        panelClass: ['sbBg']
+      });
+    })
   }
 
   getCustmerParty(pcode:string) {
@@ -201,8 +216,12 @@ export class CustomerprofileComponent implements OnInit {
   }
   
   getCustmerInvoices(pcode: string,sfyear: string,efyear: string) {
-    this.financeservice.getCustomerInvoices(pcode, sfyear,efyear).subscribe((res: any) => {
+    console.log(sfyear);
+    console.log(efyear);
+
+    this.financeservice.getCustomerInvoices(pcode,sfyear,efyear).subscribe((res: any) => {
       this.custInvoiceList = res.recordset;
+      console.log(this.custInvoiceList);
     }, (err: any) => {
       console.log(err);
     })
@@ -366,7 +385,7 @@ export class CustomerprofileComponent implements OnInit {
     });
     this.varpcode = data.PCODE;
     this.getCustmerParty(this.varpcode);
-    this.getCustmerInvoices(this.varpcode,this.varsfyear,this.varefyear);
+    this.getCustmerInvoices(this.varpcode,this.sfyear,this.efyear);
     this.getCustomerMember(this.varpcode);
     this.getAggrementDetails(this.varpcode);
   }
@@ -378,6 +397,12 @@ export class CustomerprofileComponent implements OnInit {
   }
 
   public gotoMembersDetails(url, id) {
+    var myurl = `${url}/${id}`;
+    this.router.navigateByUrl(myurl).then(e => {
+    });
+  }
+
+  public gotoInvoiceDetails(url, id) {
     var myurl = `${url}/${id}`;
     this.router.navigateByUrl(myurl).then(e => {
     });

@@ -12,13 +12,13 @@
             <input matInput type="text" style="color: black;" placeholder="Please Enter Your Seach Keyword to filter" (keyup)="quickPartyrSearch()" [(ngModel)]="searchValue">
           </mat-form-field>
         </div>
-        <!-- GET PARTY DETAILS FOR THIS CUSTOMER-->
-        <button mat-raised-button color="primary" (click)="exporter.exportTable('xlsx')">Export as Excel</button>
+        <!-- GET PARTY DETAILS FOR THIS CUSTOMER  (click)="exporter.exportTable('xlsx')"-->
+        <button mat-raised-button color="primary" (click)="exportAsExcel()">Export as Excel</button>
         <div>
           <br />
         </div>
 
-        <mat-table [dataSource]="referenceListDataSource" matTableExporter #exporter="matTableExporter"
+        <mat-table [dataSource]="referenceListDataSource" #TABLE matTableExporter #exporter="matTableExporter"
                    class="mat-table" matSort matSortDisableClear [multiTemplateDataRows]="true">
           <ng-container matColumnDef="PCODE">
             <mat-header-cell *matHeaderCellDef mat-sort-header> REFERENCE CODE </mat-header-cell>

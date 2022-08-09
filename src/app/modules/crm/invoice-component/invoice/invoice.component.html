@@ -7,8 +7,8 @@
             </div>
             <div class="col-9">
                 <div class="row">
-                    <div class="col">
-                        <button class="btn-secondary btn btn-block" [routerLinkActive]="['active']" [routerLink]="['/crm/invoicereport']" (click)="setReportData(invReportApiUrl, invReportName)" title="Print invoice">  
+                    <div class="col"> <!-- [routerLinkActive]="['active']" [routerLink]="['/crm/invoicereport']" (click)="setReportData(invReportApiUrl, invReportName)" -->
+                        <button class="btn-secondary btn btn-block" (click)="excelFunc()" title="Print invoice">  
                             <mat-icon>print</mat-icon>
                         </button>
                     </div>
@@ -18,7 +18,7 @@
                         </button>
                     </div>
                     <div class="col">
-                        <button class="btn-primary btn btn-block" (click)="goToSalesOrder()" title="View Sales Order">
+                        <button class="btn-primary btn btn-block" (click)="goToAgreement()" title="View Agreement">
                             <mat-icon>arrow_circle_right</mat-icon>  
                         </button>
                     </div>
@@ -47,25 +47,19 @@
                     <div class="row">
                         <div class="col-9">
                             <div class="row">
-                                <div class="col-3">
+                                <div class="col-4">
                                     <mat-form-field class="full-width">
                                         <mat-label i18n="@@CMMContactsNameFormControl">Invoice Number</mat-label>
                                         <input matInput #invno formControlName="invNo" (keydown.f2)="lookupInvoice(invno.value)" (keydown.enter)="getInvoice(invno.value)" >
                                     </mat-form-field>
                                 </div>
-                                <div class="col-3">
-                                    <mat-form-field class="full-width">
-                                        <mat-label i18n="@@CMMContactsNameFormControl">Sales Order Number</mat-label>
-                                        <input matInput #sono formControlName="soNo" (keydown.f2)="lookupSalesorder(sono.value)" (keydown.enter)="getSalesorder(sono.value)">
-                                    </mat-form-field>
-                                </div>
-                                <div class="col-3">
+                                <div class="col-4">
                                     <mat-form-field class="full-width">
                                         <mat-label i18n="@@CMMContactsNameFormControl">Agreement Number</mat-label>
                                         <input matInput formControlName="agrNo">
                                     </mat-form-field>
                                 </div>
-                                <div class="col-3">
+                                <div class="col-4">
                                     <mat-form-field class="full-width"> 
                                         <mat-label i18n="@@CMMContactsMobileFormControl">Invoice Date</mat-label>
                                         <input type="text" formControlName="invDate" matInput>
@@ -192,71 +186,6 @@
                 </div>
             </div>
         </form>
-        
-        <div class="col-12">
-            <ng-template #SOLookUpDialouge style="width: 60%;">
-                <h3 matDialogTitle>
-                    <b>Look up for Sales Order: {{ SOArr.length }}</b>
-                </h3>
-                <hr>
-                <div mat-dialog-content>
-                    <table mat-table 
-                    [dataSource]="SalesOrderDataSource" 
-                    class="mat-elevation-z8" 
-                    style="width: 65vw; height: 50vh;">
-                        <ng-container matColumnDef="sono">
-                            <th mat-header-cell 
-                            *matHeaderCellDef> Sales Order </th>
-                            <td mat-cell 
-                            *matCellDef="let so"> {{ so.SONO }} </td>
-                        </ng-container>
-                      
-                        <ng-container matColumnDef="pcode">
-                            <th mat-header-cell 
-                            *matHeaderCellDef> Pcode </th>
-                            <td mat-cell 
-                            *matCellDef="let so"> {{ so.PCODE }} </td>
-                        </ng-container>
-
-                        <ng-container matColumnDef="custname">
-                            <th mat-header-cell 
-                            *matHeaderCellDef> Customer </th>
-                            <td mat-cell 
-                            *matCellDef="let so"> {{ so.CUST_NAME }} </td>
-                        </ng-container>
-
-                        <ng-container matColumnDef="refno">
-                            <th mat-header-cell 
-                            *matHeaderCellDef> Invoice </th>
-                            <td mat-cell 
-                            *matCellDef="let so"> {{ so.REFNO }} </td>
-                        </ng-container>
-
-                        <ng-container matColumnDef="agrno">
-                            <th mat-header-cell 
-                            *matHeaderCellDef> Agreement </th>
-                            <td mat-cell 
-                            *matCellDef="let so"> {{ so.QUOTNO }} </td>
-                        </ng-container>
-
-                        <ng-container matColumnDef="total">
-                            <th mat-header-cell 
-                            *matHeaderCellDef> Total Amount</th>
-                            <td mat-cell 
-                            *matCellDef="let so"> {{ so.GTOTAL }} </td>
-                        </ng-container>
-                        <tr mat-header-row 
-                        *matHeaderRowDef="SalesOrderDisplayedColumns"></tr>
-                        <tr mat-row *matRowDef="let row; columns: SalesOrderDisplayedColumns;  let i= index" [ngClass]="{'highlight': selectedRowIndex == i}" (click)="highlight('salesorder',i)" tabindex="999" (keydown.arrowdown)="arrowDownEvent('salesorder',selectedRowIndex)"
-                        (keydown.arrowup)="arrowUpEvent('salesorder',selectedRowIndex)" 
-                        (keydown.enter)="getInvoiceFromSalesOrder(SOArr[selectedRowIndex])"></tr>
-                    </table>
-                </div>
-                <mat-dialog-actions align="end">
-                    <button mat-button matDialogClose="close">Close</button>
-                </mat-dialog-actions>
-            </ng-template>
-        </div>
 
         <div class="col-12">
             <ng-template #InvoiceLookUpDialouge style="width: 60%;">
@@ -270,44 +199,35 @@
                     class="mat-elevation-z8" 
                     style="width: 65vw; height: 50vh;">
 
-                    <ng-container matColumnDef="invno">
-                        <th mat-header-cell 
-                        *matHeaderCellDef> Invoice  </th>
-                        <td mat-cell 
-                        *matCellDef="let inv"> {{ inv.TRN_NO }} </td>
-                    </ng-container>
+                        <ng-container matColumnDef="invno">
+                            <th mat-header-cell *matHeaderCellDef> Invoice  </th>
+                            <td mat-cell *matCellDef="let inv"> {{ inv.TRN_NO }} </td>
+                        </ng-container>
                         
-                    <ng-container matColumnDef="sono">
-                        <th mat-header-cell 
-                        *matHeaderCellDef> SO Number </th>
-                        <td mat-cell 
-                        *matCellDef="let inv"> {{ inv.ref_no }} </td>
-                    </ng-container>
+                        <ng-container matColumnDef="sono">
+                            <th mat-header-cell *matHeaderCellDef> Agreement Number </th>
+                            <td mat-cell *matCellDef="let inv"> {{ inv.REF_NO }} </td>
+                        </ng-container>
                       
                         <ng-container matColumnDef="date">
-                            <th mat-header-cell 
-                            *matHeaderCellDef> Date </th>
-                            <td mat-cell 
-                            *matCellDef="let inv"> {{ inv.TRN_DATE }} </td>
+                            <th mat-header-cell *matHeaderCellDef> Date </th>
+                            <td mat-cell *matCellDef="let inv"> {{ inv.TRN_DATE }} </td>
                         </ng-container>
 
                         <ng-container matColumnDef="custname">
-                            <th mat-header-cell 
-                            *matHeaderCellDef> Customer Name</th>
-                            <td mat-cell 
-                            *matCellDef="let inv"> {{ inv.CUST_NAME }} </td>
+                            <th mat-header-cell *matHeaderCellDef> Customer Name</th>
+                            <td mat-cell *matCellDef="let inv"> {{ inv.CUST_NAME }} </td>
                         </ng-container>
 
                         <ng-container matColumnDef="total">
-                            <th mat-header-cell 
-                            *matHeaderCellDef> Total Amount</th>
-                            <td mat-cell 
-                            *matCellDef="let inv"> {{ inv.GROSSAMOUNT }} </td>
+                            <th mat-header-cell *matHeaderCellDef> Total Amount</th>
+                            <td mat-cell *matCellDef="let inv"> {{ inv.GROSSAMOUNT }} </td>
                         </ng-container>
+                        
                         <tr mat-header-row *matHeaderRowDef="InvoiceDisplayedColumns"></tr>
                         <tr mat-row *matRowDef="let row; columns: InvoiceDisplayedColumns;  let i= index" [ngClass]="{'highlight': selectedRowIndex == i}" (click)="highlight('invoice',i)" tabindex="999" (keydown.arrowdown)="arrowDownEvent('invoice',selectedRowIndex)"
-                        (keydown.arrowup)="arrowUpEvent('invoice',selectedRowIndex)" 
-                        (keydown.enter)="selectInvoice(invArr[selectedRowIndex])"></tr>
+                            (keydown.arrowup)="arrowUpEvent('invoice',selectedRowIndex)" 
+                            (keydown.enter)="selectInvoice(invArr[selectedRowIndex])"></tr>
                     </table>
                 </div>
                 <mat-dialog-actions align="end">

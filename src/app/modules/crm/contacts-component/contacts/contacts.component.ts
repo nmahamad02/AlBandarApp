@@ -40,7 +40,7 @@ export class ContactsComponent implements OnInit {
   getpartyData: any;
   utc = new Date();
   mCurDate = this.formatDate(this.utc);
-  pcodeDisplayedColumns: string[] = ['pcode', 'custname', 'opbal', 'glcode'];
+  pcodeDisplayedColumns: string[] = ['pcode', 'custname'];
   pcodeDataSource = new MatTableDataSource(this.pcodeArr);
   areaDisplayedColumns: string[] = ['areano', 'areaname'];
   areaDataSource = new MatTableDataSource(this.AreaArr);
@@ -138,7 +138,6 @@ export class ContactsComponent implements OnInit {
     this.invReportApiUrl = "coa/getOpbalForPrint";
     this.invReportName = "CLINETLIST.rdlx-json";
     this.getPartyDetails(this.route.snapshot.params.id);
-
   }
 
   onGridPartyrDetails(params: any){ 
@@ -216,6 +215,15 @@ export class ContactsComponent implements OnInit {
   getPartyDetails(value : any){
     if(value === 'new') {
       this.newForm();
+    } else if (value === 'exp') {
+      this.newForm();
+      const data = this.dataSharing.getData();
+      this.contactsForm.patchValue({
+        contactId: data.pcode,
+        contactPerson: data.cname,
+        name: data.cname,
+        pcode:data.pcode,
+      })
     } else {
       this.crmservices.getPartyDetails(value).subscribe((res: any) => {
         this.selectParty(res.recordset[0])
@@ -304,14 +312,13 @@ export class ContactsComponent implements OnInit {
 
    selectpcode(obj: any) {
      this.contactsForm.patchValue({
-        pcode: obj.PCODE
+        pcode: obj.pcode,
+        name: obj.cust_name
      })
-   
     let dialogRef = this.dialog.closeAll();
   }
 
   selectarea(obj: any) {
-    
     this.contactsForm.patchValue({
       area: obj.AreaName
     })

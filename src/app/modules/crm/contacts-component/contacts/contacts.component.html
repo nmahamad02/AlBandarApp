@@ -40,6 +40,7 @@
                 </div>
             </div>
         </div>
+        <br>
         <div class="row">
             <form class="form-container" [formGroup]="contactsForm">
                 <div class="row">
@@ -188,7 +189,7 @@
         <div class="col-12">
             <ng-template #pcodeLookupDailoug style="width: 60%;">
                 <h3 matDialogTitle>
-                    <b>Look up products: {{ pcodeArr.length }}</b>
+                    <b>Look up Customers: {{ pcodeArr.length }}</b>
                 </h3>
                 <hr>
                 <div mat-dialog-content>
@@ -198,30 +199,16 @@
                     style="width: 65vw; height: 50vh;">
                         <ng-container matColumnDef="pcode">
                             <th mat-header-cell 
-                            *matHeaderCellDef> Product Code </th>
+                            *matHeaderCellDef> Code </th>
                             <td mat-cell 
-                            *matCellDef="let prod"> {{ prod.PCODE }} </td>
+                            *matCellDef="let prod"> {{ prod.pcode }} </td>
                         </ng-container>
                       
                         <ng-container matColumnDef="custname">
                             <th mat-header-cell 
-                            *matHeaderCellDef> Description </th>
+                            *matHeaderCellDef> Name </th>
                             <td mat-cell 
-                            *matCellDef="let prod"> {{ prod.CUST_NAME }} </td>
-                        </ng-container>
-                            
-                        <ng-container matColumnDef="opbal">
-                            <th mat-header-cell 
-                            *matHeaderCellDef> Quantity </th>
-                            <td mat-cell 
-                            *matCellDef="let prod"> {{ prod.OPBAL }} </td>
-                        </ng-container>
-                      
-                        <ng-container matColumnDef="glcode">
-                            <th mat-header-cell 
-                            *matHeaderCellDef> Unit </th>
-                            <td mat-cell 
-                            *matCellDef="let prod"> {{ prod.GLCODE }} </td>
+                            *matCellDef="let prod"> {{ prod.title_cd }} {{ prod.cust_name }} </td>
                         </ng-container>
                       
                         <tr mat-header-row 

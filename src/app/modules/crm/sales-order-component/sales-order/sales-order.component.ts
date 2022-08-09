@@ -239,7 +239,7 @@ export class SalesOrderComponent implements OnInit {
           console.log(respo)
         })
       })
-    }, (err: any) => {
+    }, (err: any) => { 
       this.financeService.getDocForInv(year).subscribe((resp: any) => {
         const yearStr = String(resp.recordset[0].CYEAR).substring(2);
         this.docInvNo = resp.recordset[0].FIELD_VALUE_NM + 1;

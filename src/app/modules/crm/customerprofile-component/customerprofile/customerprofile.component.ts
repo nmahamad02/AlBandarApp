@@ -359,6 +359,14 @@ export class CustomerprofileComponent implements OnInit {
     this.getCustomerExcel();
     this.getCustomerDetails(this.route.snapshot.params.id);
   }
+
+  copyToContact() {
+    const data = this.custForm.value;
+    this.dataSharing.setData(data);
+    var myurl = `/crm/contacts/details/exp`;
+    this.router.navigateByUrl(myurl).then(e => {
+    });
+  }
   
   flipChartGrid() {
     this.opbalChartBool = !this.opbalChartBool;

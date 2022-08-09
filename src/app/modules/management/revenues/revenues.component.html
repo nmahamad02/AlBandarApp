@@ -17,7 +17,17 @@
                             <span>Total Ageing</span>
                         </div>
                         <div class="chart-card-body">
-                            <canvas id="totalAgeingChart"></canvas>
+                            <div>
+                                <div style="display: block">
+                                  <canvas baseChart
+                                          [datasets]="barChartData"
+                                          [labels]="barChartLabels"
+                                          [options]="barChartOptions"
+                                          [legend]="barChartLegend"
+                                          [chartType]="barChartType">
+                                  </canvas>
+                                </div>
+                              </div>
                         </div>
                     </div>
                     <!-- Ageing Table -->

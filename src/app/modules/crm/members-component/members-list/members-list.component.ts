@@ -34,7 +34,7 @@ export class MembersListComponent implements OnInit {
 
   constructor(private crmservice: CrmService, private router: Router) {
 
-      this.columnMemberDefs = ['actions', "MemberNo", "NAME", "DEPT_NAME", "MEMBTYPE", "buttons"];
+      this.columnMemberDefs = ['actions', "MemberNo", "REFNO", "NAME", "MEMBTYPE", "buttons"];
   }
 
   ngOnInit(): void {

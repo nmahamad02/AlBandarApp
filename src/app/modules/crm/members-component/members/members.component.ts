@@ -240,6 +240,20 @@ export class MembersComponent implements OnInit {
     });
     this.fillOpbalName(event.ACCODE)
     this.checkDependents(event.MEMBTYPE);
+    console.log(event.IMAGENAME);
+    var imgVal: string = event.IMAGENAME;
+    if (imgVal === "") {
+      this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/imgNaN.png";
+    } else {
+      if (imgVal.includes("fakepath")) {
+        var imgName: string = imgVal.slice(12);
+        console.log(imgName);
+        this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgName;
+      } else {
+        this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgVal;
+      }
+    }
+    console.log(this.imageSrc);
     this.crmservice.getDependentMembers(event.MemberNo).subscribe((res: any) => {
       if (event.MEMBTYPE === 'F') {
         const famArr = res.recordset;
@@ -436,8 +450,13 @@ export class MembersComponent implements OnInit {
     if (imgVal === "") {
       this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/imgNaN.png";
     } else {
-      var imgName: string = imgVal.slice(12);
-      this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgName;
+      if (imgVal.includes("fakepath")) {
+        var imgName: string = imgVal.slice(12);           
+        console.log(imgName);
+        this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgName;
+      } else {
+        this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgVal;
+      }
     }
     console.log(this.imageSrc);
     this.crmservice.getDependentMembers(data.MemberNo).subscribe((res: any) => {
@@ -529,7 +548,13 @@ export class MembersComponent implements OnInit {
         if (imgVal === "") {
           this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/imgNaN.png";
         } else {
-          this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgVal;
+          if (imgVal.includes("fakepath")) {
+            var imgName: string = imgVal.slice(12);
+            console.log(imgName);
+            this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgName;
+          } else {
+            this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgVal;
+          }
         }
         console.log(this.imageSrc);
         this.fillOpbalName(data.ACCODE)
@@ -612,9 +637,15 @@ export class MembersComponent implements OnInit {
         if (imgVal === "") {
           this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/imgNaN.png";
         } else {
-          var imgName: string = imgVal.slice(12);
-          this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgName;
+          if (imgVal.includes("fakepath")) {
+            var imgName: string = imgVal.slice(12);
+            console.log(imgName);
+            this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgName;
+          } else {
+            this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgVal;
+          }
         }
+        console.log(this.imageSrc);
         this.fillOpbalName(data.ACCODE);
         this.checkDependents(data.MEMBTYPE);
         this.crmservice.getDependentMembers(data.MemberNo).subscribe((res: any) => {
@@ -695,8 +726,15 @@ export class MembersComponent implements OnInit {
         if (imgVal === "") {
           this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/imgNaN.png";
         } else {
-          this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgVal;
+          if (imgVal.includes("fakepath")) {
+            var imgName: string = imgVal.slice(12);
+            console.log(imgName);
+            this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgName;
+          } else {
+            this.imageSrc = "https://ifaresort-images.s3.me-south-1.amazonaws.com/images/" + imgVal;
+          }
         }
+        console.log(this.imageSrc);
         this.fillOpbalName(data.ACCODE)
         this.checkDependents(data.MEMBTYPE);
         this.crmservice.getDependentMembers(data.MemberNo).subscribe((res: any) => {
@@ -1022,6 +1060,7 @@ export class MembersComponent implements OnInit {
     } else {
       this.crmservice.updateMember(data.memberRefNo,data.memberNo, data.title, data.firstname, data.surname, data.memberType, this.formatDate(data.birthdate), data.marital, data.add1, data.add2, data.add3, data.nation, data.telOff, data.telRes, data.faxNbr, data.employer, data.position, 'Y', data.relation, data.image, data.primaryMember, data.email, this.mCurDate, data.insuranceNbr, data.cprNbr, data.billingCode).subscribe((res: any) => {
         console.log(res);
+        this.uploadImage();
         this.crmservice.deleteDepMembers(data.memberNo).subscribe((resp: any) => {
           console.log(resp);
           if (data.memberType === 'F') {

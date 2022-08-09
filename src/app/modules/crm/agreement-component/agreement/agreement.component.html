@@ -13,7 +13,7 @@
                         </button>
                     </div>
                     <div class="col">
-                        <button class="btn-warning btn text-white btn-block" (click)="goToSalesOrder()" title="View Sales Order">
+                        <button class="btn-warning btn text-white btn-block" (click)="goToInvoice()" title="View Invoice">
                             <mat-icon>note_add</mat-icon> 
                         </button>
                     </div>
@@ -28,7 +28,7 @@
                         </button>
                     </div>
                     <div class="col">
-                        <button class="btn-success btn btn-block" (click)="convertToSalesOrder()" title="Convert to Sales Order">
+                        <button class="btn-success btn btn-block" (click)="convertToSalesOrder()" title="Convert to Invoice">
                             <mat-icon>arrow_circle_right</mat-icon>  
                         </button>
                     </div>
@@ -50,7 +50,7 @@
                 </div>
             </div>
         </div>
-        <br>
+        <br> 
         <form [formGroup]="salesOrderForm" class="form-container">
             <div class="col-12"> 
                 <div class="form-row">
@@ -68,8 +68,8 @@
                                 </div>
                                 <div class="col-4">
                                     <mat-form-field class="full-width">
-                                        <mat-label i18n="@@CMMContactsNameFormControl">Sales Order Number</mat-label>
-                                        <input matInput formControlName="soNbr">
+                                        <mat-label i18n="@@CMMContactsNameFormControl">Invoice Number</mat-label>
+                                        <input matInput formControlName="invNbr">
                                     </mat-form-field>
                                 </div>
                                 <div class="col-4">
@@ -89,11 +89,10 @@
                                     </mat-form-field> 
                                 </div>
                                 <div class="col-4">
-                                    <mat-form-field class="full-width"> 
-                                        <mat-label i18n="@@CMMContactsMobileFormControl">Purchase Order No</mat-label>
-                                        <input matInput type="text" formControlName="purchaseOrderNo" >
-                                        <mat-error i18n="@@CMMContactsMobileFormControlError">Purchase Order No<strong>required</strong></mat-error>
-                                    </mat-form-field> 
+                                    <mat-form-field class="full-width">
+                                        <mat-label i18n="@@CMMContactsNameFormControl">Sales Order Number</mat-label>
+                                        <input matInput formControlName="soNbr">
+                                    </mat-form-field>
                                 </div>
                                 <div class="col-4">
                                     <mat-form-field class="full-width"> 
@@ -145,18 +144,18 @@
                                             <tr class="table-reflow" 
                                             style="background-color: rgb(2, 46, 82); color: white;">
                                                 <th style="width: 5%;">Code</th>
-                                                <th style="width: 15%;">Description </th>
+                                                <!-- <th style="width: 7.5%;">Description </th> -->
                                                 <th style="width: 5%;">Member</th>
-                                                <th style="width: 17.5%;">Member Name</th>
-                                                <th style="width: 10%;">From</th>
-                                                <th style="width: 10%;">To</th>                                                                                                     
-                                                <th style="width: 7.5%;">Value</th>
-                                                <th style="width: 5%;">Disc %</th>
-                                                <th style="width: 5%;">Disc</th>
+                                                <th style="width: 18%;">Member Name</th>
+                                                <th style="width: 12%;">From</th>
+                                                <th style="width: 12%;">To</th>                                                                                                     
+                                                <th style="width: 10%;">Value</th>
+                                                <th style="width: 6%;">Disc %</th>
+                                                <th style="width: 8%;">Discount</th>
                                                 <!--<th style="width: 5%;">Gross</th> -->
-                                                <th style="width: 5%;">VAT %</th>
-                                                <th style="width: 7.5%;">VAT</th>
-                                                <th style="width: 7.5%;">Gross</th>
+                                                <th style="width: 6%;">VAT %</th>
+                                                <th style="width: 8%;">VAT</th>
+                                                <th style="width: 10%;">Gross</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
@@ -174,11 +173,13 @@
                                                     (keydown.f2)="lookUpReference(i)"
                                                     (change)="getRefData(itemCode.value,i)">
                                                 </td>
+                                                <!--
                                                 <td>
                                                     <textarea  class="form-control form-control-sm" 
                                                     formControlName="srvDesc" >
                                                     </textarea>
-                                                </td>              
+                                                </td>
+                                                -->              
                                                 <td>
                                                     <input #pcode
                                                     class="form-control form-control-sm" 
@@ -394,9 +395,9 @@
                     style="width: 65vw; height: 50vh;">
                         <ng-container matColumnDef="sono">
                             <th mat-header-cell 
-                            *matHeaderCellDef> SO Number </th>
+                            *matHeaderCellDef> Agreement Number </th>
                             <td mat-cell 
-                            *matCellDef="let so"> {{ so.SONO }} </td>
+                            *matCellDef="let so"> {{ so.AGR_NO }} </td>
                         </ng-container>
                       
                         <ng-container matColumnDef="pcode">

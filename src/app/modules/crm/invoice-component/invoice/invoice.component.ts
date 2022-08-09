@@ -12,6 +12,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Console } from 'console';
+import * as XLSX from "xlsx";
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-invoice',
@@ -25,7 +27,6 @@ export class InvoiceComponent implements OnInit {
   invoiceForm: FormGroup;
   
   agrDetArr: any[] = [];
-  SOArr: any[] = [];
   invArr: any[] = [];
 
   selectedRowIndex: any = 0;
@@ -45,6 +46,8 @@ export class InvoiceComponent implements OnInit {
   mInvDisc = 0;
   mInvGTotal = 0;
 
+  mExcelData: any;
+
   utc = new Date();
   mCurDate = this.formatDate(this.utc);
   mCYear = new Date().getFullYear();
@@ -52,15 +55,11 @@ export class InvoiceComponent implements OnInit {
   invReportApiUrl: string = "";
   invReportName: string = "";
 
-  @ViewChild('SOLookUpDialouge') SOLookUpDialouge!: TemplateRef<any>;
   @ViewChild('InvoiceLookUpDialouge') InvoiceLookUpDialouge!: TemplateRef<any>;
   
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort: MatSort;
   @ViewChild('TABLE') table: ElementRef;
-
-  SalesOrderDisplayedColumns: string[] = ['sono', 'pcode', 'custname','refno', 'agrno', 'total'];
-  SalesOrderDataSource = new MatTableDataSource(this.SOArr);
 
   InvoiceDisplayedColumns: string[] = ['invno', 'sono', 'date', 'custname','total'];
   InvoiceDataSource = new MatTableDataSource(this.invArr);
@@ -68,10 +67,9 @@ export class InvoiceComponent implements OnInit {
   BlaDisplayedColumns: string[] = [ "desc", "name", "fromdate", "todate", "amount"];
   BlaListDataSource = new MatTableDataSource(this.agrDetArr);
 
-  constructor(private crmservice: CrmService,private dialog: MatDialog,private financeService: FinanceService,private lookupservice:LookupService,private dataSharing: DataSharingService, private route: ActivatedRoute, private router: Router) {
+  constructor(private crmservice: CrmService,private dialog: MatDialog,private financeService: FinanceService,private lookupservice:LookupService,private dataSharing: DataSharingService, private route: ActivatedRoute, private router: Router, private httpClient: HttpClient) {
     this.invoiceForm = new FormGroup({
       invNo: new FormControl('', [ Validators.required]),
-      soNo: new FormControl('', [ Validators.required]),
       agrNo: new FormControl('', [ Validators.required]),
       invDate: new FormControl('', [ Validators.required]),
       subject: new FormControl('', [ Validators.required]),
@@ -122,80 +120,6 @@ export class InvoiceComponent implements OnInit {
     });
   }
 
-  lookupSalesorder(value: string) {
-    this.selectedRowIndex = 0;
-    let dialogRef = this.dialog.open(this.SOLookUpDialouge);    
-    this.financeService.searchSalesOrderMaster(value).subscribe((res: any) => {
-      console.log(this.SOArr);
-      this.SOArr = res.recordset;
-      this.SalesOrderDataSource = new MatTableDataSource(this.SOArr);
-    }, (err: any) => {
-    })
-  }
-
-  getSalesorder(sono: any) {
-      this.financeService.getSalesOrderMaster(sono).subscribe((res: any) => {
-        console.log(res.recordset[0])
-        this.getInvoiceFromSalesOrder(res.recordset[0]);
-      }, (err: any) => {
-        
-    })
-  }
-
-  getInvoiceFromSalesOrder(salesOrder: any) {
-    let dialogRef = this.dialog.closeAll();
-    this.financeService.getSales(salesOrder.REFNO).subscribe((res: any) => {
-      this.selectInvoice(res.recordset[0]);
-    }, (err: any) => {
-      const date = this.formatDate(salesOrder.SODATE);
-      this.mAgrNo = salesOrder.QUOTNO;
-      this.mPartyName = salesOrder.CUST_NAME;
-      this.mPartyId = salesOrder.PCODE;
-      this.mPartyPhone = salesOrder.CUST_PHONE1;
-      this.mPartyAdd1 = salesOrder.CUST_ADD1;
-      this.mPartyAdd2 = salesOrder.CUST_ADD2;
-      this.mPartyAdd3 = salesOrder.CUST_ADD3;
-      this.mInvTotal = salesOrder.TOTAL;
-      this.mInvVAT = salesOrder.VATAMT;
-      this.mInvDisc = salesOrder.DISCOUNT;
-      this.mInvGTotal = salesOrder.GTOTAL;
-      this.invoiceForm.patchValue({
-        soNo: salesOrder.SONO,
-        agrNo: salesOrder.QUOTNO,
-        invDate: date,
-        total: salesOrder.AMOUNT,
-        gtotal: salesOrder.GROSSAMOUNT,
-        discount: salesOrder.DISCOUNT,
-        vat: salesOrder.TAX_1_AMT,
-        custname: salesOrder.CUST_NAME,
-        pCode: salesOrder.PCODE,
-        add1: salesOrder.CUST_ADD1,
-        add2: salesOrder.CUST_ADD2,
-        add3: salesOrder.CUST_ADD3,
-        phoneNo: salesOrder.CUST_PHONE1,
-        remarks: salesOrder.REMARKS,
-        subject: salesOrder.SUBJECT
-      });
-      this.crmservice.getagreementDetails(this.mAgrNo).subscribe((res: any) => {
-        this.agrDetArr = res.recordset;
-        console.log(this.agrDetArr);
-        for(let i=0; i<res.recordset.length; i++) {
-          this.agrDetArr[i].FROMDT = this.formatDate(this.agrDetArr[i].FROMDT);
-          this.agrDetArr[i].TODT = this.formatDate(this.agrDetArr[i].TODT);          
-          this.crmservice.getAgreementBLA(this.mAgrNo, res.recordset[i].MEMBERCODE).subscribe((resp: any) => {
-            const blA = resp.recordset;
-            this.agrDetArr[i].blAArr = blA;
-          })
-        }
-        this.BlaListDataSource = new MatTableDataSource(this.agrDetArr);
-        this.BlaListDataSource.sort = this.sort;
-        this.BlaListDataSource.paginator = this.paginator;
-        console.log(this.agrDetArr);
-        this.toggleTableRows();
-      })
-    })
-  }
-
   getInvoice(invno: any) {
     this.financeService.getSales(invno).subscribe((res: any) => {
       console.log(res.recordset[0])
@@ -219,9 +143,9 @@ export class InvoiceComponent implements OnInit {
   selectInvoice(invoice: any) {
     let dialogRef = this.dialog.closeAll();
     const date = this.formatDate(invoice.TRN_DATE);
-    this.financeService.getSalesOrderMaster(invoice.REF_NO).subscribe((res: any) => {
+    this.crmservice.getagreementmaster(invoice.REF_NO).subscribe((res: any) => {
       console.log(res.recordset[0]);
-      this.mAgrNo = res.recordset[0].QUOTNO;
+      this.mAgrNo = res.recordset[0].AGR_NO;
       this.mPartyName = invoice.CUST_NAME;
       this.mPartyId = res.recordset[0].PCODE;
       this.mPartyPhone = res.recordset[0].CUST_PHONE1;
@@ -235,7 +159,7 @@ export class InvoiceComponent implements OnInit {
       this.invoiceForm.patchValue({
         invNo: invoice.TRN_NO,
         soNo: invoice.REF_NO,
-        agrNo: res.recordset[0].QUOTNO,
+        agrNo: invoice.REF_NO,
         invDate: date,
         total: invoice.AMOUNT,
         gtotal: invoice.GROSSAMOUNT,
@@ -258,7 +182,17 @@ export class InvoiceComponent implements OnInit {
           this.agrDetArr[i].TODT = this.formatDate(this.agrDetArr[i].TODT);          
           this.crmservice.getAgreementBLA(this.mAgrNo, res.recordset[i].MEMBERCODE).subscribe((resp: any) => {
             const blA = resp.recordset;
+            let blaList: string = "";
+            for(let j=0; j<blA.length; j++) {
+              if(blaList === ""){
+                blaList = blA[j].ServiceName;
+              } else {
+                blaList = blaList + ', ' + blA[j].ServiceName;
+              }
+            }
             this.agrDetArr[i].blAArr = blA;
+            this.agrDetArr[i].blAListArr = blaList;
+
           })
         }
         this.BlaListDataSource = new MatTableDataSource(this.agrDetArr);
@@ -281,7 +215,7 @@ export class InvoiceComponent implements OnInit {
     const year = String(this.mCYear);
     console.log(invData);
     this.financeService.getSales(invData.invNo).subscribe((res: any) => {
-      this.financeService.updateSales(year,invData.invNbr,invData.sodate,invData.pCode,invData.pCode, invData.custname, String(this.mInvGTotal), String(this.mInvDisc), String(this.mInvVAT), String(this.mInvTotal), invData.soNo, invData.subject, invData.remarks, 'DBA', this.mCurDate).subscribe((resp: any) => {
+      this.financeService.updateSales(year,invData.invNbr,invData.sodate,invData.pCode,invData.pCode, invData.custname, String(this.mInvGTotal), String(this.mInvDisc), String(this.mInvVAT), String(this.mInvTotal), invData.agrNo, invData.subject, invData.remarks, 'DBA', this.mCurDate).subscribe((resp: any) => {
         console.log(resp);
         this.financeService.updateOutstanding(year, invData.invNbr, invData.sodate, invData.pCode,'INV', String(this.mInvGTotal), invData.subject, invData.remarks).subscribe((respo: any) => {
           console.log(respo)
@@ -292,13 +226,13 @@ export class InvoiceComponent implements OnInit {
         const yearStr = String(resp.recordset[0].CYEAR).substring(2);
         this.docInvNo = resp.recordset[0].FIELD_VALUE_NM + 1;
         this.docInv = 'INV' + yearStr + '-' + this.docInvNo.toString();
-        this.financeService.postSales(year,this.docInv,this.mCurDate,invData.pCode,invData.pCode, invData.custname, String(this.mInvGTotal), String(this.mInvDisc), String(this.mInvVAT), String(this.mInvTotal), invData.soNo, invData.subject, invData.remarks, 'DBA', this.mCurDate).subscribe((resp: any) => {
+        this.financeService.postSales(year,this.docInv,this.mCurDate,invData.pCode,invData.pCode, invData.custname, String(this.mInvGTotal), String(this.mInvDisc), String(this.mInvVAT), String(this.mInvTotal), invData.agrNo, invData.subject, invData.remarks, 'DBA', this.mCurDate).subscribe((resp: any) => {
           this.financeService.postOutstanding(year, this.docInv, this.mCurDate, invData.pCode, 'INV', String(this.mInvGTotal), invData.subject, invData.remarks).subscribe((respo: any) => {
             console.log(respo);
             this.refreshForm();
             this.financeService.updateDocForInv(this.docInvNo, String(this.mCYear)).subscribe((res: any) => {
               this.financeService.setInvoice(invData.agrNo, invData.soNo, this.docInv).subscribe((respos: any) => {
-                this.getSalesorder(invData.soNo);
+                this.getInvoice(invData.docInv);
               })
             }, (err: any) => {
               console.log(err);
@@ -328,11 +262,7 @@ export class InvoiceComponent implements OnInit {
   }
   
   highlight(type: string, index: number){
-    if (type === "salesorder") {
-      if(index >= 0 && index <= this.SOArr.length - 1){
-        this.selectedRowIndex = index;
-      } 
-    } else if (type === "invoice") {
+    if (type === "invoice") {
       if(index >= 0 && index <= this.invArr.length - 1){
         this.selectedRowIndex = index;
       } 
@@ -351,10 +281,10 @@ export class InvoiceComponent implements OnInit {
     return [day, month, year].join('-');
   }
 
-  public goToSalesOrder() {
+  public goToAgreement() {
     const soData = this.invoiceForm.value;
-    var id = soData.agrNbr;
-    var myurl = `/crm/sales-order/details/${id}`;
+    var id = soData.agrNo;
+    var myurl = `/crm/agreements/details/${id}`;
     this.router.navigateByUrl(myurl).then(e => {
     });
   }
@@ -366,4 +296,48 @@ export class InvoiceComponent implements OnInit {
     })
   }
 
+  excelFunc() {
+    this.httpClient.get('assets/resources/albanderInvoice.xlsx',{responseType:'blob'}).subscribe((data: any) => {
+      const soData = this.invoiceForm.value;
+      let file = data;
+      let fileReader = new FileReader();
+      fileReader.readAsBinaryString(file);
+
+      fileReader.onload = (e) => {
+        var workBook = XLSX.read(fileReader.result, {type: 'binary'});
+        var SheetNames = workBook.SheetNames;
+        this.mExcelData = XLSX.utils.sheet_to_json(workBook.Sheets[SheetNames[1]]);
+        console.log(this.mExcelData);
+
+        this.crmservice.getPartyFromName(this.mPartyName).subscribe((res: any) => {
+          const headerData = {
+            "Pcode": res.recordset[0].pcode,
+            "Title": res.recordset[0].title_cd,
+            "Name": res.recordset[0].cust_name,
+            "Add1": res.recordset[0].add1,
+            "Add2": res.recordset[0].add2,
+            "Pobox": res.recordset[0].pobox,
+            "Country": res.recordset[0].add3,
+            "Phone": res.recordset[0].phone1,
+            "Email": res.recordset[0].email_id,
+            "PartyTitle": res.recordset[0].title_cd,
+            "PartyName": res.recordset[0].name,
+            "Invoice": soData.invNo,
+            "InvDate": soData.invDate,
+            "Agreement": soData.agrNo
+          }
+          const headerlist: any[] = [];
+          headerlist.push(headerData);
+
+          const ws1: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.agrDetArr);
+          const ws2: XLSX.WorkSheet = XLSX.utils.json_to_sheet(headerlist);
+          //XLSX.utils.book_append_sheet(workBook, ws, 'test');
+
+          workBook.Sheets["data"] = ws1;
+          workBook.Sheets["customer"] = ws2;
+          XLSX.writeFile(workBook, "Invoice.xlsx");
+        })
+      }
+    }) 
+  }
 }

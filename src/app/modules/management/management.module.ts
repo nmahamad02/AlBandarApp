@@ -4,7 +4,7 @@ import { MembersComponent } from './members/members.component';
 import { RevenuesComponent } from './revenues/revenues.component';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card'
-
+import { ChartsModule } from 'ng2-charts';
 
 export const misRoutes = [
   {
@@ -25,6 +25,7 @@ export const misRoutes = [
   imports: [
     CommonModule,
     MatCardModule,
+    ChartsModule,
     RouterModule.forChild(misRoutes)
   ]
 })

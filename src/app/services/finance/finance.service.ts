@@ -292,10 +292,11 @@ export class FinanceService {
     return this.http.post(this.url + '/coa/postagreementmaster', JSON.stringify(newTran), { headers: headers })
   }
 
-  updateAgreementMaster(argdate: string, partyid:string, pcode: string, custname: string, add1: string, add2: string, phone: string, remarks: string,editdt: string, edituser: string, agrno: string) {
+  updateAgreementMaster(quotno: string, argdate: string, partyid:string, pcode: string, custname: string, add1: string, add2: string, phone: string, remarks: string,editdt: string, edituser: string, agrno: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     const newTran = {
+      quotno : quotno,
       argdate : argdate,
       partyid: partyid,
       pcode : pcode,

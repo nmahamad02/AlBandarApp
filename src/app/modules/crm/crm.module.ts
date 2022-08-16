@@ -15,7 +15,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { InvoiceComponent } from './invoice-component/invoice/invoice.component';
-import { InvoicereportComponent } from './invoicereport/invoicereport.component'; 
+import { InvoicereportComponent } from './invoice-component/invoicereport/invoicereport.component'; 
 import { ActiveReportsModule } from '@grapecity/activereports-angular';
 import { CustomerprofileComponent } from './customerprofile-component/customerprofile/customerprofile.component';
 import { MembersComponent } from './members-component/members/members.component';
@@ -24,6 +24,7 @@ import { ReferenceComponent } from './reference-component/reference/reference.co
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ReceiptComponent } from './receipt/receipt.component';
+import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { DepartmentComponent } from './department-component/department/department.component';
 import { CostcenterComponent } from './costcenter-component/costcenter/costcenter.component';
 import { SalesOrderComponent } from './sales-order-component/sales-order/sales-order.component';
@@ -59,7 +60,7 @@ export const crmRoutes = [
     component: InvoiceComponent
   },
   {
-    path: 'invoicereport',
+    path: 'invoice/report/:id',
     component: InvoicereportComponent
   },
   {
@@ -166,6 +167,7 @@ export const crmRoutes = [
     MatDatepickerModule,
     MatNativeDateModule,
     MatTabsModule,
+    PdfViewerModule,
     AgGridModule.withComponents(),
     ReactiveFormsModule,
     ActiveReportsModule,

@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, TemplateRef, ViewChild, Inject, LOCALE_ID } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
@@ -11,9 +11,11 @@ import { FinanceService } from 'src/app/services/finance/finance.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { Console } from 'console';
 import * as XLSX from "xlsx";
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { HttpClient } from '@angular/common/http';
+import { formatCurrency, formatNumber } from '@angular/common';
 
 @Component({
   selector: 'app-invoice',
@@ -40,7 +42,9 @@ export class InvoiceComponent implements OnInit {
   mPartyAdd1: string = "";
   mPartyAdd2: string = "";
   mPartyAdd3: string = "";
+  mInvNo: string = "";
   mAgrNo: string = "";
+  mInvDate: string = "";
   mInvTotal = 0;
   mInvVAT = 0;
   mInvDisc = 0;
@@ -60,6 +64,7 @@ export class InvoiceComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort: MatSort;
   @ViewChild('TABLE') table: ElementRef;
+  @ViewChild('content') content: ElementRef;  
 
   InvoiceDisplayedColumns: string[] = ['invno', 'sono', 'date', 'custname','total'];
   InvoiceDataSource = new MatTableDataSource(this.invArr);
@@ -67,7 +72,7 @@ export class InvoiceComponent implements OnInit {
   BlaDisplayedColumns: string[] = [ "desc", "name", "fromdate", "todate", "amount"];
   BlaListDataSource = new MatTableDataSource(this.agrDetArr);
 
-  constructor(private crmservice: CrmService,private dialog: MatDialog,private financeService: FinanceService,private lookupservice:LookupService,private dataSharing: DataSharingService, private route: ActivatedRoute, private router: Router, private httpClient: HttpClient) {
+  constructor(private crmservice: CrmService,private dialog: MatDialog,private financeService: FinanceService,private lookupservice:LookupService,private dataSharing: DataSharingService, private route: ActivatedRoute, private router: Router, private httpClient: HttpClient,@Inject(LOCALE_ID) public locale: string,) {
     this.invoiceForm = new FormGroup({
       invNo: new FormControl('', [ Validators.required]),
       agrNo: new FormControl('', [ Validators.required]),
@@ -93,6 +98,8 @@ export class InvoiceComponent implements OnInit {
     this.mInvVAT = 0;
     this.mInvDisc = 0;
     this.mInvGTotal = 0;
+    this.mInvNo = "";
+    this.mInvDate = "";
     this.mAgrNo = "";
     this.mPartyName = "";
     this.mPartyPhone = "";
@@ -145,6 +152,8 @@ export class InvoiceComponent implements OnInit {
     const date = this.formatDate(invoice.TRN_DATE);
     this.crmservice.getagreementmaster(invoice.REF_NO).subscribe((res: any) => {
       console.log(res.recordset[0]);
+      this.mInvNo = invoice.TRN_NO;
+      this.mInvDate = date;
       this.mAgrNo = res.recordset[0].AGR_NO;
       this.mPartyName = invoice.CUST_NAME;
       this.mPartyId = res.recordset[0].PCODE;
@@ -296,6 +305,15 @@ export class InvoiceComponent implements OnInit {
     })
   }
 
+  public goToInvoiceReport() {
+   /* var id = this.mInvNo;
+    var myurl = `/invoice/report/${id}`;
+    console.log(myurl);
+    this.router.navigateByUrl(myurl).then(e => {
+    });*/
+    
+  }
+
   excelFunc() {
     this.httpClient.get('assets/resources/albanderInvoice.xlsx',{responseType:'blob'}).subscribe((data: any) => {
       const soData = this.invoiceForm.value;
@@ -340,4 +358,84 @@ export class InvoiceComponent implements OnInit {
       }
     }) 
   }
+
+  public SavePDF(): void {  
+    var doc = new jsPDF("portrait", "px", "a4");
+    var img = new Image()
+    img.src = 'assets/Pics/download.png';
+    doc.setFontSize(13)
+    doc.setFont('Times New Roman','bold');
+    doc.text('MEMBERSHIP ADVICE',300, 25);
+    doc.setFont(undefined,'normal');
+    doc.text('Invoice  :',300, 40);
+    doc.text(this.mInvNo,375, 40);
+    doc.text('Date     :',300, 55);
+    doc.text(this.mInvDate,375, 55);
+    doc.text('Agreement:',300, 70);
+    doc.text(this.mAgrNo,375, 70);
+    doc.addImage(img, 'png', 15, 15, 60, 60);
+    doc.line(20, 80, 425, 80); 
+    doc.setDrawColor(0);
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(20, 90, 200, 70, 5, 5, 'FD');
+    doc.setFontSize(11);
+    doc.text('To,',30, 105);
+    doc.text(this.mPartyName,30, 120);
+    doc.text(this.mPartyAdd1,30, 135);
+    //doc.text(this.mPartyAdd2,30, 150);
+    doc.text(this.mPartyPhone,30, 150);
+    const intro = `Dear ${this.mPartyName},\nWe would like to take this opportunity to thank you as one of the loyal members of Albander Hotel & Resort, and look \nforward to the same in the future. As your membership is due for renewal, please find below payment details payable \nfor the forthcoming and we would appreciate if you could kindly settle it at the earliest.`;
+    doc.text(intro,20, 175);
+    var detArr= [];
+    for(let i=0; i<this.agrDetArr.length; i++) {
+      var tempArr = [];
+      tempArr.push(this.agrDetArr[i].MEMBERCODE);
+      tempArr.push(this.agrDetArr[i].MEMBERNAME);
+      tempArr.push(this.agrDetArr[i].FROMDT);
+      tempArr.push(this.agrDetArr[i].TODT);
+      tempArr.push(this.agrDetArr[i].blAListArr);
+      tempArr.push(formatNumber(this.agrDetArr[i].VALUE1, this.locale,'1.3-3'));
+      console.log(tempArr);
+      detArr.push(tempArr);
+    }
+    autoTable(doc, {
+      startY: 215,                    
+      theme: 'grid',
+      headStyles: {
+        fillColor: [32,42,68]
+      },
+      head: [['S.No', 'Member', 'From', 'To', 'Services', 'Amount (BHD)']],
+      body: detArr,
+     // bodyStyles: {lineColor: [0, 0, 0]}
+    });
+    doc.setDrawColor(0, 0, 0);
+    doc.line(20, 350, 425, 350); 
+    doc.text('Discount    (BHD):',250, 365);
+    doc.text(String(formatNumber(this.mInvDisc, this.locale,'1.3-3')), 395, 365);
+    doc.text('Sub Total   (BHD):',250, 380);
+    var mInvSubTot = this.mInvTotal - this.mInvDisc;
+    doc.text(String(formatNumber(mInvSubTot, this.locale,'1.3-3')), 395, 380);
+    doc.text('VAT Amount  (BHD):',250, 395);
+    doc.text(String(formatNumber(this.mInvVAT, this.locale,'1.3-3')), 395, 395);
+    doc.setFont(undefined,'bold');
+    doc.line(250, 405, 425, 405); 
+    doc.text('Grand Total (BHD):',250, 420);
+    doc.text(String(formatNumber(this.mInvGTotal, this.locale,'1.3-3')), 395, 420);
+    doc.line(250, 430, 425, 430); 
+    doc.setFont(undefined,'normal');
+    doc.text("At the same time we would like to also reiterate the following:\n1. Members who wish to renew their membership are required to pay the above mentioned amount within seven days\n   after the expiry date of their membership. Failing to do so will result in cancellation of their membership. \n   In the event of late renewal,  re-joining fees will be applicable.\n2. In the event payment is made through bank transfer, the applicable bank charges will be borne by the Member.\n3. Should the Member wish to make any changes in the membership status or cancel their parking, kindly notify\n   the Membership Office prior to the expiration of the membership.\n4. Membership Promotions, if any, are subject to the respective terms & Conditions as published.",20, 440);
+    const outtro = `Dear ${this.mPartyName}, we hope that you are satisfied by the services extended to you at the Resort. Should you have any suggestions \nto offer or require any assistance, please feel free to contact the undersigned or the Membership office between \n9AM-1PM & 2PM-5PM throughout the week.`;
+    doc.text(outtro,20, 520);
+    doc.text("Thanking you once again, and assuring of our best services all the times.",20, 550);
+    doc.text("Yours Sincerely,\n\n\nAHMED MOKHTAR\nGENERAL MANAGER",20, 565);
+    doc.output('datauri');
+    doc.save(this.mInvNo + '.pdf');  
+    var string = doc.output('datauri');
+    var iframe = "<iframe width='100%' height='100%' src='" + string + "'></iframe>"
+    var x = window.open();
+    x.document.open();
+    x.document.write(iframe);
+    x.document.close();
+    this.goToInvoiceReport();
+  } 
 }

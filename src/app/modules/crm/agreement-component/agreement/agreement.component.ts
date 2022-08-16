@@ -663,7 +663,7 @@ export class AgreementComponent implements OnInit {
     this.refreshForm();
   }
 
-  convertToSalesOrder() {
+  /*convertToSalesOrder() {
     const agrData = this.salesOrderForm.value;
     this.financeService.getSalesOrderMaster(agrData.soNbr).subscribe((res: any) => {
       this.financeService.updateSOMaster(agrData.voucherNo, agrData.voucherDate, agrData.soNbr, agrData.party, agrData.customerCode, agrData.name, String(this.mAgrTotal), String(this.mAgrDisc), String(this.mAgrGTotal), String(this.mAgrVAT), agrData.add1, agrData.add2, agrData.phoneNo, agrData.subject, this.mCurDate, 'DBA').subscribe((resp: any) => {
@@ -698,7 +698,7 @@ export class AgreementComponent implements OnInit {
         console.log(error);
       })
     });
-  }
+  }*/
 
   convertToInvoice() {
     const soData = this.salesOrderForm.value;

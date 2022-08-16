@@ -722,7 +722,7 @@ export class FinanceService {
     return this.http.post(this.url + '/coa/postSales', JSON.stringify(newTran), { headers: headers })
   }
 
-  updateSales(year: string, invno: string, invdate: string, partyId: string, custCode: string, custName: string, gtotal: string, discount: string, vatAmt: string, amount: string, sono: string, subject: string, remarks: string, edituser: string, editdt: string) {
+  updateSales(year: string, invno: string, invdate: string, partyId: string, custCode: string, custName: string, gtotal: string, discount: string, vatAmt: string, amount: string, sono: string, subject: string, remarks: string, edituser: string, editdate: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
       const newTran = {
@@ -740,7 +740,7 @@ export class FinanceService {
         subject: subject,
         remarks: remarks,
         edituser: edituser,
-        editdt: editdt
+        editdate: editdate
       }
       return this.http.post(this.url + '/coa/updateSales', JSON.stringify(newTran), { headers: headers })
   }

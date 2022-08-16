@@ -8,7 +8,7 @@
             <div class="col-9">
                 <div class="row">
                     <div class="col"> <!-- [routerLinkActive]="['active']" [routerLink]="['/crm/invoicereport']" (click)="setReportData(invReportApiUrl, invReportName)" -->
-                        <button class="btn-secondary btn btn-block" (click)="excelFunc()" title="Print invoice">  
+                        <button class="btn-secondary btn btn-block" (click)="SavePDF()" title="Print invoice">  
                             <mat-icon>print</mat-icon>
                         </button>
                     </div>
@@ -103,61 +103,61 @@
                 <hr>
             </div>
             
-            <div class="col-12">
-                <mat-table [dataSource]="BlaListDataSource" matTableExporter #exporter="matTableExporter" class="mat-table" matSort matSortDisableClear [multiTemplateDataRows]="true">
+            <div class="col-12" id="content" #content>
+                <div id="content" #content>
+
+                    <mat-table [dataSource]="BlaListDataSource" matTableExporter #exporter="matTableExporter" class="mat-table" matSort matSortDisableClear [multiTemplateDataRows]="true">
                     
-                    <ng-container matColumnDef="desc">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header>Description </mat-header-cell>
-                        <mat-cell *matCellDef="let row" (click)="onViewCellClicked(row)"> {{ row.DESCRIPTION }} </mat-cell>
-                    </ng-container>          
-                    <ng-container matColumnDef="name">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
-                        <mat-cell *matCellDef="let row" (click)="onViewCellClicked(row)"> {{ row.MEMBERNAME }}</mat-cell>
-                    </ng-container>            
-                    <ng-container matColumnDef="fromdate">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> From Date </mat-header-cell>
-                        <mat-cell *matCellDef="let row">  {{ row.FROMDT }} </mat-cell>
-                    </ng-container>
-                    <ng-container matColumnDef="todate">
-                       <mat-header-cell *matHeaderCellDef mat-sort-header> To Date </mat-header-cell>
-                       <mat-cell *matCellDef="let row"> {{ row.TODT }} </mat-cell>
-                    </ng-container>
-                    <ng-container matColumnDef="amount">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> Amount </mat-header-cell>
-                        <mat-cell *matCellDef="let row">BHD {{ row.AMOUNT }} </mat-cell>
-                     
-                    </ng-container>
-                    <ng-container matColumnDef="expandedDetail">
-                        <mat-cell class="nested-detail-row-cell-narrow" *matCellDef="let row;">
-                            <div class="detail-row-container" [@detailExpand]="row.isExpanded ? 'expanded' : 'collapsed'">
-                                <div class="detail-cell-container">
-                                    <div class="detail-cell-content">
-                                        <b>Services :</b>
-                                    </div>
-                                    <div class="detail-cell-content">
-                                        <br>
-                                        <table class="table table-responsive">
-                                            <tr>
-                                                <th>Code</th>
-                                                <th>Name</th>
-                                                <th>Price</th>
-                                            </tr>
-                                            <tr *ngFor="let srv of row.blAArr">
-                                                <td>{{ srv.SERVICENO }}</td>
-                                                <td>{{ srv.ServiceName }}</td>
-                                                <td>{{ srv.MEMBERPRICE }}</td>
-                                            </tr>
-                                        </table>
+                        <ng-container matColumnDef="desc">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>Description </mat-header-cell>
+                            <mat-cell *matCellDef="let row" (click)="onViewCellClicked(row)"> {{ row.DESCRIPTION }} </mat-cell>
+                        </ng-container>          
+                        <ng-container matColumnDef="name">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
+                            <mat-cell *matCellDef="let row" (click)="onViewCellClicked(row)"> {{ row.MEMBERNAME }}</mat-cell>
+                        </ng-container>            
+                        <ng-container matColumnDef="fromdate">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> From Date </mat-header-cell>
+                            <mat-cell *matCellDef="let row">  {{ row.FROMDT }} </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="todate">
+                           <mat-header-cell *matHeaderCellDef mat-sort-header> To Date </mat-header-cell>
+                           <mat-cell *matCellDef="let row"> {{ row.TODT }} </mat-cell>
+                        </ng-container>
+                        <ng-container matColumnDef="amount">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> Amount </mat-header-cell>
+                            <mat-cell *matCellDef="let row">BHD {{ row.AMOUNT }} </mat-cell>
+                         
+                        </ng-container>
+                        <ng-container matColumnDef="expandedDetail">
+                            <mat-cell class="nested-detail-row-cell-narrow" *matCellDef="let row;">
+                                <div class="detail-row-container" [@detailExpand]="row.isExpanded ? 'expanded' : 'collapsed'">
+                                    <div class="detail-cell-container">
+                                        <div class="detail-cell-content">
+                                            <br>
+                                            <table class="table table-responsive">
+                                                <tr>
+                                                    <th>Code</th>
+                                                    <th>Name</th>
+                                                    <th>Price</th>
+                                                </tr>
+                                                <tr *ngFor="let srv of row.blAArr">
+                                                    <td>{{ srv.SERVICENO }}</td>
+                                                    <td>{{ srv.ServiceName }}</td>
+                                                    <td>{{ srv.MEMBERPRICE }}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </mat-cell>
-                    </ng-container>
-                    <mat-header-row *matHeaderRowDef="BlaDisplayedColumns;sticky: true"></mat-header-row>
-                    <mat-row *matRowDef="let row; columns: BlaDisplayedColumns;" class="student-element-row"
-                             [class.student-expanded-row]="row.isExpanded"></mat-row>
-                    <mat-row class="student-detail-row" *matRowDef="let row; columns: ['expandedDetail'];"> </mat-row>
-                </mat-table>
+                            </mat-cell>
+                        </ng-container>
+                        <mat-header-row *matHeaderRowDef="BlaDisplayedColumns;sticky: true"></mat-header-row>
+                        <mat-row *matRowDef="let row; columns: BlaDisplayedColumns;" class="student-element-row"
+                                 [class.student-expanded-row]="row.isExpanded"></mat-row>
+                        <mat-row class="student-detail-row" *matRowDef="let row; columns: ['expandedDetail'];"> </mat-row>
+                    </mat-table>
+                </div>
                 <mat-paginator #paginator [pageSize]="50" [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons>
                 </mat-paginator>
             </div>

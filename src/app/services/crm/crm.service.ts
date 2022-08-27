@@ -200,46 +200,34 @@ export class CrmService {
     })
   }
 
-  postRVsgldatatemp(year: string, vcrno: string, vochdate: string, refno: string, refdate: string, bank: string, entrytype: string, accode: string, creditbal: number,creditamount: number, debitbal: number,remarks: string) {
+  postsgldatatemp(year: string,trntype: string, dbcd: string, vcrno: string, vochdate: string, chqno: string, chqdate: string, bank: string, entrytype: string, accode: string, creditbal: number,amount: number, debitbal: number,remarks: string) {
+
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     const newTran = {
       year: year,
+      trntype: trntype,
+      dbcd: dbcd,
       vcrno: vcrno, 
       vochdate: vochdate,
-      refno: refno,
-      refdate: refdate,
+      chqno: chqno,
+      chqdate: chqdate,
       bank: bank,
       entrytype: entrytype, 
       accode: accode,
       creditbal: creditbal,
-      creditamount: creditamount,
+      amount: amount,
       debitbal: debitbal,
       remarks:remarks
     }
 
-    this.http.post(this.url + '/coa/postRVsgldatatemp', JSON.stringify(newTran), { headers: headers }).subscribe((res: any) => {
+    this.http.post(this.url + '/coa/postsgldatatemp', JSON.stringify(newTran), { headers: headers }).subscribe((res: any) => {
       console.log(res);
     })
   }
 
-  postRVOutstanding(year: string, vochno: string, vochdate: string, refno: string, refdate: string, accode: string,creditamount: number,remarks: string) {
-    const headers = new HttpHeaders().set('Content-Type', 'application/json');
-
-    const newTran = {
-      year: year,
-      vochno: vochno, 
-      vochdate: vochdate,
-      refno: refno,
-      refdate: refdate,
-      accode: accode,
-      creditamount: creditamount,
-      remarks:remarks
-    }
-
-    this.http.post(this.url + '/coa/postRVoustsanding', JSON.stringify(newTran), { headers: headers }).subscribe((res: any) => {
-      console.log(res);
-    })
+  deleteSGLDataTemp(year: string, trnno: string) {    
+    return this.http.get(this.url + '/crm/deleteSGLDataTemp/'+ trnno + '/' + year)
   }
 
   postNewMember(membno: string,refmembno:string,title: string, firstName: string, surName: string, memberType: string, birthDate: string, maritalStatus: string, add1: string, add2: string, add3: string, nationality: string, telOff: string, telRes: string, faxNbr: string, employer: string, position: string, isPrimary: string, relation: string, image: string, primaryMember: string, email: string, createdDate: string, insuranceNbr: string, cprNbr: string, accode: string) {

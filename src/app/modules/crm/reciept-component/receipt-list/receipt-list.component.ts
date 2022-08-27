@@ -9,14 +9,14 @@ import * as XLSX from 'xlsx';
 import { Router } from "@angular/router";
 
 @Component({
-  selector: 'app-sales-order-list',
-  templateUrl: './sales-order-list.component.html',
-  styleUrls: ['./sales-order-list.component.scss']
+  selector: 'app-receipt-list',
+  templateUrl: './receipt-list.component.html',
+  styleUrls: ['./receipt-list.component.scss']
 })
-export class SalesOrderListComponent implements OnInit {
+export class ReceiptListComponent implements OnInit {
   searchValue: any;
-  salesOrderList: any[] = [];
-  salesOrderListDataSource = new MatTableDataSource(this.salesOrderList);
+  receiptList: any[] = [];
+  receiptListDataSource = new MatTableDataSource(this.receiptList);
   columns: any[];
 
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
@@ -24,15 +24,16 @@ export class SalesOrderListComponent implements OnInit {
   @ViewChild('TABLE') table: ElementRef;
 
   constructor(private crmservices: CrmService, private router: Router, private financeService: FinanceService) {
-    this.columns = ["SONO", "QUOTNO", "SODATE", "CUST_NAME", "Actions"];
+    this.columns = ["custcode", "custname", "recno", "recdt", "recamount", "Actions"];
   }
 
   ngOnInit(): void {
-    this.financeService.getAllSalesOrders().subscribe((res: any) => {
-      this.salesOrderList = res.recordset;
-      this.salesOrderListDataSource = new MatTableDataSource(this.salesOrderList);
-      this.salesOrderListDataSource.sort = this.sort;
-      this.salesOrderListDataSource.paginator = this.paginator;
+    this.financeService.getAllReceipts().subscribe((res: any) => {
+      this.receiptList = res.recordset;
+      console.log(this.receiptList);
+      this.receiptListDataSource = new MatTableDataSource(this.receiptList);
+      this.receiptListDataSource.sort = this.sort;
+      this.receiptListDataSource.paginator = this.paginator;
     }, (error: any) => {
       console.log(error);
     });
@@ -47,14 +48,13 @@ export class SalesOrderListComponent implements OnInit {
     XLSX.writeFile(wb, 'SheetJS.xlsx');
   }
 
-  quickSalesOrderSearch() {
-    this.salesOrderListDataSource.filter = this.searchValue.trim().toLowerCase();
+  quickReceiptSearch() {
+    this.receiptListDataSource.filter = this.searchValue.trim().toLowerCase();
   }
 
-  public gotoSODetails(url, id) {
+  public gotoReceiptDetails(url, id) {
     var myurl = `${url}/${id}`;
     this.router.navigateByUrl(myurl).then(e => {
     });
   }
-
 }

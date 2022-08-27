@@ -43,7 +43,7 @@
 
         <ng-container matColumnDef="AGR_DATE">
           <mat-header-cell *matHeaderCellDef mat-sort-header> Date </mat-header-cell>
-          <mat-cell *matCellDef="let row"> {{ row.AGR_DATE }} </mat-cell>
+          <mat-cell *matCellDef="let row"> {{ row.AGR_DATE | date: 'dd-MM-yyyy'  }} </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="CUST_NAME">

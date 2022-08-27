@@ -1,6 +1,7 @@
 import { VIRTUAL_SCROLL_STRATEGY } from '@angular/cdk/scrolling';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { registerFont } from '@grapecity/activereports/core';
 
 @Injectable({
   providedIn: 'root'
@@ -173,6 +174,10 @@ export class FinanceService {
     return this.http.get(this.url + '/coa/getDocForInv/' + year)
   }
 
+  getDocForRvc(year: string) {
+    return this.http.get(this.url + '/coa/getRVDocNO/' + year)
+  }
+
   checkAgreement(agrno: string) {
     return this.http.get(this.url + '/coa/checkAgreement/'+ agrno)
   }
@@ -226,9 +231,7 @@ export class FinanceService {
       year: year, 
     }
 
-    this.http.post(this.url + '/coa/updateNewRVDocNO', JSON.stringify(newTran), { headers: headers }).subscribe((res: any) => {
-      console.log(res);
-    })
+    return this.http.post(this.url + '/coa/updateNewRVDocNO', JSON.stringify(newTran), { headers: headers })
   }
 
   postAddeptarmentmaster(compcode: string, deptid: string, prefix: string, deptname: string, lastno: string, active: string, expensetype: string, user: string, date: string) {
@@ -691,6 +694,30 @@ export class FinanceService {
     return this.http.get(this.url + '/coa/getSalesFromSono/'+ sono)
   }
 
+  getAllReceipts() {
+    return this.http.get(this.url + '/coa/getAllReceipts')
+  }
+
+  getReceipt(recno:string) {
+    return this.http.get(this.url + '/coa/getReceipt/'+ recno)
+  }  
+  
+  searchReceipts(recno:string) {
+    return this.http.get(this.url + '/coa/searchReceipts/'+ recno)
+  }  
+
+  getReceiptFromCustCode(custcode:string) {
+    return this.http.get(this.url + '/coa/getReceiptFromCustCode/'+ custcode)
+  }  
+
+  getUnallocatedInvoice(custcode:string) {
+    return this.http.get(this.url + '/coa/getUnallocatedInvoice/'+ custcode)
+  }  
+
+  getPartiallyAllocatedInvoice(custcode: string, recno:string) {
+    return this.http.get(this.url + '/coa/getPartiallyAllocatedInvoice/'+ custcode + '/' + recno)
+  }  
+
   getSalesFromPcode(pCode:string) {
     return this.http.get(this.url + '/coa/getSalesFromPcode/'+ pCode)
   }
@@ -745,7 +772,7 @@ export class FinanceService {
       return this.http.post(this.url + '/coa/updateSales', JSON.stringify(newTran), { headers: headers })
   }
 
-  postOutstanding(year: string, invno: string, invdate: string, custCode: string, dbcd: string, amount: string, subject: string, remarks: string) {
+  postOutstanding(year: string, invno: string, invdate: string, custCode: string, dbcd: string, refno: string, refdate: string, amount: string, refamount: string, subject: string, remarks: string, paymenttype: string, bank: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
       const newTran = {
@@ -754,14 +781,19 @@ export class FinanceService {
         invdate: invdate,
         custCode: custCode,
         dbcd: dbcd,
+        refno : refno,
+        refdate: refdate,
+        refamount: refamount,
         subject: subject,
         remarks: remarks,
+        paymenttype:paymenttype,
+        bank: bank,
         amount: amount
       }
       return this.http.post(this.url + '/coa/postOutstanding', JSON.stringify(newTran), { headers: headers })
   }
 
-  updateOutstanding(year: string, invno: string, invdate: string, custCode: string, dbcd: string, amount: string, subject: string, remarks: string) {
+  updateOutstanding(year: string, invno: string, invdate: string, custCode: string, dbcd: string, refno: string, refdate: string, amount: string, refamount: string,  subject: string, remarks: string, paymenttype: string, bank: string) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
       const newTran = {
@@ -770,11 +802,62 @@ export class FinanceService {
         invdate: invdate,
         custCode: custCode,
         dbcd: dbcd,
+        refno : refno,
+        refdate: refdate,
+        refamount: refamount,
         subject: subject,
         remarks: remarks,
+        paymenttype:paymenttype,
+        bank: bank,
         amount: amount
       }
       return this.http.post(this.url + '/coa/updateOutstanding', JSON.stringify(newTran), { headers: headers })
   }
+
+  setAllocationReceipt(invno: string, refno: string, refdate: string, refamount: string,  subject: string, remarks: string, paymenttype: string, bank: string) {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+
+      const newTran = {
+        invno: invno,
+        refno : refno,
+        refdate: refdate,
+        refamount: refamount,
+        subject: subject,
+        remarks: remarks,
+        paymenttype: paymenttype,
+        bank: bank,
+      }
+      return this.http.post(this.url + '/coa/setAllocationReceipt', JSON.stringify(newTran), { headers: headers })
+  }
+
+  
+  resetAllocationReceipt(invno: string, refno: string, recno: string, refdate: string, refamount: string,  subject: string, remarks: string, paymenttype: string, bank: string) {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+
+      const newTran = {
+        invno: invno,
+        refno : refno,
+        recno: recno,
+        refdate: refdate,
+        refamount: refamount,
+        subject: subject,
+        remarks: remarks,
+        paymenttype: paymenttype,
+        bank: bank,
+      }
+      return this.http.post(this.url + '/coa/resetAllocationReceipt', JSON.stringify(newTran), { headers: headers })
+  }
+
+  getAllocatedReceipt(invno: string, refno:string) {
+    return this.http.get(this.url + '/coa/getAllocatedReceipt/'+ invno + '/' + refno)
+  }  
+
+  deleteFromOutstanding(refno:string) {
+    return this.http.get(this.url + '/coa/deleteFromOutstanding/'+ refno)
+  }
+
+  deleteAllocatedReceipt(invno: string, refno:string) {
+    return this.http.get(this.url + '/coa/deleteAllocatedReceipt/'+ invno + '/' + refno)
+  }  
 
 }

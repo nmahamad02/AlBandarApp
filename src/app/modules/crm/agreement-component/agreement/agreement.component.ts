@@ -706,7 +706,7 @@ export class AgreementComponent implements OnInit {
     this.financeService.getSales(soData.invNbr).subscribe((res: any) => {
       this.financeService.updateSales(year,soData.invNbr,soData.voucherDate,soData.party,soData.customerCode, soData.name, String(this.mAgrGTotal), String(this.mAgrDisc), String(this.mAgrVAT), String(this.mAgrTotal), soData.voucherNo, soData.subject, soData.subject, 'DBA', this.mCurDate).subscribe((resp: any) => {
         console.log(resp);
-        this.financeService.updateOutstanding(year, soData.invNbr, soData.voucherDate, soData.customerCode, 'INV', String(this.mAgrGTotal), soData.subject, soData.subject).subscribe((respo: any) => {
+        this.financeService.updateOutstanding(year, soData.invNbr, soData.voucherDate, soData.customerCode, 'INV', 'null', soData.voucherDate, String(this.mAgrGTotal),'null', soData.subject, soData.subject,'null','null').subscribe((respo: any) => {
           console.log(respo)
         })
       })
@@ -716,7 +716,7 @@ export class AgreementComponent implements OnInit {
         this.docInvNo = resp.recordset[0].FIELD_VALUE_NM + 1;
         this.docInv = 'INV' + yearStr + '-' + this.docInvNo.toString();
         this.financeService.postSales(year,this.docInv,this.mCurDate,soData.party,soData.customerCode, soData.name, String(this.mAgrGTotal), String(this.mAgrDisc), String(this.mAgrVAT), String(this.mAgrTotal), soData.voucherNo, soData.subject, soData.subject, 'DBA', this.mCurDate).subscribe((resp: any) => {
-          this.financeService.postOutstanding(year, this.docInv, this.mCurDate, soData.customerCode, 'INV', String(this.mAgrGTotal), soData.subject, soData.subject).subscribe((respo: any) => {
+          this.financeService.postOutstanding(year, this.docInv, this.mCurDate, soData.customerCode, 'INV','null', this.mCurDate, String(this.mAgrGTotal), 'null', soData.subject, soData.subject,'null','null').subscribe((respo: any) => {
             console.log(respo);
             this.refreshForm();
             this.financeService.updateDocForInv(this.docInvNo, String(this.mCYear)).subscribe((res: any) => {

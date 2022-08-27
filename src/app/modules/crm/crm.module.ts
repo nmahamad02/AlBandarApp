@@ -23,17 +23,15 @@ import { MembershipComponent } from './membership/membership.component';
 import { ReferenceComponent } from './reference-component/reference/reference.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
-import { ReceiptComponent } from './receipt/receipt.component';
+import { ReceiptComponent } from './reciept-component/receipt/receipt.component';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { DepartmentComponent } from './department-component/department/department.component';
 import { CostcenterComponent } from './costcenter-component/costcenter/costcenter.component';
-import { SalesOrderComponent } from './sales-order-component/sales-order/sales-order.component';
 import { AgreementComponent } from './agreement-component/agreement/agreement.component';
 import { AgreementListComponent } from './agreement-component/agreement-list/agreement-list.component';
 import { ContactsListComponent } from './contacts-component/contacts-list/contacts-list.component';
 import { MembersListComponent } from './members-component/members-list/members-list.component';
 import { ReferenceListComponent } from './reference-component/reference-list/reference-list.component';
-import { SalesOrderListComponent } from './sales-order-component/sales-order-list/sales-order-list.component';
 import { CostcenterListComponent } from './costcenter-component/costcenter-list/costcenter-list.component';
 import { DepartmentListComponent } from './department-component/department-list/department-list.component';
 import { InvoiceListComponent } from './invoice-component/invoice-list/invoice-list.component';
@@ -41,6 +39,8 @@ import { CustomerprofileListComponent } from './customerprofile-component/custom
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from "@angular/material/sort";
 import { MatTableExporterModule } from 'mat-table-exporter';
+import { ReceiptListComponent } from './reciept-component/receipt-list/receipt-list.component';
+import { ReceiptAllocationComponent } from './reciept-component/receipt-allocation/receipt-allocation.component';
 
 export const crmRoutes = [
   {
@@ -80,16 +80,24 @@ export const crmRoutes = [
     component: MembersComponent
   },
   {
+    path: 'receipt',
+    component: ReceiptListComponent
+  },
+  {
+    path: 'receipt/details/:id',
+    component: ReceiptComponent
+  },
+  {
+    path: 'receipt/details/:id/allocation',
+    component: ReceiptAllocationComponent
+  },
+  {
     path: 'reference',
     component: ReferenceListComponent
   },
   {
     path: 'reference/details/:id',
     component: ReferenceComponent
-  },
-  {
-    path: 'receipt',
-    component: ReceiptComponent
   },
   {
     path: 'department',
@@ -106,14 +114,6 @@ export const crmRoutes = [
   {
     path: 'costcenter/details/:id',
     component: CostcenterComponent
-  },
-  {
-    path: 'sales-order',
-    component: SalesOrderListComponent
-  },
-  {
-    path:'sales-order/details/:id',
-    component: SalesOrderComponent
   },
   {
     path: "agreements",
@@ -135,19 +135,19 @@ export const crmRoutes = [
     MembershipComponent,
     ReferenceComponent,
     ReceiptComponent,
+    ReceiptListComponent,
     DepartmentComponent,
     CostcenterComponent,
-    SalesOrderComponent,
     AgreementComponent,
     AgreementListComponent,
     ContactsListComponent,
     MembersListComponent,
-    SalesOrderListComponent,
     ReferenceListComponent,
     CostcenterListComponent,
     DepartmentListComponent,
     InvoiceListComponent,
-    CustomerprofileListComponent
+    CustomerprofileListComponent,
+    ReceiptAllocationComponent
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }
